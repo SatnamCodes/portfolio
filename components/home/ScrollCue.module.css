@@ -1,0 +1,43 @@
+.cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  transition:
+    opacity 400ms var(--ease-out),
+    visibility 0s linear 0s;
+}
+
+.cue[data-hidden] {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 400ms var(--ease-out),
+    visibility 0s linear 400ms;
+}
+
+.arrow {
+  fill: none;
+  stroke: var(--color-ink-faint);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: drift 2.8s var(--ease-out) infinite;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  55% {
+    transform: translateY(6px);
+    opacity: 0.55;
+  }
+}

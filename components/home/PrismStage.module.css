@@ -1,0 +1,107 @@
+.figure {
+  position: relative;
+}
+
+.frame {
+  position: relative;
+  height: clamp(16rem, 48svh, 24rem);
+  overflow: hidden;
+}
+
+.illustration,
+.canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.canvas {
+  animation: develop 900ms var(--ease-out) both;
+}
+
+/* Horizontal drags reach the beam; vertical drags keep scrolling the page. */
+.canvas canvas {
+  touch-action: pan-y;
+}
+
+@keyframes develop {
+  from {
+    opacity: 0;
+  }
+}
+
+.note {
+  padding: var(--space-md) var(--gutter) 0;
+}
+
+.interests {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  padding: var(--space-md) var(--gutter) 0;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+@media (min-width: 48rem) {
+  .frame {
+    height: clamp(17rem, 44svh, 42rem);
+  }
+
+  /* Left of the prism, below the incoming beam. */
+  .note {
+    position: absolute;
+    top: 62%;
+    left: 12%;
+    padding: 0;
+  }
+
+  .interests {
+    position: absolute;
+    inset: 0;
+    display: block;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .interests li {
+    position: absolute;
+    left: 74%;
+    top: 50%;
+    padding-left: 0.875rem;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    transition:
+      top 700ms var(--ease-out),
+      opacity 400ms var(--ease-out);
+  }
+
+  /* Hidden visually (not from assistive tech) until the bands have been laid out. */
+  .interests:not([data-positioned]) li {
+    opacity: 0;
+  }
+}
+
+/* Intro: each interest appears as its band of light reaches it (the spectrum arrives at ~1.45–2.65s). */
+.interests[data-labels="waiting"] li {
+  opacity: 0;
+}
+
+.interests[data-labels="playing"] li {
+  animation: label-in 700ms var(--ease-out) both;
+  animation-delay: calc(1.9s + var(--i, 0) * 110ms);
+}
+
+@keyframes label-in {
+  from {
+    opacity: 0;
+    transform: translate(-6px, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}

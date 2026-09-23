@@ -1,0 +1,120 @@
+.page {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--space-xxxl);
+}
+
+/* Leaves scattered on a desk; underneath, an ordinary ordered list. */
+.desk {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.leaf {
+  position: relative;
+  padding: var(--space-md) var(--space-md) var(--space-lg);
+  background: var(--color-paper-deep);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-espresso) 14%, transparent);
+  transform: rotate(var(--tilt));
+}
+
+.leaf:nth-child(even) {
+  margin-left: var(--space-md);
+}
+
+.date {
+  display: block;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.link {
+  display: block;
+  margin-top: var(--space-xs);
+  font-family: var(--font-fountain);
+  font-size: clamp(1.35rem, 1.2rem + 0.5vw, 1.6rem);
+  line-height: 1.6;
+  color: var(--color-espresso);
+  text-decoration: none;
+}
+
+.link[data-untitled] {
+  font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem);
+  color: var(--color-espresso-tint-1);
+}
+
+/* Whole leaf is the hit area. */
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.leaf:has(.link:focus-visible) {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 4px;
+}
+
+.leaf:hover .link,
+.link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-espresso-tint-3);
+  text-underline-offset: 0.3em;
+}
+
+.preview {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  font-family: var(--font-fountain);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--color-espresso-tint-1);
+  transition:
+    max-height 500ms var(--ease-out),
+    opacity 400ms var(--ease-out),
+    margin-top 500ms var(--ease-out);
+}
+
+.leaf:hover .preview,
+.leaf:focus-within .preview {
+  max-height: 8em;
+  opacity: 1;
+  margin-top: var(--space-xs);
+}
+
+.mark {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  color: var(--color-espresso-tint-2);
+  transform: rotate(calc(var(--tilt) * -4));
+}
+
+@media (min-width: 64rem) {
+  .desk {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-lg);
+    row-gap: var(--space-xl);
+    align-items: start;
+  }
+
+  .leaf {
+    grid-column: var(--col);
+    margin-top: var(--drop);
+  }
+
+  .leaf:nth-child(even) {
+    margin-left: 0;
+  }
+}

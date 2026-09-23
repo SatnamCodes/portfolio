@@ -1,0 +1,55 @@
+/* Mirrors lib/tokens.ts — keep both in sync. */
+:root {
+  --color-espresso: #3e2723;
+  --color-espresso-tint-1: #5d4037;
+  --color-espresso-tint-2: #7d6055;
+  --color-espresso-tint-3: #bcaaa4;
+  --color-sea-sand: #fff4e4;
+  --color-sea-sand-shade-1: #f5e6cc;
+  --color-sea-sand-shade-2: #e8d3ac;
+
+  --color-ink: var(--color-espresso);
+  --color-ink-muted: var(--color-espresso-tint-1);
+  --color-ink-faint: var(--color-espresso-tint-2);
+  --color-rule: var(--color-espresso-tint-3);
+  --color-paper: var(--color-sea-sand);
+  --color-paper-deep: var(--color-sea-sand-shade-1);
+
+  /* Prism only. Not for UI. */
+  --spectrum-red: #ff3b30;
+  --spectrum-orange: #ff9500;
+  --spectrum-yellow: #ffcc00;
+  --spectrum-green: #34c759;
+  --spectrum-blue: #0a84ff;
+  --spectrum-indigo: #5e5ce6;
+  --spectrum-violet: #af52de;
+
+  --type-display-hero: clamp(3.5rem, 1.9rem + 6.8vw, 8rem);
+  --type-display-xl: clamp(2.75rem, 1.6rem + 4.9vw, 4.5rem);
+  --type-display-lg: clamp(2.125rem, 1.5rem + 2.7vw, 3rem);
+  --type-display-md: clamp(1.75rem, 1.4rem + 1.5vw, 2.25rem);
+  --type-body-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+  --type-body-md: 1.0625rem;
+  --type-body-sm: 0.9375rem;
+  --type-meta: 0.8125rem;
+  --type-meta-sm: 0.6875rem;
+
+  --leading-display: 1.08;
+  --leading-body: 1.65;
+  --leading-meta: 1.4;
+  --tracking-meta: 0.08em;
+
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-xxl: 6rem;
+  --space-xxxl: 9rem;
+
+  --measure: 36em;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 3rem);
+  --page-max: 90rem;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}

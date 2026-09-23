@@ -1,0 +1,26 @@
+.intro {
+  padding-block: var(--space-xxl) var(--space-xl);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-display-xl);
+  line-height: var(--leading-display);
+}
+
+.meta {
+  margin-top: var(--space-sm);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.empty {
+  max-width: var(--measure);
+  padding-block: var(--space-lg) var(--space-xxl);
+  font-style: italic;
+  color: var(--color-ink-muted);
+}

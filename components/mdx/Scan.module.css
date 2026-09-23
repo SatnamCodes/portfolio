@@ -1,0 +1,35 @@
+.scan {
+  break-inside: avoid;
+}
+
+.scan img {
+  width: 100%;
+  height: auto;
+  box-shadow: 0 1px 0 var(--color-rule);
+}
+
+.transcription {
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--type-body-sm);
+}
+
+.transcription summary {
+  cursor: pointer;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.formula {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.15em;
+  text-align: center;
+  break-inside: avoid;
+}

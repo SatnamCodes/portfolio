@@ -1,0 +1,91 @@
+.entry {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding: var(--space-xxl) var(--gutter);
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.kicker,
+.navLabel,
+.nav {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.kicker a {
+  text-decoration-color: var(--color-rule);
+}
+
+.title {
+  margin-top: var(--space-md);
+  max-width: 18em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-display-lg);
+  line-height: var(--leading-display);
+}
+
+.nav ol {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+}
+
+.nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+  color: var(--color-ink-muted);
+}
+
+.nav a:hover {
+  color: var(--color-ink);
+  text-decoration: underline;
+}
+
+.navLabel {
+  font-size: var(--type-meta-sm);
+  color: var(--color-ink-faint);
+}
+
+/* Research sets its own measure: the label column sits inside it. */
+.body {
+  max-width: 48rem;
+  font-size: var(--type-body-md);
+}
+
+.body > * + * {
+  margin-top: 0;
+}
+
+@media (min-width: 64rem) {
+  .entry[data-nav] {
+    grid-template-columns: 12rem minmax(0, 1fr);
+    column-gap: var(--space-xl);
+  }
+
+  .header {
+    grid-column: 1 / -1;
+  }
+
+  .nav {
+    position: sticky;
+    top: var(--space-lg);
+    align-self: start;
+  }
+
+  .nav ol {
+    flex-direction: column;
+  }
+
+  .nav a {
+    min-height: 2.25rem;
+  }
+}

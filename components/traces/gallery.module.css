@@ -1,0 +1,170 @@
+.gallery {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.figure {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--color-paper-deep);
+  cursor: zoom-in;
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 4px;
+}
+
+.thumbImage,
+.thumbImage img {
+  width: 100%;
+  height: auto;
+}
+
+.details {
+  max-width: 28rem;
+}
+
+.caption {
+  font-style: italic;
+  font-size: var(--type-body-sm);
+  color: var(--color-ink);
+}
+
+.meta {
+  margin-top: 0.2rem;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.more {
+  margin-top: var(--space-xl);
+  text-align: center;
+}
+
+.control {
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  text-underline-offset: 0.35em;
+}
+
+.control:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Viewer: the photograph alone on Espresso, metadata as a quiet caption line. */
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  color: var(--color-sea-sand);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-espresso);
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+}
+
+.frame {
+  position: relative;
+}
+
+.frame img {
+  object-fit: contain;
+}
+
+.bar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) clamp(1rem, 4vw, 4rem) var(--space-md);
+}
+
+.viewer .caption,
+.viewer .meta {
+  color: var(--color-sea-sand);
+}
+
+.viewer .meta {
+  color: var(--color-sea-sand-shade-2);
+}
+
+.viewerDetails {
+  max-width: 40rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-left: auto;
+}
+
+.counter {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  color: var(--color-sea-sand-shade-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.viewer .control:focus-visible {
+  outline-color: var(--color-sea-sand);
+}
+
+@media (min-width: 64rem) {
+  .gallery {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-lg);
+    row-gap: var(--space-xxl);
+    align-items: start;
+  }
+
+  .item {
+    grid-column: var(--col);
+    margin-top: var(--drop);
+  }
+
+  /* Portrait features and offset singles carry their caption beside the image, at its foot. */
+  .item[data-caption-side] .figure {
+    grid-template-columns: minmax(0, 1fr) 12rem;
+    align-items: end;
+    column-gap: var(--space-md);
+  }
+}

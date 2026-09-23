@@ -1,0 +1,215 @@
+.desk {
+  display: grid;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-lg);
+  max-width: 40rem;
+}
+
+.field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.input {
+  min-height: 44px;
+  padding: 0.35rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-espresso-tint-2);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--type-body-lg);
+  color: var(--color-ink);
+}
+
+.input:focus-visible,
+.letter:focus-visible {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 4px;
+}
+
+.input[aria-invalid],
+.letter[aria-invalid] {
+  border-color: var(--color-espresso);
+  border-bottom-width: 2px;
+}
+
+/* The letter is already a sheet of paper, so becoming one is a small step. */
+.letter {
+  resize: vertical;
+  min-height: 14rem;
+  padding: 1.25rem 1.5rem;
+  border: 0;
+  border-radius: 0;
+  background: var(--color-paper-deep);
+  box-shadow: 0 1px 0 var(--color-rule);
+  font-family: var(--font-body);
+  font-size: var(--type-body-md);
+  line-height: 1.75;
+  color: var(--color-ink);
+}
+
+/* Errors are margin notes in the reader's ink, not red alert boxes. */
+.error {
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+  font-style: italic;
+  font-size: var(--type-body-sm);
+  color: var(--color-ink);
+}
+
+.error::before {
+  content: "↳" / "";
+  font-style: normal;
+  color: var(--color-ink-faint);
+}
+
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.actions {
+  display: flex;
+}
+
+.submit {
+  min-height: 48px;
+  padding: 0 1.5rem;
+  border: 1px solid var(--color-espresso);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition:
+    background-color 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+
+.submit:hover {
+  background: var(--color-espresso);
+  color: var(--color-sea-sand);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 3px;
+}
+
+.form[data-busy] .submit {
+  cursor: progress;
+}
+
+.box {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-md);
+}
+
+.letterbox {
+  width: 7.5rem;
+}
+
+.letterbox svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.status {
+  display: grid;
+  gap: 0.25rem;
+  min-height: 3.5rem;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.status:focus {
+  outline: none;
+}
+
+.status:focus-visible {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 4px;
+}
+
+.posted {
+  font-family: var(--font-display);
+  font-size: var(--type-display-md);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-ink);
+  animation: settle 600ms var(--ease-out) both;
+}
+
+.statusNote {
+  max-width: 22rem;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: var(--type-body-sm);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* Reduced motion: one brief cross-fade of the form while the letter is sent. */
+.desk[data-reduced] .form {
+  transition: opacity 200ms linear;
+}
+
+.desk[data-reduced] .form[data-busy] {
+  opacity: 0.25;
+}
+
+@media (min-width: 64rem) {
+  .desk {
+    grid-template-columns: minmax(0, 40rem) minmax(12rem, 1fr);
+    column-gap: var(--space-xxl);
+  }
+
+  .box {
+    position: sticky;
+    top: var(--space-xl);
+    justify-items: center;
+    padding-top: var(--space-xl);
+    text-align: center;
+  }
+
+  .letterbox {
+    width: 9rem;
+  }
+
+  .status {
+    justify-items: center;
+  }
+}

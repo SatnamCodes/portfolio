@@ -1,0 +1,83 @@
+{
+  "$comment": "Traces: one object per photograph, newest first. Only 'id', 'src', 'width', 'height' and 'alt' are required.",
+  "photos": [
+    {
+      "id": "sample-01",
+      "src": "/placeholders/placeholder-01.jpg",
+      "width": 1800,
+      "height": 1200,
+      "alt": "Placeholder image 01: a soft landscape tonal gradient in brown and cream, labelled PLACEHOLDER 01.",
+      "caption": "[Sample caption.] A trace of something witnessed: placeholder only.",
+      "location": "Placeholder location",
+      "date": "2026-08-11",
+      "camera": "Sample camera",
+      "lens": "35mm f/2",
+      "exposure": "1/250 · f/5.6 · ISO 200",
+      "draft": true
+    },
+    {
+      "id": "sample-02",
+      "src": "/placeholders/placeholder-02.jpg",
+      "width": 1200,
+      "height": 1800,
+      "alt": "Placeholder image 02: a soft portrait tonal gradient in brown and cream, labelled PLACEHOLDER 02.",
+      "caption": "[Sample caption.] A portrait-orientation placeholder.",
+      "draft": true
+    },
+    {
+      "id": "sample-03",
+      "src": "/placeholders/placeholder-03.jpg",
+      "width": 1800,
+      "height": 1200,
+      "alt": "Placeholder image 03: a soft landscape tonal gradient in brown and cream, labelled PLACEHOLDER 03.",
+      "draft": true
+    },
+    {
+      "id": "sample-04",
+      "src": "/placeholders/placeholder-04.jpg",
+      "width": 1600,
+      "height": 1600,
+      "alt": "Placeholder image 04: a soft square tonal gradient in brown and cream, labelled PLACEHOLDER 04.",
+      "location": "Placeholder location",
+      "date": "2026-05-02",
+      "draft": true
+    },
+    {
+      "id": "sample-05",
+      "src": "/placeholders/placeholder-05.jpg",
+      "width": 1200,
+      "height": 1600,
+      "alt": "Placeholder image 05: a soft portrait tonal gradient in brown and cream, labelled PLACEHOLDER 05.",
+      "camera": "Sample camera",
+      "exposure": "1/60 · f/2 · ISO 800",
+      "draft": true
+    },
+    {
+      "id": "sample-06",
+      "src": "/placeholders/placeholder-06.jpg",
+      "width": 2000,
+      "height": 1000,
+      "alt": "Placeholder image 06: a soft landscape tonal gradient in brown and cream, labelled PLACEHOLDER 06.",
+      "caption": "[Sample caption.] A very wide placeholder, to test panoramic framing.",
+      "draft": true
+    },
+    {
+      "id": "sample-07",
+      "src": "/placeholders/placeholder-07.jpg",
+      "width": 1800,
+      "height": 1200,
+      "alt": "Placeholder image 07: a soft landscape tonal gradient in brown and cream, labelled PLACEHOLDER 07.",
+      "date": "2025-12-30",
+      "draft": true
+    },
+    {
+      "id": "sample-08",
+      "src": "/placeholders/placeholder-08.jpg",
+      "width": 1200,
+      "height": 1800,
+      "alt": "Placeholder image 08: a soft portrait tonal gradient in brown and cream, labelled PLACEHOLDER 08.",
+      "caption": "[Sample caption.] The last placeholder, with a caption only.",
+      "draft": true
+    }
+  ]
+}

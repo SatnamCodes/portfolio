@@ -1,0 +1,149 @@
+@import "../styles/tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--type-body-md);
+  line-height: var(--leading-body);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+canvas,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--color-espresso);
+  color: var(--color-sea-sand);
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: var(--space-sm);
+  z-index: 100;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-espresso);
+  color: var(--color-sea-sand);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+  outline-color: var(--color-sea-sand);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Page transitions (React <ViewTransition>, see components/Page.tsx).
+   The root snapshot is frozen so the masthead never flickers; only page content moves. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-old(.paper-out) {
+  animation: 140ms var(--ease-out) both paper-fade reverse;
+}
+
+::view-transition-new(.paper-in) {
+  animation:
+    260ms var(--ease-out) 80ms both paper-fade,
+    340ms var(--ease-out) both paper-wipe;
+}
+
+@keyframes paper-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes paper-wipe {
+  from {
+    clip-path: inset(0 0 0 12%);
+    transform: translateX(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.paper-out),
+  ::view-transition-new(.paper-in) {
+    animation: 120ms linear both paper-fade;
+  }
+
+  ::view-transition-old(.paper-out) {
+    animation-direction: reverse;
+  }
+}
+
+/* Quiet staggered entrance for list rows; items set --i. */
+.stagger > * {
+  animation: rise 520ms var(--ease-out) both;
+  animation-delay: calc(min(var(--i, 0), 12) * 45ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

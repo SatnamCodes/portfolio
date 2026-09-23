@@ -1,0 +1,487 @@
+.library {
+  --s: 1;
+  --row-h: 244px;
+  --plank: 20px;
+  --spine-type: 0.78rem;
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.category {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.count {
+  color: var(--color-ink-faint);
+  font-weight: 400;
+}
+
+/* The case: a back panel, and a plank under every line of books (top face, front face, grain). */
+.row {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  column-gap: 3px;
+  row-gap: var(--plank);
+  padding: var(--space-md) var(--space-md) var(--plank);
+  perspective: 900px;
+  background:
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0 var(--row-h),
+        var(--color-espresso-tint-2) var(--row-h) calc(var(--row-h) + 5px),
+        var(--color-espresso-tint-1) calc(var(--row-h) + 5px)
+          calc(var(--row-h) + var(--plank) - 2px),
+        var(--color-espresso) calc(var(--row-h) + var(--plank) - 2px)
+          calc(var(--row-h) + var(--plank))
+      )
+      0 var(--space-md) / 100% calc(var(--row-h) + var(--plank)),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 37px,
+      color-mix(in srgb, var(--color-espresso) 3.5%, transparent) 37px 38px
+    ),
+    var(--color-paper-deep);
+  border-inline: 6px solid var(--color-espresso-tint-1);
+}
+
+.row[data-empty] {
+  min-height: calc(var(--row-h) * 0.55 + var(--plank) + var(--space-md));
+  align-items: center;
+  background-size:
+    100% calc(var(--row-h) * 0.55 + var(--plank)),
+    auto,
+    auto;
+}
+
+.empty {
+  font-style: italic;
+  color: var(--color-ink-muted);
+  padding-inline: var(--space-sm);
+}
+
+.slot {
+  position: relative;
+  height: var(--row-h);
+  display: flex;
+  align-items: flex-end;
+}
+
+/* A leaning book pivots on its foot and rests its top against its left neighbour. The gap it needs
+   (height × sin of the lean) is set inline, so it touches that neighbour rather than cutting into it. */
+.slot[data-orientation="leaning"] {
+  margin-right: 3px;
+}
+
+/* Contact shadow where the book meets the plank: darkest at rest, fading as the book lifts. */
+.shadow {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: -4px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-espresso) 45%, transparent),
+    transparent
+  );
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Shadow cast on the back of the case, light from the upper left. Only transform and opacity animate. */
+.cast {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: calc(var(--w) * var(--s) * 1px);
+  height: calc(var(--h) * var(--s) * 1px);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-espresso) 70%, transparent);
+  filter: blur(5px);
+  opacity: 0.26;
+  transform: translate(5px, 4px);
+  transform-origin: 0% 100%;
+  pointer-events: none;
+}
+
+.cast[data-hidden],
+.shadow[data-hidden] {
+  visibility: hidden;
+}
+
+.book {
+  position: relative;
+  display: block;
+  width: calc(var(--w) * var(--s) * 1px);
+  height: calc(var(--h) * var(--s) * 1px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform-origin: 50% 100%;
+}
+
+.book:focus-visible {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 4px;
+}
+
+.gap {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.spine {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-espresso) 18%, transparent);
+}
+
+.spineArt {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.spine[data-flat] .band {
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  height: auto;
+}
+
+.plainTitle,
+.patch {
+  position: relative;
+  max-height: 78%;
+  max-width: 100%;
+  overflow: hidden;
+  writing-mode: vertical-rl;
+  display: flex;
+  align-items: center;
+}
+
+.spine[data-flat] .plainTitle,
+.spine[data-flat] .patch {
+  writing-mode: horizontal-tb;
+  max-width: 80%;
+}
+
+.patch {
+  padding: 0.5rem 0.2rem;
+  background: var(--color-sea-sand);
+  color: var(--color-espresso);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-espresso) 20%, transparent);
+}
+
+.spine[data-flat] .patch {
+  padding: 0.1rem 0.5rem;
+}
+
+.plainTitle[data-foil] {
+  color: var(--color-sea-sand-shade-2);
+  letter-spacing: 0.08em;
+}
+
+.spineTitle {
+  font-family: var(--font-display);
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Reading view */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: color-mix(in srgb, var(--color-sea-sand) 94%, transparent);
+}
+
+.reader {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  margin: auto;
+  width: min(68rem, 94vw);
+  height: min(46rem, 90dvh);
+  background: var(--color-sea-sand);
+  box-shadow:
+    0 0 0 1px var(--color-rule),
+    0 24px 60px -30px color-mix(in srgb, var(--color-espresso) 45%, transparent);
+  perspective: 1800px;
+}
+
+.readerInner {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-md);
+  padding: var(--space-lg) clamp(1rem, 4vw, 3.5rem) var(--space-md);
+}
+
+.coverFlap {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 50%;
+  backface-visibility: hidden;
+  pointer-events: none;
+  box-shadow: inset -6px 0 12px -8px rgb(0 0 0 / 0.4);
+}
+
+.readerHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm) var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.readerKind,
+.readerAuthor,
+.control,
+.pageOf {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.readerTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-display-md);
+  line-height: 1.1;
+  margin-top: 0.25rem;
+}
+
+.readerTitle:focus {
+  outline: none;
+}
+
+.readerAuthor {
+  margin-top: 0.35rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.readerControls {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.control {
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule);
+  text-underline-offset: 0.35em;
+}
+
+.control:hover {
+  color: var(--color-ink);
+  text-decoration-color: currentColor;
+}
+
+.control[aria-pressed="true"] {
+  color: var(--color-ink);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
+
+.control:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Paged notes: CSS columns overflow sideways; turning a page scrolls one spread. */
+.pages {
+  container-type: size;
+  overflow: hidden;
+  column-count: 1;
+  column-gap: 3rem;
+  column-fill: auto;
+  font-family: var(--font-body);
+  font-size: var(--type-body-md);
+  line-height: 1.65;
+}
+
+.pages > * + * {
+  margin-top: 1em;
+}
+
+.pages img {
+  max-height: 88cqh;
+  width: auto;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.pages pre,
+.pages code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.pages pre {
+  white-space: pre-wrap;
+  break-inside: avoid;
+  padding: 0.75rem 1rem;
+  background: var(--color-paper-deep);
+  border-left: 1px solid var(--color-rule);
+}
+
+.pages ul,
+.pages ol {
+  padding-left: 1.25em;
+}
+
+.pages h2,
+.pages h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  break-after: avoid;
+}
+
+.pages mark {
+  color: inherit;
+  background: linear-gradient(
+    transparent 52%,
+    var(--color-sea-sand-shade-2) 52% 94%,
+    transparent 94%
+  );
+}
+
+/* The gel pen: rounder, upright and even, on faintly ruled paper. Colour stays in the Espresso
+   family; the only "accent" is a highlighter wash from Sea Sand shade 2. */
+.pages[data-hand="gel"] {
+  --line: 2rem;
+  font-family: var(--font-gel);
+  font-weight: 300;
+  font-size: 1.1875rem;
+  line-height: var(--line);
+  color: var(--color-espresso-tint-1);
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(var(--line) - 1px),
+    color-mix(in srgb, var(--color-espresso-tint-3) 45%, transparent) calc(var(--line) - 1px)
+      var(--line)
+  );
+}
+
+.pages[data-hand="gel"] > * + * {
+  margin-top: var(--line);
+}
+
+.pages[data-hand="gel"] h2,
+.pages[data-hand="gel"] h3 {
+  font-family: var(--font-gel);
+  font-weight: 700;
+  font-size: 1.3rem;
+  line-height: var(--line);
+  color: var(--color-espresso);
+}
+
+.pages[data-hand="gel"] strong {
+  font-weight: 700;
+  color: var(--color-espresso);
+}
+
+.pages[data-hand="gel"] em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: var(--color-espresso-tint-2);
+  text-underline-offset: 0.25em;
+}
+
+.pageOf {
+  white-space: nowrap;
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--color-rule);
+}
+
+@media (min-width: 64rem) {
+  /* Two pages per spread, with a crease down the middle. */
+  .pages {
+    column-count: 2;
+    column-gap: 5rem;
+  }
+
+  .pages::after {
+    content: none;
+  }
+
+  .readerInner {
+    background: linear-gradient(
+      90deg,
+      transparent calc(50% - 20px),
+      color-mix(in srgb, var(--color-espresso) 6%, transparent) 50%,
+      transparent calc(50% + 20px)
+    );
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .library {
+    --s: 0.72;
+    --row-h: 176px;
+    --plank: 16px;
+    --spine-type: 0.66rem;
+  }
+
+  .row {
+    padding-inline: var(--space-xs);
+  }
+
+  .reader {
+    width: calc(100vw - 1rem);
+    height: calc(100dvh - 1rem);
+  }
+
+  .readerInner {
+    padding: var(--space-md) var(--space-sm) var(--space-sm);
+  }
+
+  .pageOf {
+    font-size: var(--type-meta-sm);
+  }
+}

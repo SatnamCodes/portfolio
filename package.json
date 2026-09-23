@@ -1,0 +1,42 @@
+{
+  "name": "portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "postbuild": "node scripts/check-drafts.mjs",
+    "publish": "node scripts/publish.mjs"
+  },
+  "dependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.3.6",
+    "@react-three/fiber": "^9.8.0",
+    "motion": "13.4.1",
+    "next": "16.3.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
+    "three": "^0.186.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.3.6",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.186.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "prettier": "^3.9.9",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "framer-motion": "13.4.1"
+  }
+}

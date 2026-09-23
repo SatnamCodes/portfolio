@@ -1,0 +1,19 @@
+.notes {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.note {
+  font-family: var(--font-fountain);
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  line-height: 1.5;
+  color: var(--color-ink-muted);
+  max-width: 16em;
+  white-space: pre-line;
+  transform: rotate(-2.5deg);
+  transform-origin: left center;
+}
+
+.note:nth-child(even) {
+  transform: rotate(1.5deg);
+}

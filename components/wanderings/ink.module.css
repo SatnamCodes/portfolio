@@ -1,0 +1,142 @@
+/* The fountain pen: La Belle Aurore plus seeded per-word variation (baseline drift, slight rotation,
+   occasional heavier or lighter ink, spacing) and per-paragraph drift. */
+.ink {
+  font-family: var(--font-fountain);
+  font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
+  line-height: 1.95;
+  color: var(--color-espresso);
+  word-spacing: 0.08em;
+}
+
+.ink > * + * {
+  margin-top: 1.1em;
+}
+
+.ink h2,
+.ink h3 {
+  font-family: var(--font-fountain);
+  font-weight: 400;
+  font-size: 1.35em;
+}
+
+.ink blockquote {
+  padding-left: 1.2em;
+  border-left: 1px solid var(--color-espresso-tint-3);
+}
+
+.word {
+  display: inline-block;
+  transform-origin: 50% 70%;
+}
+
+.w0 {
+  transform: translateY(-0.15px) rotate(0.13deg);
+  letter-spacing: 0.027em;
+}
+.w1 {
+  transform: translateY(-0.11px) rotate(0.02deg);
+  letter-spacing: 0.011em;
+}
+.w2 {
+  transform: translateY(-1.01px) rotate(0.03deg);
+  letter-spacing: 0.013em;
+  -webkit-text-stroke: 0.22px currentColor;
+  color: var(--color-espresso);
+}
+.w3 {
+  transform: translateY(0.94px) rotate(-0.89deg);
+  letter-spacing: -0.001em;
+}
+.w4 {
+  transform: translateY(-1.31px) rotate(0.68deg);
+  letter-spacing: 0.016em;
+  color: var(--color-espresso-tint-1);
+}
+.w5 {
+  transform: translateY(-1.47px) rotate(1.06deg);
+  letter-spacing: 0.028em;
+}
+.w6 {
+  transform: translateY(0.49px) rotate(0.25deg);
+  letter-spacing: -0.008em;
+}
+.w7 {
+  transform: translateY(-1.55px) rotate(0.06deg);
+  letter-spacing: -0.012em;
+  -webkit-text-stroke: 0.22px currentColor;
+  color: var(--color-espresso);
+}
+.w8 {
+  transform: translateY(-0.99px) rotate(-0.57deg);
+  letter-spacing: -0.014em;
+}
+.w9 {
+  transform: translateY(-0.12px) rotate(-0.13deg);
+  letter-spacing: 0.023em;
+  color: var(--color-espresso-tint-1);
+}
+.w10 {
+  transform: translateY(0.06px) rotate(0.31deg);
+  letter-spacing: 0.007em;
+}
+.w11 {
+  transform: translateY(0.52px) rotate(-0.09deg);
+  letter-spacing: -0.002em;
+}
+
+.p0 {
+  transform: rotate(-0.35deg);
+  margin-left: 0em;
+}
+.p1 {
+  transform: rotate(0.25deg);
+  margin-left: 0.4em;
+}
+.p2 {
+  transform: rotate(-0.15deg);
+  margin-left: 0.15em;
+}
+.p3 {
+  transform: rotate(0.4deg);
+  margin-left: 0.6em;
+}
+
+.aside {
+  font-family: var(--font-fountain);
+  font-size: 0.8em;
+  line-height: 1.5;
+  color: var(--color-espresso-tint-1);
+  transform: rotate(-3deg);
+  max-width: 14em;
+}
+
+@media (min-width: 64rem) {
+  .aside {
+    float: right;
+    clear: right;
+    margin: 0 -17em 1em 1.5em;
+  }
+}
+
+/* Plain type: one switch removes the hand entirely. */
+[data-plain] .ink {
+  font-family: var(--font-body);
+  font-size: var(--type-body-lg);
+  line-height: var(--leading-body);
+  word-spacing: normal;
+}
+
+[data-plain] .word,
+[data-plain] .ink > *,
+[data-plain] .aside {
+  transform: none;
+  letter-spacing: normal;
+  -webkit-text-stroke: 0;
+  color: inherit;
+  margin-left: 0;
+}
+
+[data-plain] .aside {
+  font-family: var(--font-body);
+  font-style: italic;
+}

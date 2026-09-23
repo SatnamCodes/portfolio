@@ -1,0 +1,100 @@
+.page {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--space-xxl);
+}
+
+.year + .year {
+  margin-top: var(--space-xl);
+}
+
+.yearLabel {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-display-md);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-ink);
+}
+
+.contents {
+  list-style: none;
+  padding: 0;
+}
+
+.entry {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  padding-block: var(--space-md);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.date,
+.aside {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.aside {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-display-md);
+  line-height: 1.15;
+}
+
+.link {
+  text-decoration: none;
+}
+
+/* The whole row is the link's hit area; only the title is announced. */
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.entry:hover .link,
+.link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.link:focus-visible::after {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 2px;
+}
+
+.description {
+  margin-top: 0.35rem;
+  font-style: italic;
+  color: var(--color-ink-muted);
+  max-width: var(--measure);
+}
+
+@media (min-width: 48rem) {
+  .entry {
+    grid-template-columns: 11rem minmax(0, 1fr) 9rem;
+    gap: var(--space-lg);
+    align-items: baseline;
+  }
+
+  .aside {
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+}

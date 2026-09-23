@@ -1,0 +1,83 @@
+.page {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--space-xxl);
+}
+
+/* A notebook's margin rule runs down the left of every record. */
+.notebook {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--color-ink);
+}
+
+.record {
+  display: grid;
+  gap: var(--space-xs);
+  padding-block: var(--space-md) var(--space-lg);
+  border-bottom: 1px dashed var(--color-rule);
+}
+
+.number,
+.meta,
+.fields {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.title {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--type-body-lg);
+  line-height: 1.35;
+}
+
+.title a {
+  text-decoration-color: var(--color-rule);
+}
+
+.title a:hover {
+  text-decoration-color: currentColor;
+}
+
+.meta {
+  margin-top: 0.25rem;
+}
+
+.question {
+  margin-top: var(--space-sm);
+  max-width: var(--measure);
+  color: var(--color-ink-muted);
+}
+
+.q {
+  font-family: var(--font-display);
+  font-size: 1.25em;
+  color: var(--color-ink);
+}
+
+.fields {
+  margin-top: var(--space-sm);
+  font-size: var(--type-meta-sm);
+  color: var(--color-ink-faint);
+}
+
+@media (min-width: 48rem) {
+  .record {
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .number {
+    padding-top: 0.3rem;
+  }
+
+  .body {
+    padding-left: var(--space-lg);
+    border-left: 1px solid var(--color-rule);
+  }
+}
