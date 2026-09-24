@@ -27,7 +27,7 @@
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  height: calc(var(--frame-h) * 2 + var(--gap));
+  height: calc(var(--frame-h) + 3rem);
   perspective: 1400px;
   perspective-origin: 50% 50%;
   overflow: hidden;
@@ -126,11 +126,12 @@
 }
 
 /* Details of the centred frame, scrambling into place in the gap between the two reels. */
+/* Below the single strip. */
 .details {
-  position: absolute;
-  left: 50%;
-  top: calc(var(--details-top, 0px));
-  transform: translate(-50%, -50%);
+  position: relative;
+  justify-self: center;
+  margin-top: var(--space-sm);
+  min-height: 7.5rem;
   width: min(44rem, calc(100vw - 2 * var(--gutter)));
   pointer-events: none;
   display: grid;

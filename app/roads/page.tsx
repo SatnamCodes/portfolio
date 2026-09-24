@@ -5,6 +5,7 @@ import { pageMetadata } from "@/lib/seo";
 import { PageLink as Link } from "@/components/PageLink";
 import { Page } from "@/components/Page";
 import { EmptyState, SectionIntro } from "@/components/SectionIntro";
+import { FrostQuote } from "@/components/sketch/RoadNotTaken";
 import { formatDate, getRoads } from "@/lib/content";
 import s from "./roads.module.css";
 
@@ -36,6 +37,7 @@ export default async function RoadsPage() {
               : "Essays"
           }
         />
+        <FrostQuote />
         {roads.length === 0 ? (
           <EmptyState>No roads yet. The first one is still being walked.</EmptyState>
         ) : (

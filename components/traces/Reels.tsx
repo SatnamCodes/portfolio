@@ -250,7 +250,8 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
     if (e.button !== 0) return;
     sim.current.drag = { strip, x: e.clientX, t: e.timeStamp, v: 0, moved: 0 };
     sim.current.goal = null;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    // No pointer capture yet: capturing now would send the click to the strip instead of the
+    // photo under the mouse. It's taken once the pointer actually starts to drag (below).
     nudge();
   };
   const onPointerMove = (e: React.PointerEvent) => {
@@ -262,6 +263,8 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
     const dt = Math.max(1, e.timeStamp - d.t);
     d.v = d.v * 0.5 + ((dx * factor) / dt) * 1000 * 0.5;
     d.moved += Math.abs(dx);
+    const el = e.currentTarget as HTMLElement;
+    if (d.moved > 4 && !el.hasPointerCapture(e.pointerId)) el.setPointerCapture(e.pointerId);
     d.x = e.clientX;
     d.t = e.timeStamp;
     nudge();
@@ -317,7 +320,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
         </svg>
         {lead}
         <div ref={stage} className={s.stage}>
-          {frames.map((list, si) => (
+          {frames.slice(0, 1).map((list, si) => (
             <div
               key={si}
               ref={(el) => {

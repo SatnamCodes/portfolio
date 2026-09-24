@@ -1,0 +1,234 @@
+.resumes {
+  margin-top: var(--space-xxl);
+  scroll-margin-top: var(--space-lg);
+}
+
+.title {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-ink);
+}
+
+/* The folder, and the room above it for the sheets to pop into. */
+.stage {
+  --fw: min(22rem, 86vw);
+  --fan: 118%;
+  position: relative;
+  width: var(--fw);
+  height: calc(var(--fw) * 0.62 + 13rem);
+  margin: var(--space-lg) auto 0;
+}
+
+/* Back panel with its tab. */
+.back {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--fw) * 0.6);
+  border-radius: 4px 8px 8px 8px;
+  background: var(--color-sea-sand-shade-2);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4);
+}
+
+.back::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1.1rem;
+  width: 42%;
+  height: 1.4rem;
+  border-radius: 8px 8px 0 0;
+  background: var(--color-sea-sand-shade-2);
+}
+
+/* The sheets rest inside the folder, peeking; open, they rise and fan out. */
+.sheets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sheets li {
+  --spread: calc(var(--i) - (var(--n) - 1) / 2);
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--fw) * 0.12);
+  width: calc(var(--fw) * 0.42);
+  transform: translateX(-50%) translateX(calc(var(--spread) * 18%))
+    rotate(calc(var(--spread) * 3deg));
+  transition: transform 550ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  transition-delay: calc(var(--i) * 40ms);
+  z-index: 1;
+}
+
+.stage[data-open] .sheets li {
+  transform: translateX(-50%) translateX(calc(var(--spread) * var(--fan)))
+    translateY(calc(-12rem + (var(--spread) * var(--spread)) * 1rem))
+    rotate(calc(var(--spread) * 9deg));
+}
+
+.sheet {
+  display: block;
+  position: relative;
+  background: #fff;
+  box-shadow:
+    0 1px 3px color-mix(in srgb, var(--color-espresso) 25%, transparent),
+    0 14px 28px -18px color-mix(in srgb, var(--color-espresso) 55%, transparent);
+  transition: transform 250ms var(--ease-out);
+}
+
+.sheet img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.stage[data-open] .sheet:hover,
+.stage[data-open] .sheet:focus-visible {
+  transform: translateY(-10px) scale(1.06);
+}
+
+.sheet:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+}
+
+.tag {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.35rem 0.4rem;
+  background: var(--color-espresso);
+  color: var(--color-sea-sand);
+  font-family: var(--font-meta);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out) 200ms;
+}
+
+.stage[data-open] .tag {
+  opacity: 1;
+}
+
+/* Front panel: covers the lower part of the sheets; it's also the button. */
+.front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: calc(var(--fw) * 0.44);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.2rem;
+  border: 0;
+  border-radius: 4px 4px 8px 8px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-sea-sand-shade-1),
+    var(--color-sea-sand-shade-2)
+  );
+  box-shadow:
+    0 -1px 0 rgb(255 255 255 / 0.5) inset,
+    0 18px 30px -20px color-mix(in srgb, var(--color-espresso) 60%, transparent);
+  color: var(--color-ink);
+  cursor: pointer;
+  transform-origin: 50% 100%;
+  transition: transform 450ms var(--ease-out);
+}
+
+.stage[data-open] .front {
+  transform: perspective(700px) rotateX(-14deg);
+}
+
+.front:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.hint {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.downloads {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-lg) auto 0;
+  max-width: 44rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.downloads li {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: baseline;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-rule) 60%, transparent);
+  font-size: 0.9rem;
+}
+
+.dlRole {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.dlNote {
+  color: var(--color-ink-muted);
+}
+
+.downloads a {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+@media (max-width: 40rem) {
+  .stage {
+    --fan: 78%;
+  }
+
+  .sheets li {
+    width: calc(var(--fw) * 0.34);
+  }
+
+  .downloads li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .dlNote {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheets li,
+  .front,
+  .tag {
+    transition: none;
+  }
+}

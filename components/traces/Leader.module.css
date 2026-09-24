@@ -14,7 +14,7 @@
 
 .figure {
   width: auto;
-  height: clamp(13rem, 9rem + 14vw, 22rem);
+  height: clamp(16rem, 9rem + 21vw, 31rem);
   /* Rises out of the film on arrival, coming into focus. */
   animation: rise-from-film 1.3s var(--ease-out) 0.2s both;
 }
@@ -32,7 +32,7 @@
   align-self: center;
   margin-bottom: var(--tuck);
   font-family: var(--font-fountain);
-  font-size: clamp(1.1rem, 0.7rem + 2.2vw, 2.75rem);
+  font-size: clamp(1.45rem, 0.8rem + 3.1vw, 3.9rem);
   line-height: 1.35;
   color: var(--color-espresso);
   rotate: -4deg;

@@ -1,0 +1,32 @@
+/* Roads: the fork, with Frost above it. */
+.road {
+  margin: 0 0 var(--space-xl);
+}
+
+.quote {
+  margin: 0 auto var(--space-xl);
+  max-width: 34rem;
+  text-align: center;
+}
+
+.quote p {
+  font-family: var(--font-fountain);
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  line-height: 1.5;
+  color: var(--color-espresso);
+}
+
+.quote footer {
+  margin-top: var(--space-xs);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.roadCanvas {
+  display: block;
+  width: 100%;
+  height: clamp(15rem, 34vw, 24rem);
+}

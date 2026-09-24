@@ -1,0 +1,81 @@
+{
+  "heading": "Why I'm here",
+  "manifesto": [
+    "Some questions dont stay inside the subject you first asked them in. You start at one place and the question hits a boundary of the subject and eventually transitions to the other, and eventually you find yourself to be standing somewhere you didnt plan to be. Thats what happened to me.",
+    {
+      "heading": "THE MANY ROADS"
+    },
+    "Mathematics led me towards the structure, physics led me toward the world that structure describes, Code led me toward building things out of it and philosophy led me back to asking why it exists and what all of it means.",
+    "I pursued these more or less in parallel for a while, and strange thing is the more you dive deep in one of them the less it feels like a seperate subject, while an equation describes a law, a law describes how the thing exists, What exists can, it turns out often be written down and computed. What can be computed can eventually be built and what gets built eventually makes you ask again what it was for. The road keeps splitting while the question underneath it doesn’t.",
+    {
+      "heading": "THE QUESTION OF CONVERGENCE"
+    },
+    "So instead of staying on a single road I have tried to walk across the space where they cross, not because I wasn’t able to choose a field, but because I keep wanting to know whats visible from the point where they overlap that view doesnt exist if u stay on the same road the whole way, one of these roads it turns out, I didnt choose at all, it started before I did.",
+    "My name answers this quite well, I am Satnam, The name consists of two words “Sat” and “Nam” the words have Sanskrit and Punjabi origin, Sat in Sanskrit means “truth”, “Nam” is derived from the Sanskrit word nama meaning name. Etymologically it traces back to Sanskrit meaning “he whose name is the truth”, it evolved through old Indo-Aryan languages. In Sanskrit Sat is usually spoken alongside satya - truth, existence, what is real. For a while I took them roughly as the same word, lately i have started to think they ask two very different questions and the difference is what it matters, not as scholarship but as a way of thinking I keep coming back to.",
+    "Satya as I studied it means what is true?",
+    "Two plus two is four, thats a true statement and it stays true regardless of who is checking it, but Sat in my head asks something underneath that, what is? Not whether the statement is correct but what has to exist for the statement to mean anything at all, the things being counted the structure that lets counting work, the reality the whole system is assuming.",
+    "I am not putting this forward as a settled reading of tradition its a distinction i use because its useful to me as a way of separating “is this correct” from whats actually there. Science in its own got extraordinarily good at the first question. It seems less interested in stopping to ask the second. Philosophy does the opposite, spends most of the time on the second question and sometimes forgets to check its answers. Neither one is complete on its own. Its the same split I keep running into on the roads themselves.",
+    "The boundaries that we drew are ours, We drew them so the work would be manageable, reality was never consulted, and doesnt seem to be honoring the agreement.",
+    "Lets take a prism for symbolising the same, A beam of white light goes in as one thing, comes out as a spectrum of several. There is no painter sitting in the prism to color the light, it was already in the light but the prism separated what was already mixed together.",
+    "I have started to wonder if knowledge works a little like that, we split the world into subjects so as to study in pieces, and we get very good at our own piece, But I dont know that the split is fundamental. I suspect the deeper you go into any one discipline the closer you get to something the others are also describing, just from a different angle.",
+    "I cant prove that, its a working assumption behind most of whats on this page.",
+    "If its true its not just a fact about equations and disciplines it should hold for whatever is doing the studying.",
+    {
+      "heading": "INTELLIGENCE"
+    },
+    "People talk alot about AGI and ASI, machines whose intelligence might not stay confined to one narrow task the way most software does. The question I ask isnt how big these systems can get, it is what happens if intelligence either machine or otherwise gets better at moving between the languages we have split knowledge into? Maths turning to physics, physics to compute and computation to discovery. The discovery eventually turning to what you build, eventually the old philosophical questions back on the table.",
+    "We are looking at various signs of that intelligence arriving but I can’t really answer if we are already there or what will it look like or whether its coming soon or already arrived. The ability to move between disciplines and not losing the thread connecting them seems at minimum worth paying attention to.",
+    "That question does not stop at the level of one mind or machine, it scales up to whatever’s doing the understanding at level of whole civilisation.",
+    {
+      "heading": "CIVILISATION"
+    },
+    "The Kardashev scale ranks civilisations by how much energy they can command as a measure of power and a fairly clean one, you can point to a number.",
+    "Sometimes I wonder what a different scale wld measure, Not energy but understanding. How much can we remember ,explain and   handoff to the next person without them starting from zero. A telescope extends an eye and a lab extends senses. A computer extends calculations, and I think Artificial intelligence whatever else it ends up being will extend how much reasoning can a person do in a lifetime.",
+    {
+      "heading": "ACCESS"
+    },
+    "None of that matters much if it stays to a small number of beings in a civilisation. We used to have computers big as a room and then we sent men on the moon with a few kilobytes of ram, Now we have data centers. I wonder if we will have compute in hand once again to the level of computation we consider as industrial. So it   isnt how far a tool can reach its also how many hands it reaches. A tool that makes one person extraordinary is interesting whereas if it does the same job for a group thats the version we saw with computers.",
+    "I can’t tell how to guarantee the outcome and I dont think anyone can. But it seems worth building toward on purpose rather than assuming it happens eventually.",
+    {
+      "heading": "THIS PLACE"
+    },
+    "That is why this place exists, its not a resume, and not a conclusion because I dont have one yet, Its a record of pursuit as its happening, the ROADS are the ideas I keep following, the Research is where I test them against something real. The Shelves hold what I've read and kept. The Wanderings hold what I haven't resolved and may not for a while. The Traces hold what I happened to notice along the way. The Beginnings are the story of whoever is doing the looking. The Post is where I'd like to hear from you, if any of this overlaps with what you're working on.",
+    {
+      "heading": "DECLARATION"
+    },
+    "I dont know if these roads actually meet somewhere or if it just looks like it cause I am at a place where I can look at the horizon. But they keep pointing at each other often enough that I have stopped assuming its a coincidence. So i am going to keep following them. I will study where they lead and I will build along the way. I will change the mind when the evidence asks me to. And if I can Id like to leave the path slightly clearer for whoever comes down it after me."
+  ],
+  "manifestoIsPlaceholder": false,
+  "annotations": [
+    {
+      "id": "wanders",
+      "near": "top",
+      "text": "A mind that wanders builds anyways."
+    },
+    {
+      "id": "paths",
+      "near": "prism",
+      "text": "different paths, same light."
+    },
+    {
+      "id": "reasons",
+      "near": "corner",
+      "text": "to understand\nto build\nto explore\nto leave something behind."
+    }
+  ],
+  "interests": [
+    "Mathematics",
+    "Physics",
+    "Philosophy",
+    "Curiosity",
+    "Ideas",
+    "People",
+    "Thoughts"
+  ],
+  "path": [
+    "Bathinda",
+    "Bengaluru",
+    "World"
+  ],
+  "prismDescription": "A glass prism. A beam of white light enters from the left and leaves as seven coloured bands, red through violet, fanning out toward a list of interests."
+}

@@ -1,4 +1,5 @@
 .heatmaps {
+  margin-top: var(--space-xxl);
   display: grid;
   gap: var(--space-lg);
   margin-bottom: var(--space-xxl);

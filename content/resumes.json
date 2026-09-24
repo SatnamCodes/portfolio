@@ -1,0 +1,17 @@
+[
+  {
+    "file": "Satnam_Singh_CUDA_HPC_Infra",
+    "role": "GPU Programming · HPC",
+    "note": "CUDA kernels, Nsight profiling, memory coalescing and shared-memory tiling"
+  },
+  {
+    "file": "Satnam_Singh_AIML",
+    "role": "AI / Machine Learning",
+    "note": "PyTorch, graph neural networks, retrieval-augmented generation, agentic pipelines"
+  },
+  {
+    "file": "Satnam_Singh_Research_Academia",
+    "role": "Research · Academia",
+    "note": "Machine learning for materials science, language models and high-performance computing"
+  }
+]

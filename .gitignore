@@ -47,3 +47,20 @@ content/private/*
 
 # SEO agent history, reports and private dashboard (local only)
 .seo/
+
+# Raw source media: kept on this machine only. The site uses optimised copies in public/
+# (public/traces/photos, public/traces/video, public/post, app/opengraph-image.jpg).
+/Photography-*/
+/Photography-*.zip
+*.zip
+/traces/
+/elon-musk-marijuana.gif
+/banner.png
+/Firefly*.png
+/sources/
+
+# Editor and OS clutter
+.vscode/*
+!.vscode/extensions.json
+.idea/
+Thumbs.db

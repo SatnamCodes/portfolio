@@ -162,3 +162,17 @@
   display: inline-flex;
   align-items: center;
 }
+
+/* Contact and résumé, small, in the bottom-left corner: the page's footer, inside the ending. */
+.contact {
+  position: absolute;
+  left: var(--gutter);
+  bottom: 1.25rem;
+  z-index: 2;
+}
+
+.questions[data-reduced] .contact {
+  position: static;
+  justify-content: center;
+  margin-top: var(--space-md);
+}

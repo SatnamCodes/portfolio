@@ -20,6 +20,9 @@ html {
 
 body {
   min-height: 100dvh;
+  /* The footer sits at the bottom of the window even when a page is short. */
+  display: flex;
+  flex-direction: column;
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-body);
@@ -172,4 +175,8 @@ a {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+main {
+  flex: 1 0 auto;
 }

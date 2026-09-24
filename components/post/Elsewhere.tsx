@@ -7,10 +7,17 @@ import { asset } from "@/lib/base-path";
 
 const LINKEDIN = "https://www.linkedin.com/in/satnamcodes/";
 const X = "https://x.com/gitblamesatnam";
+const GITHUB = "https://github.com/SatnamCodes";
 const ANNOUNCEMENT = "I aM ThriLLed To AnnOunce that You are GoiNg to My LinkEdIN";
 
 // How long each send-off plays before the browser follows the link.
-const HOLD = { linkedin: 3400, x: 4200 } as const;
+const HOLD = { linkedin: 3400, x: 4200, github: 5600 } as const;
+const HREF = { linkedin: LINKEDIN, x: X, github: GITHUB } as const;
+const LABEL = {
+  linkedin: "Going to LinkedIn",
+  x: "Going to X",
+  github: "Going to GitHub",
+} as const;
 type Where = keyof typeof HOLD;
 
 // Plain links underneath: middle-click, cmd-click and no-JS all go straight there. A plain click
@@ -23,7 +30,7 @@ export function Elsewhere() {
   useEffect(() => {
     if (!leaving) return;
     goNow.current?.focus();
-    const href = leaving === "linkedin" ? LINKEDIN : X;
+    const href = HREF[leaving];
     const timer = setTimeout(() => window.location.assign(href), reduced ? 1400 : HOLD[leaving]);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setLeaving(null);
     document.addEventListener("keydown", onKey);
@@ -57,6 +64,12 @@ export function Elsewhere() {
           </svg>
           X
         </a>
+        <a href={GITHUB} className={s.button} onClick={sendOff("github")}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" className={s.icon}>
+            <path d="M12 1.5a10.5 10.5 0 0 0-3.32 20.46c.53.1.72-.23.72-.5v-1.8c-2.92.64-3.54-1.4-3.54-1.4-.48-1.22-1.17-1.54-1.17-1.54-.95-.65.08-.64.08-.64 1.05.07 1.61 1.08 1.61 1.08.94 1.6 2.46 1.14 3.06.87.1-.68.37-1.14.66-1.4-2.33-.27-4.78-1.17-4.78-5.18 0-1.14.41-2.08 1.08-2.81-.11-.27-.47-1.34.1-2.78 0 0 .88-.28 2.89 1.07a10 10 0 0 1 5.26 0c2-1.35 2.88-1.07 2.88-1.07.58 1.44.22 2.51.11 2.78.67.73 1.08 1.67 1.08 2.81 0 4.02-2.46 4.9-4.8 5.16.38.33.72.97.72 1.96v2.9c0 .28.19.61.73.5A10.5 10.5 0 0 0 12 1.5Z" />
+          </svg>
+          GitHub
+        </a>
       </div>
 
       {leaving && (
@@ -66,11 +79,11 @@ export function Elsewhere() {
           data-reduced={reduced || undefined}
           role="dialog"
           aria-modal="true"
-          aria-label={leaving === "linkedin" ? "Going to LinkedIn" : "Going to X"}
+          aria-label={LABEL[leaving]}
         >
-          {leaving === "linkedin" ? <Announcement /> : <Smoke />}
+          {leaving === "linkedin" ? <Announcement /> : leaving === "x" ? <Smoke /> : <Terminal />}
           <div className={s.actions}>
-            <a ref={goNow} href={leaving === "linkedin" ? LINKEDIN : X} className={s.go}>
+            <a ref={goNow} href={HREF[leaving]} className={s.go}>
               Go now
             </a>
             <button type="button" className={s.stay} onClick={() => setLeaving(null)}>
@@ -128,6 +141,56 @@ function Smoke() {
       {/* eslint-disable-next-line @next/next/no-img-element -- animated WebP; next/image would freeze it */}
       <img src={asset("/post/x-smoke.webp")} width={480} height={272} alt="" className={s.clip} />
       <p className={s.handle}>@gitblamesatnam</p>
+    </div>
+  );
+}
+
+// GitHub: a terminal that gits you there. Commands type themselves; output answers; the objects
+// received are contribution squares; and the last push is --force-with-love.
+const SESSION: { cmd?: string; out?: string; bar?: boolean; at: number }[] = [
+  { cmd: "git clone https://github.com/SatnamCodes", at: 0.2 },
+  { out: "Cloning into 'your-next-follow'...", at: 1.35 },
+  { out: "remote: Enumerating curiosity: done.", at: 1.6 },
+  { out: "Receiving objects: 100%", bar: true, at: 1.85 },
+  { cmd: 'git commit -m "feat: follow Satnam"', at: 2.9 },
+  { out: "[main 5a7n4m] feat: follow Satnam", at: 3.9 },
+  { cmd: "git push --force-with-love", at: 4.15 },
+  { out: "Everything up-to-date. Redirecting…", at: 5.05 },
+];
+
+function Terminal() {
+  return (
+    <div className={s.terminal} aria-hidden="true">
+      <div className={s.termBar}>
+        <span />
+        <span />
+        <span />
+        <em>satnam@github: ~</em>
+      </div>
+      <div className={s.termBody}>
+        {SESSION.map((l, i) =>
+          l.cmd ? (
+            <p
+              key={i}
+              className={s.cmd}
+              style={{ "--at": `${l.at}s`, "--n": l.cmd.length } as React.CSSProperties}
+            >
+              <b>$</b> <span>{l.cmd}</span>
+            </p>
+          ) : (
+            <p key={i} className={s.out} style={{ "--at": `${l.at}s` } as React.CSSProperties}>
+              {l.out}
+              {l.bar && (
+                <span className={s.squares}>
+                  {Array.from({ length: 21 }, (_, k) => (
+                    <i key={k} style={{ "--k": k, "--lv": (k * 7) % 4 } as React.CSSProperties} />
+                  ))}
+                </span>
+              )}
+            </p>
+          ),
+        )}
+      </div>
     </div>
   );
 }

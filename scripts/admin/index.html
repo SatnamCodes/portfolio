@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · Satnam</title>
+<style>
+  :root { --ink:#3e2723; --ink2:#5d4037; --faint:#7d6055; --rule:#bcaaa4; --paper:#fff4e4; --deep:#f5e6cc; --deeper:#e8d3ac; --ok:#2e6b3a; --bad:#9b2c1f; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 Georgia, "Iowan Old Style", serif; }
+  header { display:flex; align-items:baseline; gap:1rem; padding:1rem 1.5rem; border-bottom:1px solid var(--rule); }
+  header h1 { margin:0; font-weight:400; font-size:1.6rem; }
+  header p { margin:0; color:var(--faint); font:12px/1 system-ui, sans-serif; letter-spacing:.12em; text-transform:uppercase; }
+  .wrap { display:grid; grid-template-columns: 17rem 1fr; min-height: calc(100vh - 62px); }
+  aside { border-right:1px solid var(--rule); padding:1rem; overflow:auto; }
+  .label { font:600 11px/1 system-ui, sans-serif; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin:1.2rem 0 .5rem; }
+  .types button, .items button { display:block; width:100%; text-align:left; border:0; background:none; padding:.45rem .6rem; font:inherit; color:inherit; cursor:pointer; border-radius:4px; }
+  .types button[aria-current="true"] { background:var(--deeper); }
+  .items button { font-size:.95rem; }
+  .items button:hover, .types button:hover { background:var(--deep); }
+  .items small { display:block; color:var(--faint); font:12px/1.3 system-ui, sans-serif; }
+  .draftTag { color:var(--bad); }
+  main { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:1.5rem; padding:1.25rem 1.5rem 3rem; align-items:start; }
+  form { display:grid; gap:.9rem; }
+  label { display:grid; gap:.25rem; font:13px/1.3 system-ui, sans-serif; color:var(--ink2); }
+  input[type=text], input[type=url], input[type=number], input[type=date], select, textarea {
+    font:16px/1.5 Georgia, serif; color:var(--ink); background:#fffaf2; border:1px solid var(--rule); border-radius:4px; padding:.5rem .6rem; width:100%;
+  }
+  textarea { min-height: 8rem; resize: vertical; }
+  textarea.body { min-height: 22rem; font-family: ui-monospace, Menlo, monospace; font-size: 14px; }
+  .check { display:flex; gap:.5rem; align-items:center; }
+  .row { display:flex; gap:.6rem; flex-wrap:wrap; }
+  .btn { border:1px solid var(--ink); background:var(--ink); color:var(--paper); font:600 12px/1 system-ui, sans-serif; letter-spacing:.12em; text-transform:uppercase; padding:.75rem 1rem; border-radius:3px; cursor:pointer; }
+  .btn.ghost { background:none; color:var(--ink); }
+  .btn.danger { background:none; color:var(--bad); border-color:var(--bad); }
+  .msg { font:14px/1.4 system-ui, sans-serif; padding:.6rem .8rem; border-radius:4px; white-space:pre-wrap; }
+  .msg.ok { background:#e5f0e2; color:var(--ok); } .msg.bad { background:#f6e1dc; color:var(--bad); }
+  .preview { position:sticky; top:1rem; background:#fffaf2; border:1px solid var(--rule); border-radius:4px; padding:1.25rem 1.5rem; max-height: calc(100vh - 7rem); overflow:auto; }
+  .preview h1 { font-weight:400; font-size:2rem; line-height:1.1; margin:.2rem 0 .6rem; }
+  .preview h2 { font-weight:400; font-size:1.35rem; margin:1.4rem 0 .4rem; }
+  .preview .meta { color:var(--faint); font:12px/1.4 system-ui, sans-serif; letter-spacing:.1em; text-transform:uppercase; }
+  .preview pre { background:var(--deep); padding:.7rem; overflow:auto; font-size:13px; }
+  .preview blockquote { border-left:2px solid var(--rule); margin:0; padding-left:1rem; color:var(--ink2); }
+  .help { color:var(--faint); font:13px/1.45 system-ui, sans-serif; }
+  details { border:1px solid var(--rule); border-radius:4px; padding:.5rem .75rem; background:#fffaf2; }
+  summary { cursor:pointer; font:13px system-ui, sans-serif; }
+  .publish { margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--rule); }
+  .publish pre { font-size:12px; white-space:pre-wrap; color:var(--ink2); }
+  @media (max-width: 60rem) { .wrap { grid-template-columns:1fr; } main { grid-template-columns:1fr; } aside { border-right:0; border-bottom:1px solid var(--rule); } }
+</style>
+</head>
+<body>
+<header><h1>Admin</h1><p>Local only · nothing here is on the internet</p></header>
+<div class="wrap">
+  <aside>
+    <div class="label">Write</div>
+    <div class="types" id="types"></div>
+    <div class="label">Site text</div>
+    <div class="types" id="siteTypes">
+      <button type="button" data-site="home">Homepage</button>
+      <button type="button" data-site="newBeginnings">New Beginnings (about)</button>
+      <button type="button" data-site="resumes">Résumés</button>
+    </div>
+    <div class="label" id="listLabel">Existing</div>
+    <div class="items" id="items"></div>
+    <div class="publish">
+      <div class="label">Publish</div>
+      <p class="help">Saved changes waiting to go live:</p>
+      <pre id="changes">—</pre>
+      <label>Note for the history <input type="text" id="commitMsg" placeholder="e.g. New essay: On convergence"></label>
+      <p class="row" style="margin-top:.6rem"><button class="btn" id="publishBtn" type="button">Publish to the site</button></p>
+      <div id="publishOut"></div>
+    </div>
+  </aside>
+  <main>
+    <section>
+      <form id="form" autocomplete="off"></form>
+    </section>
+    <section class="preview" aria-label="Preview"><div id="preview"><p class="help">A preview appears here as you write.</p></div></section>
+  </main>
+</div>
+<script>
+const TOKEN = "__TOKEN__";
+const call = (name, data) => fetch(`/api/${name}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": TOKEN }, body: JSON.stringify(data ?? {}) }).then(r => r.json());
+let TYPES = {}, RESEARCH = [], current = { type: "roads", slug: null };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+// A small Markdown preview: headings, emphasis, links, lists, quotes, code. The site renders the real thing.
+function md(src) {
+  const blocks = String(src ?? "").replace(/<Field name="[a-z]+">|<\/Field>/g, "").split(/\n{2,}/);
+  return blocks.map(b => {
+    if (/^```/.test(b)) return `<pre>${esc(b.replace(/^```\w*\n?|```$/g, ""))}</pre>`;
+    let h = esc(b.trim());
+    if (!h) return "";
+    h = h.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*(?!\s)(.+?)\*/g, "$1<em>$2</em>").replace(/_(.+?)_/g, "<em>$1</em>")
+         .replace(/`(.+?)`/g, "<code>$1</code>").replace(/\[(.+?)\]\((https?:[^)]+)\)/g, '<a href="$2">$1</a>');
+    if (/^#{2,3} /.test(h)) return `<h2>${h.replace(/^#+ /, "")}</h2>`;
+    if (/^&gt; /.test(h)) return `<blockquote>${h.replace(/^&gt; /gm, "")}</blockquote>`;
+    if (/^[-*] /.test(h)) return `<ul>${h.split("\n").map(l => `<li>${l.replace(/^[-*] /, "")}</li>`).join("")}</ul>`;
+    return `<p>${h.replace(/\n/g, "<br>")}</p>`;
+  }).join("");
+}
+
+function values() {
+  const f = $("form"), v = {};
+  for (const fld of TYPES[current.type].fields) {
+    const el = f.elements[fld.name];
+    v[fld.name] = fld.type === "checkbox" ? el.checked : el.value;
+  }
+  if (TYPES[current.type].body === "research") { v.sections = {}; for (const [k] of RESEARCH) v.sections[k] = f.elements[`s_${k}`].value; }
+  else v.body = f.elements.body.value;
+  return v;
+}
+
+function preview() {
+  const v = values(), t = TYPES[current.type];
+  const meta = [v.date, v.year, v.category, v.author, v.status].filter(Boolean).join(" · ");
+  let body = t.body === "research"
+    ? RESEARCH.filter(([k]) => v.sections[k]?.trim()).map(([k, l]) => `<h2>${l}</h2>${md(v.sections[k])}`).join("")
+    : md(v.body);
+  if (v.summary) body = `<p><em>${esc(v.summary)}</em></p>` + body;
+  $("preview").innerHTML = `<p class="meta">${esc(t.label)}${v.draft ? " · draft" : ""}</p><h1>${esc(v.title || (current.type === "wanderings" ? "(untitled thought)" : "Untitled"))}</h1><p class="meta">${esc(meta)}</p>${v.description ? `<p>${esc(v.description)}</p>` : ""}${body}`;
+}
+
+function renderForm(vals = {}) {
+  const t = TYPES[current.type];
+  const today = new Date().toISOString().slice(0, 10);
+  let h = `<p class="help">${current.slug ? `Editing <strong>${esc(current.slug)}</strong>` : `New ${esc(t.label.toLowerCase())}`}. Save writes the file on this computer; Publish (left) puts saved changes on the live site.</p>`;
+  for (const f of t.fields) {
+    const v = vals[f.name] ?? (f.type === "date" ? today : f.name === "year" ? new Date().getFullYear() : "");
+    const req = f.required ? " *" : "";
+    if (f.type === "checkbox") h += `<label class="check"><input type="checkbox" name="${f.name}" ${vals[f.name] ? "checked" : ""}> ${esc(f.label)}</label>`;
+    else if (f.type === "select") h += `<label>${esc(f.label)}${req}<select name="${f.name}">${f.options.map(o => `<option ${o === v ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`;
+    else if (f.type === "textarea") h += `<label>${esc(f.label)}${req}<textarea name="${f.name}">${esc(v)}</textarea></label>`;
+    else h += `<label>${esc(f.label)}${req}<input type="${f.type === "list" ? "text" : f.type}" name="${f.name}" value="${esc(v)}"></label>`;
+  }
+  if (t.body === "research") {
+    h += `<p class="help">Fill in any sections you have; empty ones are left out. They appear in this order.</p>`;
+    for (const [k, l] of RESEARCH) h += `<details ${vals.sections?.[k] ? "open" : ""}><summary>${esc(l)}</summary><textarea name="s_${k}">${esc(vals.sections?.[k] ?? "")}</textarea></details>`;
+  } else {
+    h += `<label>${esc(t.bodyLabel ?? "Text")}<textarea class="body" name="body" placeholder="Write here. A blank line starts a new paragraph. **bold**, *italic*, ## heading, - list, [link](https://…)">${esc(vals.body ?? "")}</textarea></label>`;
+  }
+  h += `<div id="formMsg"></div><p class="row"><button class="btn" type="submit">Save</button><button class="btn ghost" type="button" id="newBtn">Start a new one</button>${current.slug ? `<button class="btn danger" type="button" id="delBtn">Delete</button>` : ""}</p>`;
+  $("form").innerHTML = h;
+  $("form").oninput = preview;
+  $("newBtn").onclick = () => { current.slug = null; renderForm(); };
+  if ($("delBtn")) $("delBtn").onclick = async () => {
+    if (!confirm(`Delete ${current.slug}? (It stays in git history.)`)) return;
+    await call("remove", current); current.slug = null; renderForm(); refresh();
+  };
+  preview();
+}
+
+const saveContent = async (e) => {
+  e.preventDefault();
+  const out = await call("save", { type: current.type, slug: current.slug, values: values() });
+  $("formMsg").innerHTML = out.ok
+    ? `<p class="msg ok">Saved to ${esc(out.path)}. Publish when you're ready.</p>`
+    : `<p class="msg bad">${out.errors.map(esc).join("\n")}</p>`;
+  if (out.ok) { current.slug = out.slug; refresh(); }
+};
+$("form").onsubmit = saveContent;
+
+async function refresh() {
+  const { items } = await call("list", { type: current.type });
+  $("listLabel").textContent = `Existing: ${TYPES[current.type].label}`;
+  $("items").innerHTML = items.map(i => `<button type="button" data-slug="${esc(i.slug)}">${esc(i.title)}<small>${esc(i.date)}${i.draft ? ' · <span class="draftTag">draft</span>' : ""}</small></button>`).join("") || `<p class="help">Nothing yet.</p>`;
+  for (const b of $("items").querySelectorAll("button")) b.onclick = async () => {
+    current.slug = b.dataset.slug; const { values } = await call("get", current); renderForm(values);
+  };
+  $("changes").textContent = (await call("status")).changes || "Nothing waiting.";
+}
+
+function renderTypes() {
+  $("types").innerHTML = Object.entries(TYPES).map(([k, t]) => `<button type="button" data-type="${k}" aria-current="${k === current.type}">${esc(t.label)}</button>`).join("");
+  for (const b of $("types").querySelectorAll("button")) b.onclick = () => { current = { type: b.dataset.type, slug: null }; for (const x of document.querySelectorAll("#siteTypes button")) x.setAttribute("aria-current", "false"); $("form").onsubmit = saveContent; renderTypes(); renderForm(); refresh(); };
+}
+
+$("publishBtn").onclick = async () => {
+  $("publishBtn").disabled = true; $("publishOut").innerHTML = `<p class="help">Checking and publishing…</p>`;
+  const out = await call("publish", { message: $("commitMsg").value.trim() });
+  $("publishOut").innerHTML = `<p class="msg ${out.ok ? "ok" : "bad"}">${out.ok ? "Published. The site rebuilds in about a minute." : "Not published."}\n${esc(out.log)}</p>`;
+  $("publishBtn").disabled = false; refresh();
+};
+
+
+// ---- Site text ----
+// Manifesto format in the box: a blank line between paragraphs; a line starting "# " is a section
+// heading. Every character inside a paragraph is kept exactly as typed.
+const manifestoToText = (items) => items.map(i => typeof i === "string" ? i : `# ${i.heading}`).join("\n\n");
+const textToManifesto = (t) => t.split(/\n[ \t]*\n/).map(b => b.replace(/^\n+|\n+$/g, "")).filter(b => b.trim()).map(b => /^# /.test(b) ? { heading: b.slice(2).trim() } : b);
+
+async function renderSite(which) {
+  current = { type: null, slug: null, site: which };
+  for (const b of document.querySelectorAll(".types button")) b.setAttribute("aria-current", String(b.dataset.site === which));
+  $("items").innerHTML = ""; $("listLabel").textContent = "";
+  const data = await call("site");
+  const f = $("form");
+  if (which === "home") {
+    const h = data.home;
+    f.innerHTML = `<p class="help">The homepage. Your manifesto is kept exactly as you type it: spelling, spacing and all.</p>
+      <label>Heading *<input type="text" name="heading" value="${esc(h.heading)}"></label>
+      <label>Manifesto (blank line between paragraphs · a line starting “# ” is a section heading)<textarea class="body" name="manifesto">${esc(manifestoToText(h.manifesto))}</textarea></label>
+      <label class="check"><input type="checkbox" name="placeholder" ${h.manifestoIsPlaceholder ? "checked" : ""}> Manifesto is still a placeholder (shown in grey italics)</label>
+      ${h.annotations.map((a, i) => `<label>Margin note: ${esc(a.near)}<textarea name="note${i}" style="min-height:4rem">${esc(a.text)}</textarea></label>`).join("")}
+      <label>The seven interests beside the prism, red → violet (comma separated) *<input type="text" name="interests" value="${esc(h.interests.join(", "))}"></label>
+      <label>Path (comma separated)<input type="text" name="path" value="${esc(h.path.join(", "))}"></label>
+      <label>Prism description (for screen readers)<textarea name="prism" style="min-height:4rem">${esc(h.prismDescription)}</textarea></label>
+      <div id="formMsg"></div><p class="row"><button class="btn" type="submit">Save</button></p>`;
+    const collect = () => ({ ...h, heading: f.elements.heading.value, manifesto: textToManifesto(f.elements.manifesto.value), manifestoIsPlaceholder: f.elements.placeholder.checked,
+      annotations: h.annotations.map((a, i) => ({ ...a, text: f.elements[`note${i}`].value })), interests: f.elements.interests.value.split(",").map(x => x.trim()).filter(Boolean),
+      path: f.elements.path.value.split(",").map(x => x.trim()).filter(Boolean), prismDescription: f.elements.prism.value });
+    const show = () => { const v = collect(); $("preview").innerHTML = `<h1>${esc(v.heading)}</h1>` + v.manifesto.map(i => typeof i === "string" ? `<p style="white-space:pre-wrap">${esc(i)}</p>` : `<p class="meta">${esc(i.heading)}</p>`).join(""); };
+    f.oninput = show; show();
+    f.onsubmit = async (e) => { e.preventDefault(); showResult(await call("saveHome", { home: collect() })); };
+  } else if (which === "newBeginnings") {
+    const nb = data.newBeginnings;
+    f.innerHTML = `<p class="help">Your story. “## Chapter title” starts a chapter (the page lists them as jump links).</p>
+      <label class="check"><input type="checkbox" name="placeholder" ${nb.isPlaceholder ? "checked" : ""}> Still a placeholder (shows a notice on the page)</label>
+      <label>Story<textarea class="body" name="body" style="min-height:30rem">${esc(nb.body)}</textarea></label>
+      <div id="formMsg"></div><p class="row"><button class="btn" type="submit">Save</button></p>`;
+    const show = () => { $("preview").innerHTML = `<h1>New Beginnings</h1>${md(f.elements.body.value)}`; };
+    f.oninput = show; show();
+    f.onsubmit = async (e) => { e.preventDefault(); showResult(await call("saveNewBeginnings", { isPlaceholder: f.elements.placeholder.checked, body: f.elements.body.value })); };
+  } else {
+    let rows = data.resumes.map(r => ({ ...r }));
+    const draw = () => {
+      f.innerHTML = `<p class="help">The résumés on the Projects page, in this order. Choose a PDF to replace one; its preview is made automatically.</p>` +
+        rows.map((r, i) => `<details open><summary>${esc(r.role || "New résumé")}</summary>
+          <label>Role *<input type="text" data-i="${i}" data-k="role" value="${esc(r.role)}"></label>
+          <label>What it covers<input type="text" data-i="${i}" data-k="note" value="${esc(r.note)}"></label>
+          <label>${r.file ? `PDF: ${esc(r.file)}.pdf (choose a file to replace it)` : "PDF *"}<input type="file" accept="application/pdf" data-i="${i}" data-k="pdf"></label>
+          <p class="row"><button class="btn ghost" type="button" data-up="${i}">Move up</button><button class="btn danger" type="button" data-del="${i}">Remove</button></p></details>`).join("") +
+        `<p class="row"><button class="btn ghost" type="button" id="addRes">Add a résumé</button></p><div id="formMsg"></div><p class="row"><button class="btn" type="submit">Save</button></p>`;
+      for (const el of f.querySelectorAll("input[data-k]")) el.onchange = el.oninput = async () => {
+        const r = rows[el.dataset.i];
+        if (el.dataset.k === "pdf") { const file = el.files[0]; if (file) { const u = new Uint8Array(await file.arrayBuffer()); let bin = ""; for (let k = 0; k < u.length; k += 0x8000) bin += String.fromCharCode(...u.subarray(k, k + 0x8000)); r.pdf = btoa(bin); } }
+        else r[el.dataset.k] = el.value;
+        $("preview").innerHTML = rows.map(x => `<h2>${esc(x.role)}</h2><p>${esc(x.note)}</p>`).join("");
+      };
+      for (const b of f.querySelectorAll("[data-del]")) b.onclick = () => { rows.splice(Number(b.dataset.del), 1); draw(); };
+      for (const b of f.querySelectorAll("[data-up]")) b.onclick = () => { const i = Number(b.dataset.up); if (i > 0) [rows[i - 1], rows[i]] = [rows[i], rows[i - 1]]; draw(); };
+      $("addRes").onclick = () => { rows.push({ file: "", role: "", note: "" }); draw(); };
+      $("preview").innerHTML = rows.map(x => `<h2>${esc(x.role)}</h2><p>${esc(x.note)}</p>`).join("");
+    };
+    draw();
+    f.onsubmit = async (e) => { e.preventDefault(); const out = await call("saveResumes", { resumes: rows }); if (out.ok) { await renderSite("resumes"); } showResult(out); };
+  }
+  f.oninput ??= null;
+}
+function showResult(out) {
+  $("formMsg").innerHTML = out.ok ? `<p class="msg ok">Saved to ${esc(out.path)}. Publish when you're ready.</p>` : `<p class="msg bad">${out.errors.map(esc).join("\n")}</p>`;
+  refreshStatus();
+}
+async function refreshStatus() { $("changes").textContent = (await call("status")).changes || "Nothing waiting."; }
+for (const b of document.querySelectorAll("#siteTypes button")) b.onclick = () => renderSite(b.dataset.site);
+
+call("types").then(({ types, researchFields }) => { TYPES = types; RESEARCH = researchFields; renderTypes(); renderForm(); refresh(); });
+</script>
+</body>
+</html>

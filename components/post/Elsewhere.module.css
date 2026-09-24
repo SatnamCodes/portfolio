@@ -257,6 +257,134 @@
   animation: overlay-in 800ms var(--ease-out) 2.4s both;
 }
 
+/* ---- GitHub: a terminal that gits you there ---- */
+
+.overlay[data-where="github"] {
+  background: #0d1117;
+  color: #e6edf3;
+}
+
+.terminal {
+  width: min(40rem, 92vw);
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #010409;
+  box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.8);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: clamp(0.8rem, 0.7rem + 0.4vw, 0.98rem);
+  animation: overlay-in 400ms var(--ease-out) both;
+}
+
+.termBar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 10px 12px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+
+.termBar span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #30363d;
+}
+
+.termBar em {
+  margin-left: 8px;
+  font-style: normal;
+  font-size: 0.8em;
+  color: #7d8590;
+}
+
+.termBody {
+  text-align: left;
+  padding: 16px 18px 20px;
+  display: grid;
+  gap: 6px;
+  min-height: 15.5em;
+}
+
+.cmd,
+.out {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.cmd b {
+  color: #3fb950;
+  font-weight: 400;
+}
+
+/* Typing: the command's width grows one character at a time. */
+.cmd span {
+  display: inline-block;
+  vertical-align: bottom;
+  overflow: hidden;
+  width: 0;
+  animation: type calc(var(--n) * 28ms) steps(var(--n)) var(--at) forwards;
+}
+
+.cmd {
+  opacity: 0;
+  animation: appear 1ms linear var(--at) forwards;
+}
+
+.out {
+  color: #7d8590;
+  opacity: 0;
+  animation: appear 1ms linear var(--at) forwards;
+}
+
+@keyframes type {
+  to {
+    width: calc(var(--n) * 1ch);
+  }
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
+/* The objects received are contribution squares, lighting up one by one. */
+.squares {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.squares i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #161b22;
+  animation: square 180ms ease-out calc(1.9s + var(--k) * 45ms) forwards;
+}
+
+.squares i:nth-child(4n + 1) {
+  --lit: #0e4429;
+}
+.squares i:nth-child(4n + 2) {
+  --lit: #006d32;
+}
+.squares i:nth-child(4n + 3) {
+  --lit: #26a641;
+}
+.squares i:nth-child(4n) {
+  --lit: #39d353;
+}
+
+@keyframes square {
+  to {
+    background: var(--lit);
+  }
+}
+
 /* Reduced motion: the finished frame of each send-off, no movement. */
 .overlay[data-reduced] *,
 .overlay[data-reduced] {

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { PageLink } from "@/components/PageLink";
+import { FooterLinks } from "@/components/SiteFooter";
 import { asset } from "@/lib/base-path";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { Env, Fonts } from "./engine/core";
@@ -333,6 +334,7 @@ export function TheQuestions({ colophon }: { colophon: string }) {
         </div>
       )}
       <p className={s.colophon}>{colophon}</p>
+      <FooterLinks className={s.contact} />
     </section>
   );
 }
