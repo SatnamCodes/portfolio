@@ -3,17 +3,23 @@
   margin: 0 0 var(--space-xl);
 }
 
+/* One line, set flush left with the heading and the list below it. */
 .quote {
-  margin: 0 auto var(--space-xl);
-  max-width: 34rem;
-  text-align: center;
+  margin: 0 0 var(--space-lg);
 }
 
 .quote p {
   font-family: var(--font-fountain);
-  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  font-size: clamp(1rem, 0.85rem + 0.6vw, 1.3rem);
   line-height: 1.5;
   color: var(--color-espresso);
+}
+
+/* Wide screens keep it on a single line; phones let it wrap rather than overflow. */
+@media (min-width: 48rem) {
+  .quote p {
+    white-space: nowrap;
+  }
 }
 
 .quote footer {

@@ -199,10 +199,7 @@ function boy(
 export function FrostQuote() {
   return (
     <blockquote className={s.quote}>
-      <p>
-        Two roads diverged in a wood, and I—
-        <br />I took the one less traveled by,
-      </p>
+      <p>Two roads diverged in a wood, and I— / I took the one less traveled by,</p>
       <footer>Robert Frost, “The Road Not Taken” (1916)</footer>
     </blockquote>
   );

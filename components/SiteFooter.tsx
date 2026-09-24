@@ -9,9 +9,18 @@ import { PageLink } from "./PageLink";
 import s from "./SiteFooter.module.css";
 
 // Sections whose footer carries a small scene standing on the footer's line.
-const SCENES: { prefix: string; draw: Sketch; still: number; tall?: boolean; label: string }[] = [
+// `exact` keeps a scene on the section's index page only, off its individual entries.
+const SCENES: {
+  prefix: string;
+  exact?: boolean;
+  draw: Sketch;
+  still: number;
+  tall?: boolean;
+  label: string;
+}[] = [
   {
     prefix: "/roads",
+    exact: true,
     draw: roadScene,
     still: 6.6,
     tall: true,
@@ -42,10 +51,20 @@ const SCENES: { prefix: string; draw: Sketch; still: number; tall?: boolean; lab
 export function SiteFooter() {
   const pathname = usePathname();
   if (pathname === "/") return null;
-  const scene = SCENES.find((x) => pathname === x.prefix || pathname.startsWith(`${x.prefix}/`));
+  const scene = SCENES.find(
+    (x) => pathname === x.prefix || (!x.exact && pathname.startsWith(`${x.prefix}/`)),
+  );
   return (
     <footer className={s.footer}>
-      {scene && <Scene key={scene.prefix} {...scene} />}
+      {scene && (
+        <Scene
+          key={scene.prefix}
+          draw={scene.draw}
+          still={scene.still}
+          tall={scene.tall}
+          label={scene.label}
+        />
+      )}
       <FooterLinks className={s.bar} />
     </footer>
   );
