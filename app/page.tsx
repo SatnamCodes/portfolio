@@ -1,4 +1,5 @@
 import { Page } from "@/components/Page";
+import { Journey } from "@/components/home/Journey";
 import { MarginNotes } from "@/components/home/MarginNotes";
 import { PrismStage } from "@/components/home/PrismStage";
 import { ScrollCue } from "@/components/home/ScrollCue";
@@ -50,11 +51,7 @@ export default function Home() {
 
       <footer className={s.footer}>
         <MarginNotes near="corner" className={s.footerNote} />
-        <ol className={s.path} aria-label="Path">
-          {home.path.map((place) => (
-            <li key={place}>{place}</li>
-          ))}
-        </ol>
+        <Journey places={home.path} />
       </footer>
     </Page>
   );

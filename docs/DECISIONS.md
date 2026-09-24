@@ -479,3 +479,44 @@ mdx-components.tsx   required by @next/mdx in the App Router
 - **Motion blur:** scroll speed (px/ms, smoothed) drives an SVG `feGaussianBlur` with `stdDeviation="0 N"`. It blurs only vertically, in the direction of travel, up to 8px, only while the morph is in play, and is removed entirely once scrolling stops (verified 5px during a fast wheel scroll, none after).
 - **Cost:** one rAF loop, woken by scroll and asleep when the page is still. It writes transforms and opacity only, plus the filter while blurring.
 - **Reduced motion or no JavaScript:** nothing moves, there's no blur, and the title slot is `display: none`, so the page is simply the hero followed by the manifesto (verified).
+
+### Homepage revision 5: centring and the journey footer (2026-09-24, owner feedback)
+- **Centring:** from 48rem up, the hero is a 5-row grid (`1fr · stage · heading · 1.15fr · cue`), so the prism and heading sit together at the optical centre of the first screen, with the cue at the foot. At 1920×1009 the stage now spans 220–664px and the heading 680–802px (they were at 146–589 and 605–727). The scroll morph measures positions live, so it needed no change.
+- **Journey** (`components/home/Journey.tsx`), replacing the plain path list in the footer: a 640×110 line drawing with a 12s loop that runs only while visible.
+  - A **car** drives a road into **Bathinda** (a pin drops with a small bounce), squashes into a **train** that runs a sleepered track, then lifts off as a **plane** on a dashed contrail arc.
+  - The plane touches down level at **Bengaluru** (second pin), takes off again, and flies on to a globe at **World**. The ink fades and the loop restarts.
+  - The places stay a real visually hidden `<ol aria-label="Path">`. **Reduced motion** shows the finished route with no vehicle. Place names come from `content/home.ts`; any count other than 3 falls back to the plain list.
+- **Footer note overflow:** the owner's screenshot showed the note clipped at the left edge. The current build places it 48px in with no overflow at 1920 wide. The screenshot most likely came from a stale reload in the middle of the footer change, and the other session's `.footerNote` rules (`max-width`, `padding-left`, `overflow: hidden` on the footer) are kept.
+- **CSP (from another session):** `next.config.ts` now sends a Content-Security-Policy. Its `script-src` lacked `'unsafe-eval'`, which React's development build needs, so dev showed a console error and the "1 Issue" badge. `'unsafe-eval'` is now added in **development only**; production is unchanged.
+- **Two sessions:** another Claude session (`portfolio-f6`) edited this repo in parallel (security headers, a git repository, a `RouteAnimation` on `/traces`). It was told which files this session was changing. **Open question for the owner:** there are now two route animations, the homepage footer journey and `/traces` `RouteAnimation`; keep one.
+
+## Traces revision: film reels (2026-09-24, owner request)
+- **Two curved reels replace the editorial grid** (`components/traces/Reels.tsx`, physics in `lib/reel-physics.ts`, pure). The cinematic viewer from `Gallery.tsx` is reused, exported as `Viewer`.
+- **Film:** each frame is an Espresso film cell with sprocket holes *cut out* by an SVG mask (the page colour shows through, from the token), an edge number ("03A" / "03B"), and the photo inset, cropped to the frame. The strips run full-bleed. Frames bend around a vertical cylinder (radius ≈ 0.95 × the stage width, via `translate3d` + `rotateY` under a 1400px perspective). The top reel bows up at its ends and the bottom reel down, so they curve apart.
+- **Motion and physics:**
+  - Wheel and trackpad (either axis) push the film. The page doesn't scroll while the pointer is over the reels, and scrolls normally everywhere else.
+  - Dragging either strip moves it with the pointer; dragging the lower one drives the upper one inversely.
+  - On release the film keeps its momentum, slows with friction (half-life ≈ 0.2s), and below 90px/s the nearest frame pulls it into place with a slightly underdamped spring.
+  - The **lower reel counter-runs** at 0.82× through a spring, so it lags and catches up.
+  - **Speed shows:** frames skew (up to ±9°) and each strip gets a horizontal motion blur (an SVG Gaussian, x axis only, up to 6px), both gone at rest.
+  - **Infinite:** frames wrap modulo the strip span, with enough copies to cover a wide screen. After 2.5s without input the film eases into a slow run (22px/s).
+  - The loop runs only while the reels are on screen and the tab is visible.
+- **Details:** as a frame reaches the centre, the details in the gap between the reels (frame number, caption, place · date, camera · lens · exposure) scramble through random glyphs and resolve left to right, each line slightly after the one above. A polite live region announces the final text once, 600ms after it settles.
+- **Accessibility:**
+  - Every photograph appears once as a real, focusable `<button>` labelled with its alt text; duplicate frames are `aria-hidden` and untabbable.
+  - Focusing a frame brings it to the centre, ←/→ step between frames, Enter opens the viewer, and closing returns focus to that frame.
+  - **Reduced motion:** no drift, inertia, skew, blur or scramble. The film moves a whole frame at a time and the details appear directly.
+- **Verified** (Chrome, dev build): at 1920×1009 and 390×844, the details clear both reels, with no horizontal overflow and no console errors. Fling, drag, keyboard, viewer and idle-drift behaviours were all checked.
+- **Global:** `html { overflow-x: clip }` absorbs the scrollbar-width overhang of 100vw full-bleed elements. It uses `clip`, not `hidden`, so sticky positioning still works.
+
+### Revision 6: reels fixed, trail, footer, phone labels, prism +4% (2026-09-24, owner feedback)
+- **Traces route animation:** removed; the homepage footer journey is the one route drawing (answers the open question above).
+- **Reels actually animate.** Two real bugs:
+  - Frames rendered as solid brown blocks: a `<button>` defaults its grid items to `align-items: flex-start`, so the sprocket rows and the picture collapsed to 0px. `.frame` now sets `align-items: stretch`.
+  - Frames were rotated the wrong way round the cylinder (`rotateY(-θ)`), which produced a sawtooth of overlapping cells. The tangent of a convex drum needs `+θ`.
+  - The idle run was too slow to read as motion. It now starts after 1.5s (was 2.5s) at 48px/s (was 22px/s). The loop also restarts on `visibilitychange`; before, a page opened in a background tab never started.
+- **Wanderings trail** (`components/wanderings/Trail.tsx`): a dotted footpath, measured from the laid-out leaves, runs from under each leaf to the top of the next and sits behind the paper. It is seeded, so its shape stays stable, and redrawn on resize and once fonts load. A mask inks it in once, top to bottom (2.6s). With reduced motion it is shown complete.
+- **Footer balanced:** from 56rem up, the note and the journey (32rem) form one group centred on the page with a fluid gap, instead of two 40rem columns pushed to the window edges. Below 56rem they stack, centred.
+- **Interests beside the prism on phones:** the labels are absolutely placed at every width. Phones use a label column at 66% of the width (74% on wide screens), 10px type and a 19px minimum gap. The whole scene shifts 14% of the width to the left (`narrowShift` in `lib/prism-optics.ts`, applied to the camera and to the drawn fallback alike), so the fan has room before the words.
+- **Prism 4% larger:** `PRISM_SCALE = 1.04` in `lib/prism-optics.ts` scales the camera framing (both branches) and the fallback illustration. Bands still end exactly at the labels, because the layout is solved against the same camera.
+- **Banner:** its natural home is the share card it already is (`app/opengraph-image.jpg` / `twitter-image.jpg`, 1280×720, with alt text). Placing it on a page would repeat the masthead wordmark and the tagline. `banner.png` at the repo root is the source.

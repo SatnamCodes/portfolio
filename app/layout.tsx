@@ -5,7 +5,9 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "Satnam", template: "%s — Satnam" },
-  description: "A personal archive.",
+  description: "A cartographer of the unseen.",
+  openGraph: { siteName: "Satnam", type: "website" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

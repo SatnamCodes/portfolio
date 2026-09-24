@@ -41,7 +41,7 @@ function fit(photo: GalleryPhoto) {
   return { width: Math.round(photo.width * k), height: Math.round(photo.height * k) };
 }
 
-function Viewer({
+export function Viewer({
   photos,
   index,
   morphId,

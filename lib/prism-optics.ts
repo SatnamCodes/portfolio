@@ -100,3 +100,9 @@ export function traceDispersion(
   });
   return { entry, incomingDir, bands };
 }
+
+// On-screen size of the prism, shared by the WebGL scene and the drawn fallback.
+export const PRISM_SCALE = 1.04;
+
+// On phones the prism moves this many px left of its usual place, so the interests fit beside the fan.
+export const narrowShift = (width: number) => (width < 768 ? width * 0.14 : 0);

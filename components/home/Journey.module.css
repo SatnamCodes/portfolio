@@ -1,0 +1,123 @@
+.journey {
+  width: min(40rem, 100%);
+  margin: 0;
+}
+
+.drawing {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  --journey-fade: 1;
+}
+
+.guide {
+  fill: none;
+  stroke: var(--color-espresso-tint-3);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+  opacity: 0.6;
+}
+
+.hidden {
+  fill: none;
+  stroke: none;
+}
+
+.road,
+.roadInk,
+.rail,
+.contrail {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.road {
+  stroke: none;
+}
+
+.roadInk {
+  stroke: var(--color-espresso-tint-1);
+  stroke-width: 1.6;
+  opacity: var(--journey-fade);
+}
+
+/* Track: rails plus sleepers, drawn as one dashed stroke over a thin line. */
+.rail {
+  stroke: var(--color-espresso-tint-1);
+  stroke-width: 1.6;
+  opacity: var(--journey-fade);
+}
+
+/* Sleepers: short ticks across the rail. */
+.ties {
+  fill: none;
+  stroke: var(--color-espresso-tint-1);
+  stroke-width: 6;
+  stroke-dasharray: 1.2 5;
+  opacity: var(--journey-fade);
+}
+
+.contrail {
+  stroke: var(--color-espresso-tint-1);
+  stroke-width: 1.3;
+  stroke-dasharray: 5 5;
+  opacity: var(--journey-fade);
+}
+
+.maskStroke {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.pin {
+  fill: var(--color-espresso);
+  opacity: 0;
+}
+
+.pinHole {
+  fill: var(--color-sea-sand);
+}
+
+.world {
+  fill: none;
+  stroke: var(--color-espresso);
+  stroke-width: 1.2;
+  opacity: 0;
+}
+
+.label {
+  font-family: var(--font-meta);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  fill: var(--color-ink-muted);
+}
+
+.vehicle {
+  opacity: 1;
+}
+
+.icon {
+  fill: var(--color-sea-sand);
+  stroke: var(--color-espresso);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0;
+}
+
+.fallback {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}

@@ -1,4 +1,10 @@
-import { equilateral, traceDispersion, type Vec2 } from "@/lib/prism-optics";
+import {
+  equilateral,
+  narrowShift,
+  PRISM_SCALE,
+  traceDispersion,
+  type Vec2,
+} from "@/lib/prism-optics";
 import { color, spectrum } from "@/lib/tokens";
 
 const BAND_COLORS = Object.values(spectrum);
@@ -19,9 +25,9 @@ export function illustrationLayout(
   labelX: number | null,
 ): IllustrationLayout {
   // Same scale as the WebGL scene: the original 70svh stage framed 5.63 scene units.
-  const unit = Math.min(736, Math.max(320, window.innerHeight * 0.7)) / 5.63;
-  const side = labelX === null ? Math.min(w * 0.2, h * 0.42) : 2.4 * unit;
-  const center: Vec2 = [w * (labelX === null ? 0.34 : 0.47), h * 0.5];
+  const unit = (PRISM_SCALE * Math.min(736, Math.max(320, window.innerHeight * 0.7))) / 5.63;
+  const side = labelX === null ? PRISM_SCALE * Math.min(w * 0.2, h * 0.42) : 2.4 * unit;
+  const center: Vec2 = [w * (labelX === null ? 0.34 : 0.47) - narrowShift(w), h * 0.5];
   const toPx = ([x, y]: Vec2): Vec2 => {
     const rx = x * Math.cos(ROT) - y * Math.sin(ROT);
     const ry = x * Math.sin(ROT) + y * Math.cos(ROT);

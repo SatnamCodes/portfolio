@@ -6,7 +6,13 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { color, spectrum } from "@/lib/tokens";
 import { OcclusionField, type Segment } from "@/lib/beam-occlusion";
-import { equilateral, traceDispersion, type Vec2 } from "@/lib/prism-optics";
+import {
+  equilateral,
+  narrowShift,
+  PRISM_SCALE,
+  traceDispersion,
+  type Vec2,
+} from "@/lib/prism-optics";
 import type { PrismVariation } from "@/lib/session-seed";
 
 const SIDE = 2.4;
@@ -20,8 +26,9 @@ const INCOMING_LENGTH = 4.6;
 const DEFAULT_EXIT_LENGTH = 12;
 // On wide screens the prism's size follows the viewport height exactly as the original 70svh stage
 // (clamped 320–736px, framing 5.63 scene units) did, even though the stage itself is now shorter.
-const pxPerUnit = () => Math.min(736, Math.max(320, window.innerHeight * 0.7)) / 5.63;
-const MIN_VISIBLE_WIDTH_NARROW = 6.8;
+const pxPerUnit = () =>
+  (PRISM_SCALE * Math.min(736, Math.max(320, window.innerHeight * 0.7))) / 5.63;
+const MIN_VISIBLE_WIDTH_NARROW = 6.8 / PRISM_SCALE;
 const BAND_COLORS = Object.values(spectrum);
 
 // Raw sRGB triplets: the beam shaders skip colour management so tokens land on screen unchanged.
@@ -398,9 +405,11 @@ function cameraPose(width: number, height: number, variation: PrismVariation) {
       ? Math.max(8, MIN_VISIBLE_WIDTH_NARROW / (2 * halfTan * aspect))
       : height / pxPerUnit() / (2 * halfTan);
   const [cx, cy, cz] = variation.camera;
+  // Moving the camera right by the phone shift (px → scene units at the prism's plane) moves the prism left.
+  const shift = (narrowShift(width) * 2 * distance * halfTan) / height;
   return {
-    position: new THREE.Vector3(cx, cy, distance + cz),
-    target: new THREE.Vector3(cx * 0.3, cy * 0.3, 0),
+    position: new THREE.Vector3(cx + shift, cy, distance + cz),
+    target: new THREE.Vector3(cx * 0.3 + shift, cy * 0.3, 0),
   };
 }
 

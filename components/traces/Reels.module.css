@@ -1,0 +1,173 @@
+.reels {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.hint {
+  justify-self: center;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+/* Full-bleed stage; the strips bend around a cylinder under this perspective. */
+.reels {
+  position: relative;
+}
+
+/* Full bleed: the film runs off both edges of the window, not the page column. */
+.stage {
+  --frame-w: 300px;
+  --frame-h: calc(var(--frame-w) * 0.8);
+  --gap: 14.5rem;
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  height: calc(var(--frame-h) * 2 + var(--gap));
+  perspective: 1400px;
+  perspective-origin: 50% 50%;
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+
+.stage:active {
+  cursor: grabbing;
+}
+
+.strip {
+  position: absolute;
+  left: 50%;
+  width: 0;
+  height: var(--frame-h);
+  transform-style: preserve-3d;
+}
+
+.strip[data-strip="0"] {
+  top: 1.5rem;
+}
+
+.strip[data-strip="1"] {
+  bottom: 1.5rem;
+}
+
+/* One cell of film: Espresso base, a row of sprocket holes above and below, the picture between. */
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--frame-w);
+  height: var(--frame-h);
+  padding: 0;
+  border: 0;
+  background: var(--color-espresso);
+  display: grid;
+  grid-template-rows: 13% 1fr 13%;
+  /* Buttons default their grid items to flex-start, which collapses the holes and picture to 0px. */
+  align-items: stretch;
+  backface-visibility: hidden;
+  cursor: inherit;
+  will-change: transform;
+}
+
+.frame:focus-visible {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 6px;
+}
+
+.holes {
+  position: relative;
+  display: block;
+  background: var(--color-sea-sand);
+  /* The holes are cut out of the film by a mask; their colour is the page showing through. */
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14'%3E%3Crect x='7' y='3.5' width='10' height='7' rx='1.6'/%3E%3C/svg%3E")
+    repeat-x left center / 24px 58%;
+  opacity: 0.9;
+}
+
+.edgeMark {
+  position: absolute;
+  left: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding-inline: 0.15rem;
+  background: var(--color-espresso);
+  font-family: var(--font-meta);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--color-sea-sand-shade-2);
+}
+
+.picture {
+  position: relative;
+  margin-inline: 5px;
+  overflow: hidden;
+  background: var(--color-espresso-tint-1);
+}
+
+.picture img {
+  object-fit: cover;
+  filter: saturate(0.92) contrast(1.02);
+}
+
+/* Details of the centred frame, scrambling into place in the gap between the two reels. */
+.details {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--details-top, 0px));
+  transform: translate(-50%, -50%);
+  width: min(44rem, calc(100vw - 2 * var(--gutter)));
+  pointer-events: none;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.line {
+  display: block;
+  min-height: 1.2em;
+  white-space: pre-wrap;
+}
+
+.line[data-line="0"] {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.line[data-line="1"] {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 1rem + 0.9vw, 1.85rem);
+  line-height: 1.15;
+  color: var(--color-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line[data-line="2"],
+.line[data-line="3"] {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+@media (max-width: 47.99rem) {
+  .stage {
+    --gap: 12.5rem;
+  }
+
+  .line[data-line="1"] {
+    font-size: var(--type-body-lg);
+  }
+}

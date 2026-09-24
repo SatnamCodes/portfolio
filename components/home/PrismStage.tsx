@@ -11,10 +11,11 @@ const PrismScene = dynamic(() => import("@/components/three/PrismScene"), { ssr:
 
 type Status = "pending" | "webgl" | "fallback";
 
-// Fraction of the stage width where the bands meet the interests list.
-const LABEL_FRACTION = 0.74;
+// Fraction of the stage width where the bands meet the interests list. Phones give the words a wider
+// share so the list still fits beside the prism.
+const LABEL_FRACTION = { wide: 0.74, narrow: 0.66 };
 // Labels never crowd closer than this, even where the bands are tighter; they stay centred on the fan.
-const MIN_LABEL_GAP = 26;
+const MIN_LABEL_GAP = { wide: 26, narrow: 19 };
 
 function useMedia(query: string) {
   return useSyncExternalStore(
@@ -28,10 +29,10 @@ function useMedia(query: string) {
   );
 }
 
-function labelTop(ys: number[], i: number, n: number) {
+function labelTop(ys: number[], i: number, n: number, gap: number) {
   const first = ys[0];
   const last = ys.at(-1)!;
-  const span = Math.max(last - first, MIN_LABEL_GAP * (n - 1));
+  const span = Math.max(last - first, gap * (n - 1));
   const start = (first + last) / 2 - span / 2;
   return start + (span * i) / Math.max(1, n - 1);
 }
@@ -134,12 +135,13 @@ export function PrismStage({
     setStatus("fallback");
   }, []);
 
-  const labelX = wide && size ? size.w * LABEL_FRACTION : null;
+  const fraction = LABEL_FRACTION[wide ? "wide" : "narrow"];
+  const labelX = size ? size.w * fraction : null;
   const layout = useMemo(
     () => (size ? illustrationLayout(size.w, size.h, labelX) : null),
     [size, labelX],
   );
-  const ys = !wide ? null : status === "webgl" ? sceneYs : (layout?.ends.map(([, y]) => y) ?? null);
+  const ys = status === "webgl" ? sceneYs : (layout?.ends.map(([, y]) => y) ?? null);
 
   return (
     <figure className={s.figure}>
@@ -179,7 +181,9 @@ export function PrismStage({
         aria-label="Interests"
       >
         {interests.map((item, i) => {
-          const top = ys ? labelTop(ys, i, interests.length) : undefined;
+          const top = ys
+            ? labelTop(ys, i, interests.length, MIN_LABEL_GAP[wide ? "wide" : "narrow"])
+            : undefined;
           return (
             <li
               key={item}
@@ -188,7 +192,7 @@ export function PrismStage({
                   ? undefined
                   : ({
                       top: `${top}px`,
-                      left: `${LABEL_FRACTION * 100}%`,
+                      left: `${fraction * 100}%`,
                       "--i": i,
                     } as React.CSSProperties)
               }

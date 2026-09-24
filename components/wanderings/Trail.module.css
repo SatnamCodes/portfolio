@@ -1,0 +1,40 @@
+.trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Footsteps: short dashes with round ends, in the same brown as the leaves' marks. */
+.path {
+  fill: none;
+  stroke: var(--color-espresso-tint-2);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 0.5 7;
+}
+
+/* The ink walks the path once, top to bottom, after the leaves have settled. */
+.reveal {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 10;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: walk 2.6s var(--ease-out) 0.6s forwards;
+}
+
+@keyframes walk {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

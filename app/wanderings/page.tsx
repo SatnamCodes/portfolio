@@ -3,6 +3,7 @@ import { Page } from "@/components/Page";
 import { PageLink } from "@/components/PageLink";
 import { EmptyState, SectionIntro } from "@/components/SectionIntro";
 import { Mark, MARK_NAMES } from "@/components/wanderings/Marks";
+import { Trail } from "@/components/wanderings/Trail";
 import { formatDate, getWanderings, opening } from "@/lib/content";
 import { mulberry32 } from "@/lib/session-seed";
 import s from "./wanderings.module.css";
@@ -38,36 +39,40 @@ export default async function WanderingsPage() {
         {entries.length === 0 ? (
           <EmptyState>Nothing written here yet. The pages are waiting.</EmptyState>
         ) : (
-          <ol className={`${s.desk} stagger`}>
-            {entries.map((e, i) => {
-              const { mark, ...place } = placement(e.slug, e.words);
-              const label = e.meta.title ?? opening(e.source, 14);
-              return (
-                <li
-                  key={e.slug}
-                  className={s.leaf}
-                  style={{ ...place, "--i": i } as React.CSSProperties}
-                >
-                  <time className={s.date} dateTime={e.meta.date}>
-                    {formatDate(e.meta.date)}
-                  </time>
-                  <PageLink
-                    href={`/wanderings/${e.slug}`}
-                    className={s.link}
-                    data-untitled={!e.meta.title || undefined}
+          <div className={s.deskWrap}>
+            <ol className={`${s.desk} stagger`}>
+              {entries.map((e, i) => {
+                const { mark, ...place } = placement(e.slug, e.words);
+                const label = e.meta.title ?? opening(e.source, 14);
+                return (
+                  <li
+                    key={e.slug}
+                    className={s.leaf}
+                    data-leaf=""
+                    style={{ ...place, "--i": i } as React.CSSProperties}
                   >
-                    {label}
-                  </PageLink>
-                  {e.meta.title && (
-                    <p className={s.preview} aria-hidden="true">
-                      {opening(e.source, 26)}
-                    </p>
-                  )}
-                  <Mark name={mark} className={s.mark} />
-                </li>
-              );
-            })}
-          </ol>
+                    <time className={s.date} dateTime={e.meta.date}>
+                      {formatDate(e.meta.date)}
+                    </time>
+                    <PageLink
+                      href={`/wanderings/${e.slug}`}
+                      className={s.link}
+                      data-untitled={!e.meta.title || undefined}
+                    >
+                      {label}
+                    </PageLink>
+                    {e.meta.title && (
+                      <p className={s.preview} aria-hidden="true">
+                        {opening(e.source, 26)}
+                      </p>
+                    )}
+                    <Mark name={mark} className={s.mark} />
+                  </li>
+                );
+              })}
+            </ol>
+            <Trail />
+          </div>
         )}
       </div>
     </Page>
