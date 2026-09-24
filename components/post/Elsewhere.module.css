@@ -249,25 +249,6 @@
   animation: overlay-in 700ms var(--ease-out) both;
 }
 
-/* The mark condenses out of the haze: blurred and faint, then sharp. */
-.xmark {
-  position: absolute;
-  top: 18%;
-  right: 6%;
-  width: 16%;
-  fill: #f1e3cf;
-  filter: drop-shadow(0 0 18px rgb(255 140 60 / 0.45));
-  animation: condense 1.6s var(--ease-out) 1.8s both;
-}
-
-@keyframes condense {
-  from {
-    opacity: 0;
-    scale: 1.3;
-    filter: blur(16px) drop-shadow(0 0 0 transparent);
-  }
-}
-
 .handle {
   font-family: var(--font-meta);
   font-size: var(--type-meta);

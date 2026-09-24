@@ -13,6 +13,7 @@ export default function TracesPage() {
   const photos = getPhotos().map((p) => ({
     id: p.id,
     src: p.src,
+    video: p.video,
     width: p.width,
     height: p.height,
     alt: p.alt,

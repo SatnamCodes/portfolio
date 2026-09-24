@@ -6,6 +6,8 @@ import { z } from "zod";
 const photoSchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9-]+$/),
   src: z.string().startsWith("/"),
+  // A short muted clip (an Instagram reel); `src` is then its poster frame.
+  video: z.string().startsWith("/").endsWith(".mp4").optional(),
   width: z.number().int().positive(),
   height: z.number().int().positive(),
   alt: z.string().min(10, "alt text must describe the photograph"),

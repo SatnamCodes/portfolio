@@ -120,15 +120,12 @@ function Announcement() {
 }
 
 // The smoking clip, recoloured into the site's palette (espresso shadows, Sea Sand highlights), with
-// the X mark condensing over it before the browser follows the link.
+// then the browser follows the link to X.
 function Smoke() {
   return (
     <div className={s.studio}>
       {/* eslint-disable-next-line @next/next/no-img-element -- animated WebP; next/image would freeze it */}
       <img src="/post/x-smoke.webp" width={480} height={272} alt="" className={s.clip} />
-      <svg viewBox="0 0 24 24" className={s.xmark} aria-hidden="true">
-        <path d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.78L17.75 3Zm-1.08 16.2h1.7L7.4 4.73H5.58L16.67 19.2Z" />
-      </svg>
       <p className={s.handle}>@gitblamesatnam</p>
     </div>
   );

@@ -22,6 +22,34 @@ function detailLines(p: GalleryPhoto, i: number, n: number) {
   ];
 }
 
+// A reel on the film: muted, looping, and only playing while that frame is on screen.
+function ReelVideo({ src, poster, reduced }: { src: string; poster: string; reduced: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || reduced) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) v.play().catch(() => {});
+      else v.pause();
+    });
+    io.observe(v);
+    return () => io.disconnect();
+  }, [reduced]);
+  return (
+    <video
+      ref={ref}
+      src={src}
+      poster={poster}
+      muted
+      loop
+      playsInline
+      preload="none"
+      aria-hidden="true"
+      className={s.reelVideo}
+    />
+  );
+}
+
 export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.ReactNode }) {
   const reduced = useReducedMotion();
   const n = photos.length;
@@ -324,14 +352,18 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
                   >
                     <span className={s.holes} data-edge="top" aria-hidden="true" />
                     <span className={s.picture}>
-                      <Image
-                        src={photo.src}
-                        alt=""
-                        fill
-                        sizes="320px"
-                        draggable={false}
-                        priority={si === 0 && fi < 6}
-                      />
+                      {photo.video ? (
+                        <ReelVideo src={photo.video} poster={photo.src} reduced={reduced} />
+                      ) : (
+                        <Image
+                          src={photo.src}
+                          alt=""
+                          fill
+                          sizes="320px"
+                          draggable={false}
+                          priority={si === 0 && fi < 6}
+                        />
+                      )}
                     </span>
                     <span className={s.holes} data-edge="bottom" aria-hidden="true">
                       <span className={s.edgeMark}>

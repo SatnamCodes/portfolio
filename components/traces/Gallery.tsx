@@ -11,6 +11,7 @@ import s from "./gallery.module.css";
 export type GalleryPhoto = {
   id: string;
   src: string;
+  video?: string;
   width: number;
   height: number;
   alt: string;
@@ -126,7 +127,21 @@ export function Viewer({
               opacity: { duration: reduced ? 0.15 : 0.35 },
             }}
           >
-            <Image src={photo.src} alt={photo.alt} fill sizes="100vw" draggable={false} />
+            {photo.video ? (
+              <video
+                src={photo.video}
+                poster={photo.src}
+                aria-label={photo.alt}
+                className={s.video}
+                autoPlay={!reduced}
+                controls
+                muted
+                loop
+                playsInline
+              />
+            ) : (
+              <Image src={photo.src} alt={photo.alt} fill sizes="100vw" draggable={false} />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

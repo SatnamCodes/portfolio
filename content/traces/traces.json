@@ -11,6 +11,15 @@
       "date": "2022-12-11"
     },
     {
+      "id": "gibbous-moon-reel",
+      "src": "/traces/video/gibbous-moon-reel.jpg",
+      "video": "/traces/video/gibbous-moon-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of a gibbous moon hanging in black sky, its craters and grey maria sharp along the terminator.",
+      "caption": "Gibbous, in motion"
+    },
+    {
       "id": "sun-sunspots-signed",
       "src": "/traces/photos/sun-sunspots-signed.jpg",
       "width": 1080,
@@ -43,6 +52,15 @@
       "height": 1080,
       "alt": "A warm, honey-toned gibbous moon with deep craters along its shadowed edge.",
       "caption": "Gibbous, low and warm"
+    },
+    {
+      "id": "sunset-sun-tree-reel",
+      "src": "/traces/video/sunset-sun-tree-reel.jpg",
+      "video": "/traces/video/sunset-sun-tree-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of a huge orange setting sun, with the silhouette of a tree's branches drifting across its edge.",
+      "caption": "The sun, through the trees"
     },
     {
       "id": "half-moon-two-tones",
@@ -78,6 +96,16 @@
       "alt": "Saturn as a small, soft golden disc with its rings tilted across it.",
       "caption": "Saturn, rings and all",
       "date": "2024-01-28"
+    },
+    {
+      "id": "nasa-moonsnap-reel",
+      "src": "/traces/video/nasa-moonsnap-reel.jpg",
+      "video": "/traces/video/nasa-moonsnap-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video montage: moon photographs signed Cosmic Voyagerzz, then NASA Artemis replying: Always great to see the craters in such detail. Thanks for sharing your #NASAMoonSnap with us!",
+      "caption": "#NASAMoonSnap, and a reply from NASA Artemis",
+      "date": "2024-07-27"
     },
     {
       "id": "crescent-moon-jan-2023",
