@@ -47,9 +47,15 @@ export default function Home() {
               data-morph="rise"
               data-placeholder={home.manifestoIsPlaceholder || undefined}
             >
-              {home.manifesto.map((paragraph, i) => (
-                <p key={i}>{paragraph}</p>
-              ))}
+              {home.manifesto.map((item, i) =>
+                typeof item === "string" ? (
+                  <p key={i}>{item}</p>
+                ) : (
+                  <h2 key={i} className={s.manifestoHeading}>
+                    {item.heading}
+                  </h2>
+                ),
+              )}
             </div>
           </div>
           <MarginNotes near="body" className={s.bodyNote} />

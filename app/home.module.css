@@ -76,6 +76,21 @@
   gap: 1.1em;
 }
 
+.paragraphs p {
+  /* The manifesto is kept exactly as written, including its spacing. */
+  white-space: pre-wrap;
+}
+
+/* Section titles inside the manifesto, set in the meta face; the words are already capitals. */
+.manifestoHeading {
+  margin-top: 1.4em;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  font-weight: 500;
+  letter-spacing: var(--tracking-meta);
+  color: var(--color-ink-muted);
+}
+
 .paragraphs[data-placeholder] {
   font-style: italic;
   color: var(--color-ink-muted);
