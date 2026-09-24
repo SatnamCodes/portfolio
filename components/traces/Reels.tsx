@@ -22,7 +22,7 @@ function detailLines(p: GalleryPhoto, i: number, n: number) {
   ];
 }
 
-export function Reels({ photos }: { photos: GalleryPhoto[] }) {
+export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.ReactNode }) {
   const reduced = useReducedMotion();
   const n = photos.length;
   const stage = useRef<HTMLDivElement>(null);
@@ -286,9 +286,7 @@ export function Reels({ photos }: { photos: GalleryPhoto[] }) {
             </filter>
           ))}
         </svg>
-        <p className={s.hint} aria-hidden="true">
-          Scroll or drag the film
-        </p>
+        {lead}
         <div ref={stage} className={s.stage}>
           {frames.map((list, si) => (
             <div
@@ -348,6 +346,9 @@ export function Reels({ photos }: { photos: GalleryPhoto[] }) {
           ))}
         </div>
 
+        <p className={s.hint} aria-hidden="true">
+          Scroll or drag the film
+        </p>
         <div className={s.details} aria-hidden="true">
           {[0, 1, 2, 3].map((i) => (
             <span

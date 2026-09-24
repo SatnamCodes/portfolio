@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Page } from "@/components/Page";
 import { EmptyState, SectionIntro } from "@/components/SectionIntro";
+import { Leader } from "@/components/traces/Leader";
 import { Reels } from "@/components/traces/Reels";
 import { formatDate } from "@/lib/content";
 import { getPhotos } from "@/lib/traces";
@@ -24,7 +25,11 @@ export default function TracesPage() {
     <Page>
       <div className={s.page}>
         <SectionIntro title="Traces" meta="Things witnessed" />
-        {photos.length === 0 ? <EmptyState>No traces yet.</EmptyState> : <Reels photos={photos} />}
+        {photos.length === 0 ? (
+          <EmptyState>No traces yet.</EmptyState>
+        ) : (
+          <Reels photos={photos} lead={<Leader />} />
+        )}
       </div>
     </Page>
   );

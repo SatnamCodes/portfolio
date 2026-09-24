@@ -2,7 +2,8 @@
 
 import { setPlainType, usePlainType } from "@/lib/plain-type";
 
-// Wraps handwritten content; `data-plain` switches it to the typeset serif (see the ink stylesheets).
+// Wraps handwritten content; `data-plain` switches it to an ordinary typeset article (see the ink
+// stylesheets). The toggle is labelled "View as article" / "View as notebook".
 export function PlainTypeFrame({
   children,
   className,
@@ -27,7 +28,7 @@ export function PlainTypeToggle({ className }: { className?: string }) {
       aria-pressed={plain}
       onClick={() => setPlainType(!plain)}
     >
-      Plain type
+      {plain ? "View as notebook" : "View as article"}
     </button>
   );
 }

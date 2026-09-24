@@ -68,6 +68,9 @@ export const bookSchema = z.strictObject({
     Object.keys(NOTE_KINDS) as [keyof typeof NOTE_KINDS, ...(keyof typeof NOTE_KINDS)[]],
   ),
   author: z.string().min(1).optional(),
+  // Publication line shown in the reader, e.g. "Morgan Kaufmann, 4th edition, 2022".
+  published: z.string().min(1).optional(),
+  link: z.url().optional(),
   // Lower numbers sit further left on the shelf.
   order: z.number().optional(),
   orientation: z.enum(["upright", "leaning", "flat"]).optional(),

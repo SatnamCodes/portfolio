@@ -135,6 +135,7 @@ export function ReadingView({
         aria-modal="true"
         aria-labelledby={titleId}
         className={s.reader}
+        data-article={plain || undefined}
         layoutId={reduced ? undefined : `book-${book.slug}`}
         initial={reduced ? { opacity: 0 } : undefined}
         animate={reduced ? { opacity: 1 } : undefined}
@@ -159,15 +160,29 @@ export function ReadingView({
                 {book.title}
               </h2>
               {book.author && <p className={s.readerAuthor}>{book.author}</p>}
+              {book.source && (
+                <p className={s.readerSource}>
+                  {book.source.detail}
+                  {book.source.link && (
+                    <>
+                      {" · "}
+                      <a href={book.source.link} target="_blank" rel="noopener noreferrer">
+                        About the book<span aria-hidden="true"> ↗</span>
+                        <span className="visually-hidden"> (opens in a new tab)</span>
+                      </a>
+                    </>
+                  )}
+                </p>
+              )}
             </div>
             <div className={s.readerControls}>
               <button
                 type="button"
                 aria-pressed={plain}
                 onClick={togglePlain}
-                className={s.control}
+                className={`${s.control} ${s.viewToggle}`}
               >
-                Plain type
+                {plain ? "View as notebook" : "View as article"}
               </button>
               <button type="button" onClick={requestClose} className={s.control}>
                 Close<span className="visually-hidden"> {book.title}</span>
@@ -177,7 +192,7 @@ export function ReadingView({
           <div ref={pages} className={s.pages} data-hand={plain ? undefined : "gel"}>
             {children}
           </div>
-          {pageCount > 1 && (
+          {pageCount > 1 && !plain && (
             <nav className={s.pager} aria-label="Pages">
               <button
                 type="button"

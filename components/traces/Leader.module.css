@@ -1,0 +1,73 @@
+/* The figure and the line sit side by side as one group; the figure's crop line hides behind the
+   upper film strip (the strip starts 1.5rem into the stage; 1.25rem more covers the edge). */
+.leader {
+  --tuck: 2.75rem;
+  position: relative;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(0.5rem, 2vw, 2rem);
+  margin-bottom: calc(-1 * var(--tuck) - var(--space-md));
+  pointer-events: none;
+}
+
+.figure {
+  width: auto;
+  height: clamp(13rem, 9rem + 14vw, 22rem);
+  /* Rises out of the film on arrival, coming into focus. */
+  animation: rise-from-film 1.3s var(--ease-out) 0.2s both;
+}
+
+@keyframes rise-from-film {
+  from {
+    translate: 0 28%;
+    opacity: 0;
+    filter: blur(10px);
+  }
+}
+
+/* The banner's cursive: the site's own hand, written in from left to right after the figure. */
+.line {
+  align-self: center;
+  margin-bottom: var(--tuck);
+  font-family: var(--font-fountain);
+  font-size: clamp(1.1rem, 0.7rem + 2.2vw, 2.75rem);
+  line-height: 1.35;
+  color: var(--color-espresso);
+  rotate: -4deg;
+  white-space: nowrap;
+  animation: write 1.4s cubic-bezier(0.45, 0, 0.3, 1) 1s both;
+}
+
+@keyframes write {
+  from {
+    clip-path: inset(0 100% 0 0);
+    filter: blur(3px);
+  }
+}
+
+/* Scrolling on: the figure sinks back into the film and blurs, the line fades. */
+@supports (animation-timeline: view()) {
+  .leader {
+    animation: sink linear both;
+    animation-timeline: view();
+    animation-range: exit -20% exit 60%;
+  }
+}
+
+@keyframes sink {
+  to {
+    translate: 0 18%;
+    filter: blur(8px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leader,
+  .figure,
+  .line {
+    animation: none;
+  }
+}

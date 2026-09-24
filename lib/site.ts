@@ -17,3 +17,12 @@ export const navItems = [
 ] as const;
 
 export const PAGE_TRANSITION = "page";
+
+// Moving right along the nav slides the page left, and vice versa; globals.css reads these types.
+export function pageDirection(from: string, to: string): "page-forward" | "page-back" {
+  const index = (path: string) =>
+    navItems.findLastIndex(
+      ({ href }) => path === href || (href !== "/" && path.startsWith(`${href}/`)),
+    );
+  return index(to) < index(from) ? "page-back" : "page-forward";
+}

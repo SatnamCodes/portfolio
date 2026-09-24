@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageLink as Link } from "@/components/PageLink";
 import { Page } from "@/components/Page";
+import { Heatmaps } from "@/components/projects/Heatmaps";
 import { EmptyState, SectionIntro } from "@/components/SectionIntro";
 import { getProjects } from "@/lib/content";
 import s from "./projects.module.css";
@@ -14,6 +15,7 @@ export default async function ProjectsPage() {
     <Page>
       <div className={s.page}>
         <SectionIntro title="Projects" meta="Log of built work" />
+        <Heatmaps />
         {projects.length === 0 ? (
           <EmptyState>Nothing logged yet.</EmptyState>
         ) : (

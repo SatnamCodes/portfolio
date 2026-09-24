@@ -15,6 +15,7 @@ export type BookData = {
   category: string;
   kindLabel: string;
   author?: string;
+  source?: { detail?: string; link?: string };
   variation: BookVariation;
 };
 

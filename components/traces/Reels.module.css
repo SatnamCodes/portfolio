@@ -17,8 +17,10 @@
   position: relative;
 }
 
-/* Full bleed: the film runs off both edges of the window, not the page column. */
+/* Full bleed: the film runs off both edges of the window, not the page column. Above the leader, so
+   the upper strip covers the figure's crop line. */
 .stage {
+  z-index: 1;
   --frame-w: 300px;
   --frame-h: calc(var(--frame-w) * 0.8);
   --gap: 14.5rem;

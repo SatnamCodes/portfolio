@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { navItems, PAGE_TRANSITION, site } from "@/lib/site";
+import { navItems, PAGE_TRANSITION, pageDirection, site } from "@/lib/site";
 import s from "./SiteNav.module.css";
 
 function currentState(pathname: string, href: string): "page" | "true" | undefined {
@@ -34,7 +34,11 @@ export function SiteNav() {
 
   return (
     <header className={s.masthead}>
-      <Link href="/" className={s.wordmark} transitionTypes={[PAGE_TRANSITION]}>
+      <Link
+        href="/"
+        className={s.wordmark}
+        transitionTypes={[PAGE_TRANSITION, pageDirection(pathname, "/")]}
+      >
         {site.owner}
       </Link>
 
@@ -60,7 +64,7 @@ export function SiteNav() {
                 href={href}
                 className={s.link}
                 aria-current={currentState(pathname, href)}
-                transitionTypes={[PAGE_TRANSITION]}
+                transitionTypes={[PAGE_TRANSITION, pageDirection(pathname, href)]}
               >
                 {label}
               </Link>

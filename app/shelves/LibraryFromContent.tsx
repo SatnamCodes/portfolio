@@ -13,6 +13,8 @@ export async function LibraryFromContent() {
     category: meta.category,
     kindLabel: NOTE_KINDS[meta.kind],
     author: meta.author,
+    source:
+      meta.published || meta.link ? { detail: meta.published, link: meta.link } : undefined,
     variation: bookVariation(slug, { orientation: meta.orientation }),
   }));
   const notes = Object.fromEntries(books.map(({ slug, Body }) => [slug, <Body key={slug} />]));

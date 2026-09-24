@@ -1,0 +1,104 @@
+.heatmaps {
+  display: grid;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xxl);
+}
+
+.title {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-ink);
+}
+
+.map {
+  margin: 0;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem var(--space-md);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: var(--type-display-md);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.name:hover,
+.name:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.total {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+/* The full year stays legible on phones: the map scrolls sideways, starting at the latest week. */
+.scroll {
+  overflow-x: auto;
+  direction: rtl;
+  scrollbar-width: thin;
+}
+
+.scroll svg {
+  direction: ltr;
+  display: block;
+  width: min(100%, 60rem);
+  min-width: 40rem;
+  height: auto;
+}
+
+.month {
+  font-family: var(--font-meta);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  fill: var(--color-ink-faint);
+}
+
+/* Espresso ink on Sea Sand paper, lightest to darkest. */
+.cell {
+  fill: var(--color-paper-deep);
+  animation: cell-in 500ms var(--ease-out) both;
+  animation-delay: calc(var(--w) * 12ms);
+}
+
+.cell[data-level="1"] {
+  fill: var(--color-espresso-tint-3);
+}
+
+.cell[data-level="2"] {
+  fill: var(--color-espresso-tint-2);
+}
+
+.cell[data-level="3"] {
+  fill: var(--color-espresso-tint-1);
+}
+
+.cell[data-level="4"] {
+  fill: var(--color-espresso);
+}
+
+@keyframes cell-in {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}

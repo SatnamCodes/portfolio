@@ -485,3 +485,76 @@
     font-size: var(--type-meta-sm);
   }
 }
+
+/* ---- Article view: the notebook becomes an ordinary web page ----
+   Full window, one scrolling column at reading measure, typeset serif, no ruled paper and no pages. */
+.reader[data-article] {
+  width: 100vw;
+  height: 100dvh;
+  box-shadow: none;
+  border-radius: 0 !important;
+}
+
+.reader[data-article] .readerInner {
+  display: block;
+  background: none;
+  overflow-y: auto;
+  padding: var(--space-xl) var(--gutter) var(--space-xxl);
+}
+
+.reader[data-article] .coverFlap {
+  display: none;
+}
+
+.reader[data-article] .readerHeader {
+  max-width: 42rem;
+  margin: 0 auto var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.reader[data-article] .readerTitle {
+  font-size: var(--type-display-lg);
+}
+
+.reader[data-article] .pages {
+  container-type: normal;
+  overflow: visible;
+  column-count: auto;
+  max-width: 42rem;
+  margin-inline: auto;
+  font-family: var(--font-body);
+  font-size: var(--type-body-lg);
+  line-height: var(--leading-body);
+  color: var(--color-ink);
+  background: none;
+}
+
+.reader[data-article] .pages > * + * {
+  margin-top: 1.1em;
+}
+
+.reader[data-article] .pages h2,
+.reader[data-article] .pages h3 {
+  margin-top: 1.8em;
+}
+
+.reader[data-article] .pages img {
+  max-height: none;
+}
+
+.readerSource {
+  margin-top: var(--space-xs);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.08em;
+  color: var(--color-ink-muted);
+}
+
+.readerSource a {
+  color: inherit;
+}
+
+.viewToggle[aria-pressed="true"] {
+  color: var(--color-ink);
+}

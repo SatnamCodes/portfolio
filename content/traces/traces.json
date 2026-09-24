@@ -2,82 +2,132 @@
   "$comment": "Traces: one object per photograph, newest first. Only 'id', 'src', 'width', 'height' and 'alt' are required.",
   "photos": [
     {
-      "id": "sample-01",
-      "src": "/placeholders/placeholder-01.jpg",
-      "width": 1800,
-      "height": 1200,
-      "alt": "Placeholder image 01: a soft landscape tonal gradient in brown and cream, labelled PLACEHOLDER 01.",
-      "caption": "[Sample caption.] A trace of something witnessed: placeholder only.",
-      "location": "Placeholder location",
-      "date": "2026-08-11",
-      "camera": "Sample camera",
-      "lens": "35mm f/2",
-      "exposure": "1/250 · f/5.6 · ISO 200",
-      "draft": true
+      "id": "crescent-moon-dec-2022",
+      "src": "/traces/photos/crescent-moon-dec-2022.jpg",
+      "width": 1318,
+      "height": 1683,
+      "alt": "A thin crescent moon against black sky, craters sharp along the terminator.",
+      "caption": "Crescent, from the terrace",
+      "date": "2022-12-11"
     },
     {
-      "id": "sample-02",
-      "src": "/placeholders/placeholder-02.jpg",
-      "width": 1200,
+      "id": "sun-sunspots-signed",
+      "src": "/traces/photos/sun-sunspots-signed.jpg",
+      "width": 1080,
+      "height": 1126,
+      "alt": "The sun through a solar filter, glowing orange-red, with a small group of dark sunspots near the centre.",
+      "caption": "The sun, and its spots",
+      "date": "2023-02-11"
+    },
+    {
+      "id": "full-moon-bright",
+      "src": "/traces/photos/full-moon-bright.jpg",
+      "width": 1080,
+      "height": 1350,
+      "alt": "A bright, nearly full moon filling the frame, its grey maria and rayed craters clear.",
+      "caption": "Full moon"
+    },
+    {
+      "id": "orion-nebula-wide",
+      "src": "/traces/photos/orion-nebula-wide.jpg",
+      "width": 898,
+      "height": 505,
+      "alt": "The Orion Nebula: a glowing cloud of gas around a bright core, scattered with stars.",
+      "caption": "M42, the Orion Nebula",
+      "date": "2023-03-14"
+    },
+    {
+      "id": "gibbous-moon-warm",
+      "src": "/traces/photos/gibbous-moon-warm.jpg",
+      "width": 1080,
+      "height": 1080,
+      "alt": "A warm, honey-toned gibbous moon with deep craters along its shadowed edge.",
+      "caption": "Gibbous, low and warm"
+    },
+    {
+      "id": "half-moon-two-tones",
+      "src": "/traces/photos/half-moon-two-tones.jpg",
+      "width": 1012,
       "height": 1800,
-      "alt": "Placeholder image 02: a soft portrait tonal gradient in brown and cream, labelled PLACEHOLDER 02.",
-      "caption": "[Sample caption.] A portrait-orientation placeholder.",
-      "draft": true
+      "alt": "The same half moon twice: once cool and silver, once warm and golden.",
+      "caption": "One moon, two temperatures",
+      "date": "2024-02-17"
     },
     {
-      "id": "sample-03",
-      "src": "/placeholders/placeholder-03.jpg",
-      "width": 1800,
-      "height": 1200,
-      "alt": "Placeholder image 03: a soft landscape tonal gradient in brown and cream, labelled PLACEHOLDER 03.",
-      "draft": true
+      "id": "sun-orange-limb",
+      "src": "/traces/photos/sun-orange-limb.jpg",
+      "width": 1080,
+      "height": 1350,
+      "alt": "A close crop of the sun's orange disc, sunspots scattered across its face.",
+      "caption": "Sunspots on the limb"
     },
     {
-      "id": "sample-04",
-      "src": "/placeholders/placeholder-04.jpg",
-      "width": 1600,
-      "height": 1600,
-      "alt": "Placeholder image 04: a soft square tonal gradient in brown and cream, labelled PLACEHOLDER 04.",
-      "location": "Placeholder location",
-      "date": "2026-05-02",
-      "draft": true
-    },
-    {
-      "id": "sample-05",
-      "src": "/placeholders/placeholder-05.jpg",
-      "width": 1200,
-      "height": 1600,
-      "alt": "Placeholder image 05: a soft portrait tonal gradient in brown and cream, labelled PLACEHOLDER 05.",
-      "camera": "Sample camera",
-      "exposure": "1/60 · f/2 · ISO 800",
-      "draft": true
-    },
-    {
-      "id": "sample-06",
-      "src": "/placeholders/placeholder-06.jpg",
-      "width": 2000,
-      "height": 1000,
-      "alt": "Placeholder image 06: a soft landscape tonal gradient in brown and cream, labelled PLACEHOLDER 06.",
-      "caption": "[Sample caption.] A very wide placeholder, to test panoramic framing.",
-      "draft": true
-    },
-    {
-      "id": "sample-07",
-      "src": "/placeholders/placeholder-07.jpg",
-      "width": 1800,
-      "height": 1200,
-      "alt": "Placeholder image 07: a soft landscape tonal gradient in brown and cream, labelled PLACEHOLDER 07.",
-      "date": "2025-12-30",
-      "draft": true
-    },
-    {
-      "id": "sample-08",
-      "src": "/placeholders/placeholder-08.jpg",
-      "width": 1200,
+      "id": "crescent-cosmic-voyagerzz",
+      "src": "/traces/photos/crescent-cosmic-voyagerzz.jpg",
+      "width": 1012,
       "height": 1800,
-      "alt": "Placeholder image 08: a soft portrait tonal gradient in brown and cream, labelled PLACEHOLDER 08.",
-      "caption": "[Sample caption.] The last placeholder, with a caption only.",
-      "draft": true
+      "alt": "A slim crescent moon on black, with the words Cosmic Voyagerzz above it.",
+      "caption": "Cosmic Voyagerzz",
+      "date": "2024-12-05"
+    },
+    {
+      "id": "saturn-rings",
+      "src": "/traces/photos/saturn-rings.jpg",
+      "width": 486,
+      "height": 324,
+      "alt": "Saturn as a small, soft golden disc with its rings tilted across it.",
+      "caption": "Saturn, rings and all",
+      "date": "2024-01-28"
+    },
+    {
+      "id": "crescent-moon-jan-2023",
+      "src": "/traces/photos/crescent-moon-jan-2023.jpg",
+      "width": 1410,
+      "height": 1800,
+      "alt": "A crescent moon, lit from the left, craters crowding the shadow line.",
+      "caption": "Crescent",
+      "date": "2023-01-22"
+    },
+    {
+      "id": "sun-full-disc",
+      "src": "/traces/photos/sun-full-disc.jpg",
+      "width": 1080,
+      "height": 1080,
+      "alt": "The whole sun as a deep orange disc on black, with a single tiny sunspot.",
+      "caption": "The whole sun"
+    },
+    {
+      "id": "waning-gibbous",
+      "src": "/traces/photos/waning-gibbous.jpg",
+      "width": 960,
+      "height": 869,
+      "alt": "A pale waning gibbous moon, its bright rim and shadowed craters in soft grey.",
+      "caption": "Waning gibbous"
+    },
+    {
+      "id": "moon-in-shadow",
+      "src": "/traces/photos/moon-in-shadow.jpg",
+      "width": 1012,
+      "height": 1800,
+      "alt": "The moon partly dimmed, its lower edge fading into shadow.",
+      "caption": "A moon in shadow",
+      "date": "2023-10-29"
+    },
+    {
+      "id": "comet-in-eyepiece",
+      "src": "/traces/photos/comet-in-eyepiece.jpg",
+      "width": 997,
+      "height": 1080,
+      "alt": "A faint green smudge among stars in the round field of a telescope eyepiece.",
+      "caption": "A green visitor"
+    },
+    {
+      "id": "crescent-sharp",
+      "src": "/traces/photos/crescent-sharp.jpg",
+      "width": 1021,
+      "height": 1021,
+      "alt": "A sharp crescent moon, the lunar highlands bright against a black sky.",
+      "caption": "Crescent, sharper"
     }
   ]
 }
