@@ -34,7 +34,7 @@ ${list("Projects") || "- None published yet."}
 
 ${list("Research") || "- None published yet."}
 
-## Essays (Roads)
+## Blogs (Roads)
 
 ${list("Roads") || "- None published yet."}
 

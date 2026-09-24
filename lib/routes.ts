@@ -14,7 +14,7 @@ export type PublicRoute = {
 
 export const SECTIONS: PublicRoute[] = [
   { path: "/", title: "Home", section: "Home" },
-  { path: "/roads", title: "Roads", section: "Roads", description: "Essays." },
+  { path: "/roads", title: "Roads", section: "Roads", description: "Blogs." },
   {
     path: "/research",
     title: "Research",

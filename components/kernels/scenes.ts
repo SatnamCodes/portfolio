@@ -31,8 +31,52 @@ const m = (at: Where, r: number, c: number, h: number, w: number, tone: Tone): M
   tone,
 });
 
-// Contiguous runs of one row cost one transaction; that is the whole memory model here.
+// Kernel 1 as written in the road: row from .y, col from .x, one thread per element of C.
+// A 4 x 4 block (one "floor") owns a tile of C; two of its threads are followed through the loop.
 function naive(): Scene {
+  const BLOCK = 4;
+  const steps: Step[] = [];
+  let count = 0;
+  const floor = m("C", 0, 0, BLOCK, BLOCK, "tile");
+  const done: Mark[] = [];
+  for (const [row, col] of [
+    [1, 2],
+    [2, 1],
+  ]) {
+    for (let i = 0; i < SIZE; i++) {
+      count += 2;
+      steps.push({
+        marks: [
+          floor,
+          ...done,
+          m("C", row, col, 1, 1, "acc"),
+          m("A", row, 0, 1, SIZE, "tile"),
+          m("B", 0, col, SIZE, 1, "tile"),
+          m("A", row, i, 1, 1, "read"),
+          m("B", i, col, 1, 1, "read"),
+        ],
+        note: `Thread (row ${row}, col ${col}), i = ${i}: sum += A[${row} * K + ${i}] * B[${i} * N + ${col}]`,
+        count,
+      });
+    }
+    done.push(m("C", row, col, 1, 1, "done"));
+    steps.push({
+      marks: [floor, ...done],
+      note: `The loop is done, so this thread writes C[${row} * N + ${col}]. It never talked to any other thread.`,
+      count,
+    });
+  }
+  steps.push({
+    marks: [m("C", 0, 0, BLOCK, BLOCK, "done")],
+    note: "Every room on the floor did the same thing at the same time, each for its own element of C.",
+    count,
+  });
+  return { title: "Kernel 1: naive", counter: "global reads by the highlighted threads", steps };
+}
+
+// Contiguous runs of one row cost one transaction; that is the whole memory model here.
+// A warp laid down a column of C, which is how the matmul repo's naive.cu maps threads.
+function uncoalesced(): Scene {
   const steps: Step[] = [];
   const WARP = 8;
   let count = 0;
@@ -58,7 +102,7 @@ function naive(): Scene {
       count,
     });
   }
-  return { title: "Naive", counter: "global transactions", steps };
+  return { title: "Uncoalesced", counter: "global transactions", steps };
 }
 
 function coalesced(): Scene {
@@ -83,7 +127,7 @@ function coalesced(): Scene {
     done.push(m("C", row, 0, 1, WARP, "done"));
     steps.push({
       marks: [...done],
-      note: "Same arithmetic as the naive kernel, a fraction of the memory transactions.",
+      note: "Same arithmetic as the uncoalesced mapping, a fraction of the memory transactions.",
       count,
     });
   }
@@ -290,6 +334,7 @@ function warptiling(): Scene {
 
 export const KERNELS = {
   naive,
+  uncoalesced,
   coalesced,
   shared,
   blocktiling1d: () =>

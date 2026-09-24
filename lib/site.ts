@@ -2,7 +2,7 @@ export const site = {
   owner: "Satnam",
 } as const;
 
-// Names are deliberate metaphors (Roads = essays, Shelves = notes, Wanderings = thoughts,
+// Names are deliberate metaphors (Roads = blogs, Shelves = notes, Wanderings = thoughts,
 // Traces = photography, New Beginnings = about). Do not rename.
 export const navItems = [
   { label: "Home", href: "/" },

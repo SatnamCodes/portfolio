@@ -1,23 +1,165 @@
 export const metadata = {
-  title: "Achieving cuBLAS-level performance with CUDA matmul",
+  title: "Achieving cuBLAS-Level Performance with CUDA Matmul",
   date: "2026-09-24",
-  description: "Writing an SGEMM kernel from scratch and optimising it step by step towards cuBLAS.",
-  category: "GPU",
-  draft: true,
+  description: "The point isn't to replace a black box, but to open one.",
+  category: "CUDA",
 };
 
-{/* The article text from Hashnode goes in the gaps below, word for word. */}
+Matrix multiplication or matmul is the foundational operation behind almost all the artificial intelligence tools we use today. This post is a part of a longer series where I iteratively try to build and optimize GPU kernels for several algorithms and AI agents, running these iterations across hardware from an NVIDIA GeForce RTX 4060 to an NVIDIA RTX PRO 6000 Blackwell Series. The point isn't to replace a black box, but to open one. The first entry to this series is the optimization of a matmul kernel from a naive implementation to near cuBLAS performance documented as a work log , warts and all.
+
+## Kernel 1 : Naive Matrix Multiplication.
+
+While being the most basic implementation of SGEMM this kernel helps us understand the standard hierarchy of computation.
+
+When we run a kernel , it creates a grid which is further divided into blocks. Each block is then further divided into threads (max 1024). Threads in the same block share the same shared memory region called (SMEM) , this will play an important role in the further implementations of revised kernels.
+
+Consider a grid to be a building with N number of floors with each floor having M number of rooms in the format (001,002,003,00M...N9M).
+
+Now to understand the naiver kernel I will take this example to explore the hierarchy of computation in the GPU.
+
+Here,
+
+Grid - Building  
+Floor - Block  
+Room - Thread.
+
+The M i.e number of rooms (here number of threads in a block) is configured using the ***blockDim*** variable. Now each block is represented as a floor in a building now floors have numbers thus the ***blockIdx*** variable gives us the index of a thread block within the gird. Now each building has a number of floors and thus the total number of floors is represented as ***gridDim*** thus the dimensions of the grid.
+
+Now, within a floor, each room also has its own number, and this is the ***threadIdx*** variable, the index of a thread within its own block. This is actually exactly how real room numbers work: in a room numbered 305, the 3 is the floor (***blockIdx***) and the 05 is the room on that floor (***threadIdx***). Combining the two, that is, which floor you're on, times the number of rooms per floor, plus your room number on that floor, gives you a single, unique room in the entire building. This is precisely how we compute a thread's global position when indexing into our matrices.
+
+Each of these is a 3 component vector with a .x .y and a .z members. threadIdx and blockIdx are ranked from zero. Thus threadIdx belongs to the range \[0,blockDim.x - 1\], the other two dimensions work in the same way.
+
+### ***Why matrices become 1D arrays***
+
+Before we look at the kernel code, we need to answer one question: how does a 2D matrix actually live inside GPU memory?
+
+The truth is, GPUs (and CPUs) don't have "2D memory." Memory is just one long line of boxes, each with a single address, box 0, box 1, box 2, box 3, and so on. So before we can store a matrix, we first have to decide how to squash its rows and columns into that single line. This is called flattening.
+
+Say we have a small 3x4 matrix. Let's label each element by its (row, col) position:
+
+```plaintext
+(0,0) (0,1) (0,2) (0,3)
+(1,0) (1,1) (1,2) (1,3)
+(2,0) (2,1) (2,2) (2,3)
+```
+
+The most common way to flatten this is row-major order, we lay row 0 down first, then row 1 right after it, then row 2 after that:
+
+```plaintext
+Memory:  [ (0,0) (0,1) (0,2) (0,3) | (1,0) (1,1) (1,2) (1,3) | (2,0) (2,1) (2,2) (2,3) ]
+Index:      0      1      2     3      4      5      6     7      8      9     10    11
+```
+
+Now the question becomes: if I want element (row, col), what index do I actually go to?
+
+Notice each row has exactly 4 elements, the number of columns, let's call this the `width`. So:
+
+*   Row 0 starts at index 0
+    
+*   Row 1 starts at index 4, since it has to skip over all 4 elements of row 0
+    
+*   Row 2 starts at index 8, skipping over both row 0 and row 1
+    
+
+So the starting index of any row is simply `row * width`. Once we've jumped to the start of the correct row, we just walk forward `col` more steps to land on the exact element we want. That gives us:
+
+```plaintext
+index = row * width + col
+```
+
+Let's verify it. Element (1, 2) should sit at index 6. Plugging into the formula: `1 * 4 + 2 = 6`. Counting it out in the memory line above, index 6 is indeed (1,2). It checks out.
+
+**Applying this to A, B, and C**
+
+*   A is M rows by K columns, so its width is K. Element (row, i) of A lives at `A[row * K + i]`
+    
+*   B is K rows by N columns, so its width is N. Element (i, col) of B lives at `B[i * N + col]`
+    
+*   C is M rows by N columns, so its width is N. Element (row, col) of C lives at `C[row * N + col]`
+    
+
+And that's the entire origin of the index expressions you'll see in the kernel, nothing more than "skip full rows to reach the right row, then walk across to reach the right column."
+
+```cpp
+__global__ void naiveMatMul(float* A, float* B, float* C, int M, int N, int K) { 
+// "Which floor, which room" -> global row/col in the output matrix C 
+int row = blockIdx.y * blockDim.y + threadIdx.y; 
+// floor number * rooms/floor + room number 
+int col = blockIdx.x * blockDim.x + threadIdx.x;
+// Make sure this "room" actually exists in the building (bounds check)
+if (row < M && col < N) {
+    float sum = 0.0f;
+
+    // Each thread computes exactly one element of C
+    // by walking across a row of A and down a column of B
+    for (int i = 0; i < K; i++) {
+        sum += A[row * K + i] * B[i * N + col];
+    }
+
+    C[row * N + col] = sum;
+}
+}
+```
+
+Now lets take a glance at the kernel function that we wrote. The function starts with `__global__` that marks it as a kernel. A kernel is nothing but a function that can run on a GPU but is launched from the CPU i.e host code.
+
+**Computing row and column** : This is the building analogy in the code.
+
+`blockIdx.y * blockDim.y + threadIdx.y` says that "My floor number times the number of rooms in the floor plus my room number on the floor" and the result is my unique room number in the whole building here interpreted as a `row` index into C. Same logic is used for `col` using the `.x` dimension. Every single thread in the the entire grid runs this exact same line but gets a different row,col combination beacuse its `blockIdx` and `threadIdx` are different.
+
+**The bounds check** : `if (row<M && col<N)`. Since blocks are a fixed size but matrix dimensions might not divide evenly into that we can end up launching more threads than there are actual matrix elements . This check just makes sure a thread does not write outside the matrix i.e into the memory it does not own.
+
+The loop : This is the actual dot product. Each thread walks along `row` of A and down the column `col` of B , multiplying and accumalating into `sum`. Node `A[row*K + i]` , matrices are stored as flat 1D arrays in memory so `row*K+i` is how you convert a 2d (row,i) coordinate into a 1D memory offset for a row major matrix of width K. Same is the idea for B with B being row major of width N.
+
+**The write**: once the loop finishes, `sum` holds the full dot product for that one output element, and it gets written to `C[row * N + col]`.
+
+The key idea for kernel 1 specifically: **one thread computes exactly one output element**, and does it completely independently, with its own full pass through global memory. No thread talks to any other thread. That's both what makes it simple to understand and what makes it slow.
 
 <KernelAnimation kernel="naive" />
 
-<KernelAnimation kernel="coalesced" />
+**Launch configuration of the naive kernel**
 
-<KernelAnimation kernel="shared" />
+Writing the kernel function only defines what one thread does. It doesn't yet say how many threads to create, or how to arrange them into blocks and a grid. That's the job of the launch configuration, the part that actually constructs the building before anyone moves in.
 
-<KernelAnimation kernel="blocktiling1d" />
+```cpp
+dim3 blockDim(16, 16);
+dim3 gridDim((N + blockDim.x - 1) / blockDim.x,
+             (M + blockDim.y - 1) / blockDim.y);
 
-<KernelAnimation kernel="blocktiling2d" />
+naiveMatMul<<<gridDim, blockDim>>>(A, B, C, M, N, K);
+```
 
-<KernelAnimation kernel="vectorized" />
+**Choosing room size first:** `blockDim`
 
-<KernelAnimation kernel="warptiling" />
+`dim3` is just a small container for up to three numbers (x, y, z), CUDA uses it to describe sizes in up to 3 dimensions. Here we're saying each block (floor) will have 16 threads along x and 16 threads along y, so 16 x 16 = 256 threads (rooms) per floor. This number is a choice we make, not something forced on us. 16x16 is a common starting point because it's comfortably under the 1024-threads-per-block limit, and it divides evenly into groups of 32 (called warps), which is how the hardware actually schedules threads.
+
+**Figuring out how many floors we need:** `gridDim`
+
+We know we need one thread per output element of C, and C is M rows by N columns. So we need at least M x N threads in total. Since each block only gives us 16 x 16 threads, we need to figure out how many blocks it takes to cover the full matrix.
+
+If N were exactly 64, this would be easy, `64 / 16 = 4` blocks across. But what if N is 70? `70 / 16 = 4.375`, and integer division in C++ truncates that down to 4. Four blocks only gives us `4 * 16 = 64` threads, which is 6 threads short of covering all 70 columns.
+
+To fix this, we round up instead of down:
+
+```cpp
+(N + blockDim.x - 1) / blockDim.x
+```
+
+Adding `blockDim.x - 1` before dividing pushes any leftover remainder over to the next whole number, without affecting exact multiples. Checking both cases:
+
+*   N = 64: `(64 + 15) / 16 = 79 / 16 = 4` (still 4, correct, no rounding needed since it divided evenly)
+    
+*   N = 70: `(70 + 15) / 16 = 85 / 16 = 5` (rounds up to 5, giving `5 * 16 = 80` threads, enough to cover all 70 columns)
+    
+
+This is exactly why the bounds check inside the kernel (`if (row < M && col < N)`) matters. In the N = 70 case, those extra 10 threads still exist and still run, but there's no real matrix data for them, so the bounds check simply tells them to do nothing.
+
+The same rounding-up logic applies to the y dimension using M, giving us the total number of floors needed in both directions.
+
+**Actually launching the kernel**
+
+```cpp
+naiveMatMul<<<gridDim, blockDim>>>(A, B, C, M, N, K);
+```
+
+The triple angle brackets are CUDA's special syntax for launching a kernel. They tell the GPU to build a grid shaped like `gridDim`, where every block is shaped like `blockDim`, and the normal parentheses after that pass in the actual function arguments, same as any regular function call. The moment this line executes, the entire building gets constructed at once, every floor, every room, all `gridDim.x * gridDim.y * blockDim.x * blockDim.y` threads spin up in parallel, each one running the exact same kernel code but computing a different `row`/`col` because of its own `blockIdx` and `threadIdx`.

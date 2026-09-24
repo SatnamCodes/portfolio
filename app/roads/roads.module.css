@@ -98,3 +98,101 @@
     text-align: right;
   }
 }
+
+/* Category filters and search: set in the meta face, like the dates and asides. */
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-lg);
+  margin-block: var(--space-lg);
+  padding-block: var(--space-xs);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-md);
+  list-style: none;
+  padding: 0;
+}
+
+.tool {
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
+  transition:
+    color 160ms,
+    text-decoration-color 160ms;
+}
+
+.tool:hover,
+.tool[aria-pressed="true"] {
+  color: var(--color-ink);
+  text-decoration-color: currentColor;
+}
+
+.tool:focus-visible {
+  outline: 2px solid var(--color-espresso);
+  outline-offset: 2px;
+}
+
+.search {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-left: auto;
+}
+
+.query {
+  width: min(16rem, 60vw);
+  padding: 0.25rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-ink);
+  background: none;
+  font-family: var(--font-display);
+  font-size: var(--type-body-md);
+  font-style: italic;
+  color: var(--color-ink);
+  animation: open 320ms var(--ease-out) both;
+}
+
+@keyframes open {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+
+/* The rule under the field thickens on focus instead of a box outline. */
+.query:focus {
+  outline: none;
+  box-shadow: 0 1px 0 var(--color-ink);
+}
+
+.query::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.query::placeholder {
+  color: var(--color-ink-faint);
+}
+
+.none {
+  max-width: var(--measure);
+  padding-block: var(--space-lg);
+  font-style: italic;
+  color: var(--color-ink-muted);
+}

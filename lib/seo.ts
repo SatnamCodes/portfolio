@@ -11,7 +11,7 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://satnamport
 
 export const SITE_NAME = "Satnam";
 export const SITE_DESCRIPTION =
-  "Satnam's personal site: GPU computing with CUDA, machine learning and systems projects, research notes, essays, book notes and astrophotography.";
+  "Satnam's personal site: GPU computing with CUDA, machine learning and systems projects, research notes, blogs, book notes and astrophotography.";
 
 // Profiles that genuinely belong to the site's owner (used as Person.sameAs and in llms.txt).
 export const PROFILES = {
