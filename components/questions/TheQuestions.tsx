@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { PageLink } from "@/components/PageLink";
 import { asset } from "@/lib/base-path";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { Env, Fonts } from "./engine/core";
@@ -290,10 +291,16 @@ export function TheQuestions({ colophon }: { colophon: string }) {
           ))}
         </ol>
         <p className={s.final}>{FINAL}</p>
+        <p className={s.src}>
+          <PageLink href="/questions">See all ten on the plate, with sources</PageLink>
+        </p>
       </div>
       {reduced && <canvas ref={canvas} className={s.still} aria-hidden="true" />}
       {!reduced && (
         <div className={s.controls}>
+          <PageLink href="/questions" className={s.plateLink}>
+            The plate
+          </PageLink>
           <button type="button" onClick={togglePlay} aria-pressed={playing}>
             {ended ? "Replay" : playing ? "Pause" : "Play"}
           </button>

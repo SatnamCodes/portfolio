@@ -42,6 +42,12 @@ export const SECTIONS: PublicRoute[] = [
     description: "The owner's story, in chapters.",
   },
   {
+    path: "/questions",
+    title: "The Questions",
+    section: "Questions",
+    description: "A plate of ten questions, from Socrates to Keats, with sources.",
+  },
+  {
     path: "/post",
     title: "Post",
     section: "Contact",

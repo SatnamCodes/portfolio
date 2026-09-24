@@ -109,8 +109,6 @@ export function question(
   ctx.textBaseline = "top";
   const lines = wrap(ctx, text, maxW);
   const lh = size * 1.12;
-  const blur = (1 - clamp(alpha * 1.4)) * 6;
-  if (blur > 0.3) ctx.filter = `blur(${blur.toFixed(1)}px)`;
   lines.forEach((l, i) => {
     const yy = y + i * lh;
     ctx.fillStyle = `rgba(160,60,50,${(alpha * 0.1).toFixed(3)})`;

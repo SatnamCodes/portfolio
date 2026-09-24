@@ -92,7 +92,8 @@
   z-index: 2;
 }
 
-.controls button {
+.controls button,
+.plateLink {
   min-height: 44px;
   padding: 0;
   border: 0;
@@ -112,7 +113,9 @@
 }
 
 .controls button:hover,
-.controls button:focus-visible {
+.controls button:focus-visible,
+.plateLink:hover,
+.plateLink:focus-visible {
   color: var(--color-ink);
   text-decoration-color: currentColor;
 }
@@ -153,4 +156,9 @@
   color: var(--color-ink);
   background: rgb(255 244 228 / 0.9);
   border: 1px solid var(--color-rule);
+}
+
+.plateLink {
+  display: inline-flex;
+  align-items: center;
 }

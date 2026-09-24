@@ -85,7 +85,7 @@ export function finish(e: Env, grainTile: HTMLCanvasElement) {
   ctx.fillRect(0, 0, w + 200, h + 200);
   ctx.restore();
   // Exposure breathing: a very slight flicker.
-  const flick = 0.012 + 0.012 * Math.sin(now * 23) * Math.sin(now * 7.3);
+  const flick = 0.006 + 0.004 * Math.sin(now * 23) * Math.sin(now * 7.3);
   ctx.fillStyle = `rgba(255,244,228,${Math.max(0, flick).toFixed(3)})`;
   ctx.fillRect(0, 0, w, h);
   // Dust: a few specks that live for a moment.

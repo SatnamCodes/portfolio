@@ -243,7 +243,9 @@ export function render(e: Env, colophon: string, bare = false) {
   if (bare) return;
 
   for (const q of QUESTIONS) {
-    const alpha = fade(t, q.a, q.a + 1.2, q.b - 0.8, q.b);
+    // Short questions get short fades, so each one is fully sharp for most of its time.
+    const edge = Math.min(0.9, (q.b - q.a) * 0.2);
+    const alpha = fade(t, q.a, q.a + edge, q.b - edge, q.b);
     if (alpha <= 0) continue;
     if (q.where === "side") question(e, q.text, alpha, L.qx, L.qy, L.qw, L.qSize, L.align);
     else if (q.where === "low")

@@ -4,7 +4,7 @@
 // The narration file (optional). The animation never waits for it.
 export const AUDIO_SRC = "/audio/the-questions.mp3";
 
-export const DURATION = 136; // seconds; the last few hold the resting "end of page" frame
+export const DURATION = 144; // seconds; the last few hold the resting "end of page" frame
 
 export type SceneId =
   | "question"

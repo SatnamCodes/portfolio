@@ -1,0 +1,175 @@
+.page {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--space-xxxl);
+}
+
+.header {
+  padding: var(--space-xl) 0 var(--space-lg);
+  max-width: var(--measure);
+}
+
+.kicker {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.kicker a {
+  color: inherit;
+}
+
+.title {
+  margin-top: var(--space-sm);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-display-xl);
+  line-height: 1;
+}
+
+.lead {
+  margin-top: var(--space-md);
+  font-size: var(--type-body-lg);
+  color: var(--color-ink-muted);
+}
+
+/* The plate: a warm engraved sheet with a double ruled border, like a frontispiece. */
+.plate {
+  margin: 0;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background:
+    radial-gradient(ellipse at 50% 35%, transparent 55%, rgb(120 80 50 / 0.07)),
+    var(--color-paper-deep);
+  outline: 1px solid var(--color-ink);
+  outline-offset: -8px;
+  box-shadow:
+    inset 0 0 0 12px var(--color-paper-deep),
+    inset 0 0 0 13px var(--color-rule);
+}
+
+.niches {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--space-lg) var(--space-md);
+}
+
+.niche {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  animation: rise 700ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+/* Each emblem stands in an arched niche. */
+.arch {
+  width: min(9rem, 100%);
+  aspect-ratio: 3 / 4;
+  display: grid;
+  place-items: center;
+  padding: 0.75rem;
+  border: 1px solid var(--color-ink-faint);
+  border-radius: 999px 999px 2px 2px;
+  color: var(--color-ink);
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0.35), transparent 70%);
+}
+
+.arch svg {
+  width: 100%;
+  height: auto;
+}
+
+.arch svg text {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 14px;
+  fill: currentColor;
+  stroke: none;
+}
+
+.name {
+  margin-top: var(--space-xs);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.meta {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.question {
+  font-family: var(--font-fountain);
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--color-espresso-tint-1);
+}
+
+.quote {
+  font-family: var(--font-body);
+  font-style: italic;
+}
+
+.caption {
+  margin-top: var(--space-lg);
+  max-width: var(--measure);
+  margin-inline: auto;
+  text-align: center;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--color-ink-muted);
+}
+
+.sources {
+  margin-top: var(--space-xxl);
+  max-width: var(--measure);
+}
+
+.sourcesTitle {
+  font-family: var(--font-meta);
+  font-weight: 500;
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-ink);
+  margin-bottom: var(--space-md);
+}
+
+.sources ol {
+  padding-left: 1.25em;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.next {
+  color: var(--color-ink-muted);
+  font-style: italic;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+}
+
+/* Two rows of five on wide screens: balanced, like a hung series. */
+@media (min-width: 64rem) {
+  .niches {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}

@@ -13,6 +13,7 @@ import {
   seg,
 } from "../engine/core";
 import { caption, circlePts, handwrite, linePts, mathText, type Pt, stroke } from "../engine/ink";
+import { hand } from "../engine/ascii";
 import { glow } from "../engine/texture";
 import { euclid, fieldLines, table, tape, TURING_STATES } from "./geometry";
 
@@ -348,106 +349,195 @@ export function sceneConvergence(e: Env, L: Layout) {
   memories(e, L, 0.12 * fade(t, 109.6, 110.6, 117.5, 119.2));
 }
 
-/** 12. The prism: one beam in, a spectrum out, and then one beam again. Then the page rests. */
+/** 12. The prism: one beam in, seven out; a second, inverted prism gathers the seven back into
+ *  white (Newton's own experimentum crucis, run in reverse). Then two hands meet. */
 export function scenePrism(e: Env, L: Layout, colophon: string) {
   const { t, w, h, ctx } = e;
   const lay = illustrationLayout(w, h * 0.9, e.portrait ? w * 0.9 : w * 0.8);
-  const shiftY = h * 0.03;
+  const shiftY = e.portrait ? h * 0.02 : h * 0.03;
   const P = (p: readonly [number, number]): Pt => [p[0], p[1] + shiftY];
   const [start, entry] = [P(lay.start), P(lay.entry)];
-  // The white beam arrives from the convergence point.
-  const beamIn = easeInOut(seg(t, 120, 121.6));
-  const bx = lerp(start[0], entry[0], beamIn),
-    byy = lerp(start[1], entry[1], beamIn);
+  const recede = 1 - seg(t, 134, 136.5) * 0.82; // the prisms step back for the hands
   ctx.save();
+  ctx.globalAlpha = recede;
   ctx.lineCap = "round";
-  const white = (x1: number, y1: number, x2: number, y2: number, wid: number, alpha: number) => {
-    const g = ctx.createLinearGradient(x1, y1, x2, y2);
-    g.addColorStop(0, `rgba(255,255,255,0)`);
-    g.addColorStop(0.3, `rgba(255,255,250,${alpha})`);
+  const whiteLine = (a: Pt, b: Pt, wid: number, alpha: number, fadeIn = true) => {
+    if (alpha <= 0.002) return;
+    const g = ctx.createLinearGradient(a[0], a[1], b[0], b[1]);
+    g.addColorStop(0, `rgba(255,255,250,${fadeIn ? 0 : alpha})`);
+    g.addColorStop(fadeIn ? 0.3 : 0, `rgba(255,255,250,${alpha})`);
     g.addColorStop(1, `rgba(255,255,250,${alpha})`);
     ctx.strokeStyle = g;
     ctx.lineWidth = wid;
     ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
+    ctx.moveTo(a[0], a[1]);
+    ctx.lineTo(b[0], b[1]);
     ctx.stroke();
-    ctx.strokeStyle = `rgba(200,180,150,${(alpha * 0.35).toFixed(3)})`;
+    ctx.strokeStyle = `rgba(190,165,130,${(alpha * 0.4).toFixed(3)})`;
     ctx.lineWidth = 0.6;
     ctx.stroke();
   };
-  white(start[0], start[1], bx, byy, 3, 0.95);
-  glow(e, bx, byy, 40, 0.5 * seg(t, 120.2, 121));
-  // The glass: the site's prism, drawn in the illustration's geometry.
-  const tri = lay.triangle.map(P);
-  const glass = seg(t, 120.4, 121.8);
-  if (glass > 0) {
+  const glass = (tri: Pt[], alpha: number) => {
+    if (alpha <= 0) return;
     ctx.beginPath();
     tri.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
     ctx.closePath();
     const gg = ctx.createLinearGradient(tri[1][0], tri[0][1], tri[2][0], tri[1][1]);
-    gg.addColorStop(0, `rgba(255,255,255,${(0.55 * glass).toFixed(3)})`);
-    gg.addColorStop(1, `rgba(232,211,172,${(0.35 * glass).toFixed(3)})`);
+    gg.addColorStop(0, `rgba(255,255,255,${(0.55 * alpha).toFixed(3)})`);
+    gg.addColorStop(1, `rgba(232,211,172,${(0.35 * alpha).toFixed(3)})`);
     ctx.fillStyle = gg;
     ctx.fill();
-    ctx.strokeStyle = ink(0.55 * glass);
+    ctx.strokeStyle = ink(0.55 * alpha);
     ctx.lineWidth = 1.1;
     ctx.stroke();
-  }
-  // Dispersion, then recombination: the bands' far ends drift back together and whiten.
-  const bands = seg(t, 121.8, 124);
-  const rejoin = easeInOut(seg(t, 128.6, 131.2));
-  const colors = Object.values(spectrum);
-  const mid = P(lay.ends[3]);
-  const midIn = P(lay.internal[3]);
-  if (bands > 0) {
-    lay.ends.forEach((end0, i) => {
-      const inner = P(lay.internal[i]);
-      const endP = P(end0);
-      const ex = lerp(endP[0], mid[0], rejoin),
-        ey = lerp(endP[1], mid[1], rejoin);
-      const ix = lerp(inner[0], midIn[0], rejoin),
-        iy = lerp(inner[1], midIn[1], rejoin);
-      const p = easeOut(clampSeg(bands, i));
-      const x2 = lerp(ix, ex, p),
-        y2 = lerp(iy, ey, p);
-      // Inside the glass: faint.
-      ctx.strokeStyle = `rgba(255,255,255,${(0.5 * bands).toFixed(3)})`;
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.moveTo(entry[0], entry[1]);
-      ctx.lineTo(ix, iy);
-      ctx.stroke();
-      const c = colors[i];
-      const g = ctx.createLinearGradient(ix, iy, ex, ey);
-      g.addColorStop(0, mix(c, "#ffffff", rejoin));
-      g.addColorStop(1, hexA(mix(c, "#ffffff", rejoin), 0.15));
-      ctx.strokeStyle = g;
-      ctx.lineWidth = 5.5 * (1 - rejoin * 0.5);
-      ctx.globalAlpha = 0.9;
-      ctx.beginPath();
-      ctx.moveTo(ix, iy);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    });
-  }
-  ctx.restore();
-  // The colophon: the page ends here.
-  caption(e, colophon, seg(t, 133, 135) * 0.8, w / 2, h - 40, "center");
-  stroke(
+  };
+  // White light arrives.
+  const beamIn = easeInOut(seg(t, 120, 121.6));
+  whiteLine(start, [lerp(start[0], entry[0], beamIn), lerp(start[1], entry[1], beamIn)], 3, 0.95);
+  glow(
     e,
-    [
-      [w / 2 - 20, h - 52],
-      [w / 2 + 20, h - 52],
-    ],
-    1,
-    0.6,
-    seg(t, 133, 135) * 0.4,
+    lerp(start[0], entry[0], beamIn),
+    lerp(start[1], entry[1], beamIn),
+    40,
+    0.5 * seg(t, 120.2, 121) * (1 - seg(t, 122, 123)),
   );
+  const tri1 = lay.triangle.map(P);
+  glass(tri1, seg(t, 120.4, 121.8));
+
+  // The second prism: the first one, turned upside down, set where the fan is still narrow.
+  const inner = lay.internal.map(P);
+  const ends = lay.ends.map(P);
+  const cx1 = (tri1[0][0] + tri1[1][0] + tri1[2][0]) / 3;
+  const cy1 = (tri1[0][1] + tri1[1][1] + tri1[2][1]) / 3;
+  const gap = e.portrait ? w * 0.36 : Math.min(w * 0.36, (ends[3][0] - inner[3][0]) * 0.78);
+  const mid = inner[3];
+  const dirMid = [ends[3][0] - mid[0], ends[3][1] - mid[1]];
+  const dl = Math.hypot(dirMid[0], dirMid[1]);
+  const c2: Pt = [
+    mid[0] + (dirMid[0] / dl) * gap + (cx1 - tri1[0][0]) * 0.1,
+    mid[1] + (dirMid[1] / dl) * gap,
+  ];
+  const tri2 = tri1.map(([x, y]) => [c2[0] - (x - cx1), c2[1] - (y - cy1)] as Pt); // rotated 180°
+  // Its entrance face: the edge facing back toward the first prism.
+  const faces: [Pt, Pt][] = [
+    [tri2[0], tri2[1]],
+    [tri2[1], tri2[2]],
+    [tri2[2], tri2[0]],
+  ];
+  const hit = (o: Pt, d: number[]) => {
+    let best: Pt | null = null,
+      bt = Infinity;
+    for (const [a, b] of faces) {
+      const ex = b[0] - a[0],
+        ey = b[1] - a[1];
+      const den = d[0] * ey - d[1] * ex;
+      if (Math.abs(den) < 1e-9) continue;
+      const tt = ((a[0] - o[0]) * ey - (a[1] - o[1]) * ex) / den;
+      const u = ((a[0] - o[0]) * d[1] - (a[1] - o[1]) * d[0]) / den;
+      if (tt > 0.02 && u >= 0 && u <= 1 && tt < bt) {
+        bt = tt;
+        best = [o[0] + d[0] * tt, o[1] + d[1] * tt];
+      }
+    }
+    return best;
+  };
+  const exit: Pt = [c2[0] + (cx1 - tri1[0][0]) * 0.55, c2[1] - (cy1 - tri1[0][1]) * 0.05];
+  const colors = Object.values(spectrum);
+  const fan = seg(t, 121.8, 124);
+  const reach = easeInOut(seg(t, 124, 126.4));
+  const gather = easeInOut(seg(t, 126.4, 127.6));
+  glass(tri2, seg(t, 123.2, 124.6));
+  inner.forEach((ip, i) => {
+    const d = [ends[i][0] - ip[0], ends[i][1] - ip[1]];
+    const at = hit(ip, d) ?? ends[i];
+    // Before the second prism appears, the fan spreads freely; then it runs into the glass.
+    const far: Pt = [
+      lerp(lerp(ip[0], ends[i][0], 0.35), at[0], reach),
+      lerp(lerp(ip[1], ends[i][1], 0.35), at[1], reach),
+    ];
+    const p = easeOut(Math.min(1, Math.max(0, fan * 1.4 - i * 0.06)));
+    const tip: Pt = [lerp(ip[0], far[0], p), lerp(ip[1], far[1], p)];
+    ctx.strokeStyle = `rgba(255,255,255,${(0.5 * fan).toFixed(3)})`;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(entry[0], entry[1]);
+    ctx.lineTo(ip[0], ip[1]);
+    ctx.stroke();
+    const g = ctx.createLinearGradient(ip[0], ip[1], tip[0], tip[1]);
+    g.addColorStop(0, colors[i]);
+    g.addColorStop(1, hexA(colors[i], 0.6));
+    ctx.strokeStyle = g;
+    ctx.lineWidth = 5;
+    ctx.globalAlpha = 0.9 * recede;
+    ctx.beginPath();
+    ctx.moveTo(ip[0], ip[1]);
+    ctx.lineTo(tip[0], tip[1]);
+    ctx.stroke();
+    // Inside the second prism: the colours converge on one point of the far face.
+    if (gather > 0 && reach > 0.99) {
+      ctx.strokeStyle = hexA(mix(colors[i], "#ffffff", gather * 0.6), 0.75);
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(at[0], at[1]);
+      ctx.lineTo(lerp(at[0], exit[0], gather), lerp(at[1], exit[1], gather));
+      ctx.stroke();
+    }
+    ctx.globalAlpha = recede;
+  });
+  // And white light leaves.
+  const out = easeOut(seg(t, 127.6, 129.2));
+  whiteLine(exit, [lerp(exit[0], w + 20, out), exit[1]], 3, 0.95, false);
+  glow(e, exit[0], exit[1], 36, 0.6 * seg(t, 127.4, 128) * (1 - seg(t, 129.5, 131)));
+  ctx.restore();
+
+  hands(e, t);
+  // The colophon: the page ends here.
+  const col = seg(t, 141, 143) * 0.8;
+  if (colophon) {
+    caption(e, colophon, col, w / 2, h - 40, "center");
+    stroke(
+      e,
+      [
+        [w / 2 - 20, h - 52],
+        [w / 2 + 20, h - 52],
+      ],
+      1,
+      0.6,
+      col * 0.5,
+    );
+  }
 }
 
-const clampSeg = (x: number, i: number) => Math.min(1, Math.max(0, x * 1.4 - i * 0.06));
+/** Two hands in ASCII, after the Sistine ceiling; here the fingers close the gap and touch. */
+function hands(e: Env, t: number) {
+  const a = seg(t, 134.4, 136);
+  if (a <= 0) return;
+  const { ctx, w, h } = e;
+  const cell = e.portrait ? 4 : 5.5;
+  const width = e.portrait ? w * 0.47 : Math.min(w * 0.4, 620);
+  const adam = hand(false, width, cell);
+  const god = hand(true, width, cell);
+  const cy = e.portrait ? h * 0.63 : h * 0.6;
+  const touch = easeInOut(seg(t, 136, 140.5));
+  const gapPx = lerp(w * 0.12, 0, touch);
+  const leftX = w / 2 - gapPx / 2 - adam.tipX;
+  const rightTip = w / 2 + gapPx / 2;
+  ctx.save();
+  // Monospace glyphs are ~0.6 em wide: size the font so one glyph fills one sampled cell.
+  ctx.font = `${cell / 0.6}px ui-monospace, "SF Mono", Menlo, Consolas, monospace`;
+  ctx.textBaseline = "top";
+  ctx.fillStyle = ink(0.75 * a);
+  adam.rows.forEach((r, i) => ctx.fillText(r, leftX, cy - adam.tipY + i * adam.ch));
+  // God's hand is the same drawing mirrored, reaching left.
+  ctx.translate(rightTip, cy - god.tipY);
+  ctx.scale(-1, 1);
+  god.rows.forEach((r, i) => ctx.fillText(r, -god.tipX, i * god.ch));
+  ctx.restore();
+  // The moment of contact.
+  const spark = seg(t, 140.3, 140.8) * (1 - seg(t, 141.5, 143.5));
+  glow(e, w / 2, cy, 40, 0.8 * spark, "255,240,210");
+}
+
 function mix(a: string, b: string, t: number) {
   const pa = parseInt(a.slice(1), 16),
     pb = parseInt(b.slice(1), 16);
