@@ -38,6 +38,7 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /portfolio
           NEXT_PUBLIC_SITE_URL: https://satnamportfolio.vercel.app
           NEXT_PUBLIC_POST_URL: https://satnamportfolio.vercel.app/api/post
+          NEXT_PUBLIC_ACTIVITY_URL: https://satnamportfolio.vercel.app/api/activity
       - name: Tidy output
         run: |
           find out -type d -name __empty -prune -exec rm -rf {} +

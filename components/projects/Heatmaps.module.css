@@ -74,12 +74,21 @@
   fill: var(--color-ink-faint);
 }
 
-/* Espresso ink on Sea Sand paper, lightest to darkest. */
+/* Espresso ink on Sea Sand paper, lightest to darkest. Hidden until the section scrolls into
+   view, then drawn in week by week, left to right. */
 .scroll rect {
   rx: 2px;
   fill: var(--color-paper-deep);
-  animation: cell-in 500ms var(--ease-out) both;
-  animation-delay: calc(var(--w) * 12ms);
+  transition: fill 600ms var(--ease-out);
+}
+
+.heatmaps[data-armed]:not([data-shown]) .scroll rect {
+  opacity: 0;
+}
+
+.heatmaps[data-shown] .scroll rect {
+  animation: cell-in 520ms var(--ease-out) both;
+  animation-delay: calc(var(--w) * 14ms);
 }
 
 .scroll rect[data-level="1"] {
@@ -101,6 +110,34 @@
 @keyframes cell-in {
   from {
     opacity: 0;
+    transform: scale(0.4);
     filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.scroll rect {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.updated {
+  float: right;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll rect,
+  .heatmaps[data-armed]:not([data-shown]) .scroll rect {
+    opacity: 0;
+  }
+
+  .heatmaps[data-shown] .scroll rect {
+    opacity: 1;
+    animation: none;
   }
 }

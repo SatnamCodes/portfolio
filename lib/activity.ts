@@ -1,10 +1,10 @@
 import "server-only";
 
 // Daily activity from three public sources, for the Projects heatmaps. Fetched on the server and
-// cached for half a day; a source that fails simply renders as unavailable.
+// cached for ten minutes; a source that fails simply renders as unavailable.
 export type Activity = { days: Record<string, number>; total: number };
 
-const REVALIDATE = 60 * 60 * 12;
+const REVALIDATE = 60 * 10; // ten minutes
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 export const PROFILES = {
@@ -84,5 +84,5 @@ export async function getActivity() {
     settle(leetcode()),
     settle(codeforces()),
   ]);
-  return { github: gh, leetcode: lc, codeforces: cf };
+  return { at: new Date().toISOString(), github: gh, leetcode: lc, codeforces: cf };
 }
