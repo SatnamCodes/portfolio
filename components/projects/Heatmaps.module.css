@@ -74,25 +74,26 @@
 }
 
 /* Espresso ink on Sea Sand paper, lightest to darkest. */
-.cell {
+.scroll rect {
+  rx: 2px;
   fill: var(--color-paper-deep);
   animation: cell-in 500ms var(--ease-out) both;
   animation-delay: calc(var(--w) * 12ms);
 }
 
-.cell[data-level="1"] {
+.scroll rect[data-level="1"] {
   fill: var(--color-espresso-tint-3);
 }
 
-.cell[data-level="2"] {
+.scroll rect[data-level="2"] {
   fill: var(--color-espresso-tint-2);
 }
 
-.cell[data-level="3"] {
+.scroll rect[data-level="3"] {
   fill: var(--color-espresso-tint-1);
 }
 
-.cell[data-level="4"] {
+.scroll rect[data-level="4"] {
   fill: var(--color-espresso);
 }
 

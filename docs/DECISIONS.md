@@ -538,3 +538,16 @@ mdx-components.tsx   required by @next/mdx in the App Router
 - **Books:** *Programming Massively Parallel Processors* (Hwu, Kirk, El Hajj; Morgan Kaufmann, 4th ed., 2022), *Mathematics for Machine Learning* (Deisenroth, Faisal, Ong; CUP, 2020), *Introduction to Algorithms* (CLRS; MIT Press, 4th ed., 2022) and, in Current Reads, *Crime and Punishment* (Dostoevsky, 1866). `bookSchema` gained optional `published` and `link` fields, which the reader shows under the author.
 - **"Plain type" is now "View as article" / "View as notebook"** (same stored preference). On Shelves the book dialog becomes a full-window, single-column web article: serif body at a 42rem measure, no ruled paper, no pages, no crease, no cover flap. Wanderings entries use the same label.
 - **X send-off:** the owner's smoking clip, recoloured frame by frame with a three-tone gradient map (#1c1210 → #7d4e3a → Sea Sand), saved as `public/post/x-smoke.gif` (2.5MB) and as an animated WebP (300KB) that the page actually loads. The X mark condenses over it, then the browser goes to X after 4.2s.
+
+### Revision 9: reels fit, reels on film, X clip without logo, SEO/AEO system (2026-09-24, owner request)
+- **Reel frames** use `object-fit: contain` on black, so a whole moon or sun always fits the cell. The black letterbox reads as sky.
+- **Video reels:** two Instagram reel downloads (`traces/*.mp4`) and one local montage (#NASAMoonSnap with NASA Artemis's reply), transcoded to 720p muted H.264 (0.45–0.84MB each) with poster frames. A frame plays only while it's on screen; the viewer shows the clip with controls. Instagram itself can't be fetched (401 without login).
+- **X send-off:** the X mark over the clip is removed.
+- **SEO/AEO:** see `docs/SEO_*.md` and `docs/SEO_IMPLEMENTATION_REPORT.md`.
+- **Pronouns:** alt text no longer uses "his"; the owner's pronouns aren't stated.
+
+### Revision 10: GitHub Pages mirror (2026-09-24, owner request)
+- `GITHUB_PAGES=1` switches `next.config.ts` to `output: "export"`, `basePath: /portfolio`, `trailingSlash` (directory indexes), no headers, and a custom image loader (`lib/image-loader.ts`) that serves images unoptimised under the base path. Raw `<img>`/`<video>` URLs go through `asset()` (`lib/base-path.ts`).
+- Metadata routes are `force-static`. Detail routes use `staticParams()`, which emits a placeholder only for an all-draft section on Pages; the workflow deletes it.
+- The letter form posts to `NEXT_PUBLIC_POST_URL` (the Vercel endpoint) on Pages; `/api/post` answers CORS only for `POST_ALLOWED_ORIGINS`.
+- Verified locally: the export serves under `/portfolio` with no failed requests or console errors, the Vercel build is unchanged, SEO tests pass, and CORS allows github.io and refuses other origins.

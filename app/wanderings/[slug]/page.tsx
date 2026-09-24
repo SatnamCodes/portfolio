@@ -1,17 +1,20 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { notFound } from "next/navigation";
 import { Page } from "@/components/Page";
 import { PageLink } from "@/components/PageLink";
 import { PlainTypeFrame, PlainTypeToggle } from "@/components/PlainType";
 import { inkComponents } from "@/components/wanderings/Ink";
 import ink from "@/components/wanderings/ink.module.css";
-import { formatDate, getWanderings, opening } from "@/lib/content";
+import { formatDate, getWanderings, opening, staticParams } from "@/lib/content";
+import { article, breadcrumbs, webPage } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 import s from "./entry.module.css";
 
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return (await getWanderings()).map((w) => ({ slug: w.slug }));
+  return staticParams((await getWanderings()).map((x) => x.slug));
 }
 
 async function find(params: Promise<{ slug: string }>) {
@@ -25,16 +28,36 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const entry = await find(params);
-  return entry ? { title: entry.meta.title ?? opening(entry.source, 8) } : {};
+  if (!entry) return {};
+  return pageMetadata({
+    title: entry.meta.title ?? opening(entry.source, 8),
+    description: opening(entry.source, 30),
+    path: `/wanderings/${entry.slug}`,
+    type: "article",
+    published: entry.meta.date,
+  });
 }
 
 export default async function WanderingEntry({ params }: { params: Promise<{ slug: string }> }) {
   const entry = await find(params);
   if (!entry) notFound();
   const { meta, Body, words } = entry;
+  const path = `/wanderings/${entry.slug}`;
+  const title = meta.title ?? opening(entry.source, 8);
+  const description = opening(entry.source, 30);
 
   return (
     <Page>
+      <JsonLd
+        nodes={[
+          webPage(path, title, description),
+          breadcrumbs([
+            { name: "Wanderings", path: "/wanderings" },
+            { name: title, path },
+          ]),
+          article({ path, title, description, date: meta.date }),
+        ]}
+      />
       <PlainTypeFrame className={s.entry}>
         <header className={s.header}>
           <p className={s.meta}>

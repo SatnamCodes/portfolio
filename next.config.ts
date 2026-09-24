@@ -23,27 +23,45 @@ const securityHeaders: Header[] = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 
+// GITHUB_PAGES=1 builds the static mirror for GitHub Pages (.github/workflows/pages.yml): a plain
+// export under /portfolio, with no server features (API routes, headers, image optimisation).
+const pages = process.env.GITHUB_PAGES === "1";
+const basePath = pages ? (process.env.NEXT_PUBLIC_BASE_PATH ?? "/portfolio") : "";
+
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "mdx"],
+  ...(pages
+    ? {
+        output: "export" as const,
+        basePath,
+        trailingSlash: true,
+        images: { loader: "custom" as const, loaderFile: "./lib/image-loader.ts" },
+      }
+    : {}),
   outputFileTracingExcludes: {
     "/*": ["content/**/*"],
   },
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: securityHeaders,
-      },
-      {
-        source: "/style-guide",
-        headers: [
-          ...securityHeaders,
-          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
-        ],
-      },
-    ];
-  },
+  // Static hosting can't send headers; the export skips them.
+  ...(pages ? {} : { headers }),
 };
+
+async function headers() {
+  return [
+    {
+      source: "/:path*",
+      headers: securityHeaders,
+    },
+    // API responses are never search results.
+    {
+      source: "/api/:path*",
+      headers: [...securityHeaders, { key: "X-Robots-Tag", value: "noindex, nofollow" }],
+    },
+    {
+      source: "/style-guide",
+      headers: [...securityHeaders, { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+    },
+  ];
+}
 
 const withMDX = createMDX({});
 const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === "true" });

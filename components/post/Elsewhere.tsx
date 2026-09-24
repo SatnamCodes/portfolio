@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import s from "./Elsewhere.module.css";
+import { asset } from "@/lib/base-path";
 
 const LINKEDIN = "https://www.linkedin.com/in/satnamcodes/";
 const X = "https://x.com/gitblamesatnam";
@@ -125,7 +126,7 @@ function Smoke() {
   return (
     <div className={s.studio}>
       {/* eslint-disable-next-line @next/next/no-img-element -- animated WebP; next/image would freeze it */}
-      <img src="/post/x-smoke.webp" width={480} height={272} alt="" className={s.clip} />
+      <img src={asset("/post/x-smoke.webp")} width={480} height={272} alt="" className={s.clip} />
       <p className={s.handle}>@gitblamesatnam</p>
     </div>
   );

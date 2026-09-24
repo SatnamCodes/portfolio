@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { PageLink as Link } from "@/components/PageLink";
 import { notFound } from "next/navigation";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Page } from "@/components/Page";
-import { getProjects, hasBody } from "@/lib/content";
+import { getProjects, hasBody, staticParams } from "@/lib/content";
+import { breadcrumbs, project as projectNode, webPage } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 import prose from "@/styles/prose.module.css";
 import s from "./project.module.css";
 
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return (await getProjects()).map((p) => ({ slug: p.slug }));
+  return staticParams((await getProjects()).map((x) => x.slug));
 }
 
 async function find(params: Promise<{ slug: string }>) {
@@ -24,7 +27,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const project = await find(params);
-  return project ? { title: project.meta.title, description: project.meta.summary } : {};
+  if (!project) return {};
+  return pageMetadata({
+    title: project.meta.title,
+    description: project.meta.summary,
+    path: `/projects/${project.slug}`,
+  });
 }
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -52,8 +60,20 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       </ExternalLink>,
     ]);
 
+  const path = `/projects/${project.slug}`;
+
   return (
     <Page>
+      <JsonLd
+        nodes={[
+          webPage(path, meta.title, meta.summary),
+          breadcrumbs([
+            { name: "Projects", path: "/projects" },
+            { name: meta.title, path },
+          ]),
+          projectNode({ path, ...meta }),
+        ]}
+      />
       <article className={s.project}>
         <header>
           <p className={s.kicker}>

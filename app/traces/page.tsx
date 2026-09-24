@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbs, webPage, imageGallery } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 import { Page } from "@/components/Page";
 import { EmptyState, SectionIntro } from "@/components/SectionIntro";
 import { Leader } from "@/components/traces/Leader";
@@ -7,7 +10,13 @@ import { formatDate } from "@/lib/content";
 import { getPhotos } from "@/lib/traces";
 import s from "./traces.module.css";
 
-export const metadata: Metadata = { title: "Traces" };
+export const metadata: Metadata = pageMetadata({
+  title: "Traces",
+  description:
+    "Astrophotography by Satnam: the moon, the sun and its sunspots, Saturn and the Orion Nebula, shown on two reels of film.",
+  path: "/traces",
+  type: "website",
+});
 
 export default function TracesPage() {
   const photos = getPhotos().map((p) => ({
@@ -24,6 +33,13 @@ export default function TracesPage() {
 
   return (
     <Page>
+      <JsonLd
+        nodes={[
+          webPage("/traces", "Traces", metadata.description!, "CollectionPage"),
+          breadcrumbs([{ name: "Traces", path: "/traces" }]),
+          imageGallery("/traces", photos),
+        ]}
+      />
       <div className={s.page}>
         <SectionIntro title="Traces" meta="Things witnessed" />
         {photos.length === 0 ? (

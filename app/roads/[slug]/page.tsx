@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
 import Image from "next/image";
 import { PageLink as Link } from "@/components/PageLink";
 import { notFound } from "next/navigation";
 import { Page } from "@/components/Page";
-import { formatDate, getRoads } from "@/lib/content";
+import { formatDate, getRoads, staticParams } from "@/lib/content";
+import { article, breadcrumbs, webPage } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 import prose from "@/styles/prose.module.css";
 import s from "../article.module.css";
 
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return (await getRoads()).map((r) => ({ slug: r.slug }));
+  return staticParams((await getRoads()).map((x) => x.slug));
 }
 
 async function find(params: Promise<{ slug: string }>) {
@@ -24,16 +27,41 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const road = await find(params);
-  return road ? { title: road.meta.title, description: road.meta.description } : {};
+  if (!road) return {};
+  return pageMetadata({
+    title: road.meta.title,
+    description: road.meta.description,
+    path: `/roads/${road.slug}`,
+    type: "article",
+    published: road.meta.date,
+  });
 }
 
 export default async function RoadPage({ params }: { params: Promise<{ slug: string }> }) {
   const road = await find(params);
   if (!road) notFound();
   const { meta, Body, minutes } = road;
+  const path = `/roads/${road.slug}`;
 
   return (
     <Page>
+      <JsonLd
+        nodes={[
+          webPage(path, meta.title, meta.description),
+          breadcrumbs([
+            { name: "Roads", path: "/roads" },
+            { name: meta.title, path },
+          ]),
+          article({
+            path,
+            title: meta.title,
+            description: meta.description,
+            date: meta.date,
+            section: meta.category,
+            image: meta.image?.src,
+          }),
+        ]}
+      />
       <article className={s.article}>
         <header className={s.header}>
           <p className={s.kicker}>

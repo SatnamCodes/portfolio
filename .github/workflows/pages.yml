@@ -1,0 +1,56 @@
+# GitHub Pages mirror: a static export of the site at https://satnamcodes.github.io/portfolio/.
+# Vercel (https://satnamportfolio.vercel.app) stays the canonical site: every mirrored page declares
+# its canonical on Vercel, so search engines don't treat the mirror as duplicate content.
+# Server features don't exist on Pages: API routes are left out, the letter form posts to the
+# Vercel endpoint (CORS-allowed), and the heatmaps are refreshed by the daily rebuild below.
+name: GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "5 2 * * *" # daily: refresh GitHub / LeetCode / Codeforces heatmaps
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Remove server-only routes (no server on Pages)
+        run: rm -rf app/api app/indexnow-key.txt
+      - name: Static export
+        run: npx next build && node scripts/check-drafts.mjs
+        env:
+          GITHUB_PAGES: "1"
+          NEXT_PUBLIC_BASE_PATH: /portfolio
+          NEXT_PUBLIC_SITE_URL: https://satnamportfolio.vercel.app
+          NEXT_PUBLIC_POST_URL: https://satnamportfolio.vercel.app/api/post
+      - name: Tidy output
+        run: |
+          find out -type d -name __empty -prune -exec rm -rf {} +
+          touch out/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: out }
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -88,25 +88,26 @@ function ActivityMap({
               </text>
             ) : null,
           )}
-          {weeks.map((col, w) =>
-            col.map((c, d) =>
-              c.future ? null : (
-                <rect
-                  key={c.date}
-                  x={w * (CELL + GAP)}
-                  y={16 + d * (CELL + GAP)}
-                  width={CELL}
-                  height={CELL}
-                  rx={2}
-                  className={s.cell}
-                  data-level={level(activity?.days[c.date] ?? 0)}
-                  style={{ "--w": w } as React.CSSProperties}
-                >
-                  <title>{`${activity?.days[c.date] ?? 0} ${unit} on ${c.date}`}</title>
-                </rect>
-              ),
-            ),
-          )}
+          {weeks.map((col, w) => (
+            <g key={w} style={{ "--w": w } as React.CSSProperties}>
+              {col.map((c, d) => {
+                if (c.future) return null;
+                const n = activity?.days[c.date] ?? 0;
+                return (
+                  <rect
+                    key={d}
+                    x={w * (CELL + GAP)}
+                    y={16 + d * (CELL + GAP)}
+                    width={CELL}
+                    height={CELL}
+                    data-level={level(n)}
+                  >
+                    {n > 0 && <title>{`${n} ${unit} on ${c.date}`}</title>}
+                  </rect>
+                );
+              })}
+            </g>
+          ))}
         </svg>
       </div>
     </figure>

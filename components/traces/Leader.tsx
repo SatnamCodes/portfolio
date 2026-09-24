@@ -13,7 +13,7 @@ export function Leader() {
         sizes="(min-width: 48rem) 22rem, 13rem"
         priority
         className={s.figure}
-        alt="Satnam, seen from behind with a hand in his hair and a denim jacket over his shoulder."
+        alt="Satnam, seen from behind with one hand in their hair and a denim jacket over one shoulder."
       />
       <p className={s.line}>
         A Cartographer of

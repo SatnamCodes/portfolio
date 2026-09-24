@@ -31,7 +31,8 @@ async function deliver(v: Values): Promise<Outcome> {
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), DELIVERY_TIMEOUT_MS);
   try {
-    const res = await fetch("/api/post", {
+    // The GitHub Pages mirror has no server; it posts to the Vercel deployment's endpoint instead.
+    const res = await fetch(process.env.NEXT_PUBLIC_POST_URL ?? "/api/post", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(v),

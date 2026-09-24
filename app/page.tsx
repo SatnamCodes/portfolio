@@ -1,4 +1,8 @@
+import type { Metadata } from "next";
 import { Page } from "@/components/Page";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { webPage } from "@/lib/schema";
+import { pageMetadata, SITE_DESCRIPTION } from "@/lib/seo";
 import { Journey } from "@/components/home/Journey";
 import { MarginNotes } from "@/components/home/MarginNotes";
 import { PrismStage } from "@/components/home/PrismStage";
@@ -7,9 +11,12 @@ import { ScrollMorph } from "@/components/home/ScrollMorph";
 import { home } from "@/content/home";
 import s from "./home.module.css";
 
+export const metadata: Metadata = pageMetadata({ description: SITE_DESCRIPTION, path: "/" });
+
 export default function Home() {
   return (
     <Page>
+      <JsonLd nodes={[webPage("/", "Satnam", SITE_DESCRIPTION)]} />
       <div data-morph-root="">
         <ScrollMorph />
         {/* The first screen: the prism at the centre, the heading beneath it. On scroll the heading

@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbs, webPage } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 import { PageLink as Link } from "@/components/PageLink";
 import { Page } from "@/components/Page";
 import { EmptyState, SectionIntro } from "@/components/SectionIntro";
 import { formatDate, getRoads } from "@/lib/content";
 import s from "./roads.module.css";
 
-export const metadata: Metadata = { title: "Roads" };
+export const metadata: Metadata = pageMetadata({
+  title: "Roads",
+  description: "Essays by Satnam, newest first.",
+  path: "/roads",
+  type: "website",
+});
 
 export default async function RoadsPage() {
   const roads = await getRoads();
@@ -13,6 +21,12 @@ export default async function RoadsPage() {
 
   return (
     <Page>
+      <JsonLd
+        nodes={[
+          webPage("/roads", "Roads", metadata.description!, "CollectionPage"),
+          breadcrumbs([{ name: "Roads", path: "/roads" }]),
+        ]}
+      />
       <div className={s.page}>
         <SectionIntro
           title="Roads"

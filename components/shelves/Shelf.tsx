@@ -128,6 +128,8 @@ function Book({
         type="button"
         className={s.book}
         aria-haspopup="dialog"
+        // Named explicitly: while the book is open its slot shows only an empty gap.
+        aria-label={`${book.title}, ${book.kindLabel}${book.author ? ` by ${book.author}` : ""}`}
         onClick={() => onOpen(book.slug)}
         onFocus={() => hold(book.slug, "focus")}
         onBlur={() => hold(book.slug, null)}

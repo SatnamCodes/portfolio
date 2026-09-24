@@ -1,0 +1,39 @@
+.page {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding: var(--space-xxl) var(--gutter) var(--space-xxxl);
+  display: grid;
+  gap: var(--space-md);
+}
+
+.code {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  color: var(--color-ink-faint);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-display-xl);
+  line-height: 1;
+}
+
+.lead {
+  max-width: var(--measure);
+  font-size: var(--type-body-lg);
+  color: var(--color-ink-muted);
+}
+
+.links {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+}

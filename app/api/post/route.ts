@@ -82,7 +82,7 @@ async function send(letter: { name: string; email: string; message: string }) {
   }
 }
 
-export async function POST(request: Request) {
+async function handle(request: Request) {
   const length = Number(request.headers.get("content-length") ?? 0);
   if (length > MAX_BODY_BYTES)
     return reply(413, { ok: false, error: "That letter is too long to send." });
@@ -121,4 +121,33 @@ export async function POST(request: Request) {
 
   const result = await send(parsed.data);
   return result.ok ? reply(200, { ok: true }) : reply(502, result);
+}
+
+// The GitHub Pages mirror posts here cross-origin. Only listed origins get CORS headers; everyone
+// else stays same-origin only, exactly as before.
+const ALLOWED_ORIGINS = (process.env.POST_ALLOWED_ORIGINS ?? "https://satnamcodes.github.io")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+function cors(request: Request): Record<string, string> {
+  const origin = request.headers.get("origin");
+  if (!origin || !ALLOWED_ORIGINS.includes(origin)) return {};
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  };
+}
+
+export function OPTIONS(request: Request) {
+  return new Response(null, { status: 204, headers: cors(request) });
+}
+
+export async function POST(request: Request) {
+  const res = await handle(request);
+  for (const [k, v] of Object.entries(cors(request))) res.headers.set(k, v);
+  return res;
 }

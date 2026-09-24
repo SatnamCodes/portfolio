@@ -227,3 +227,13 @@ export function formatDate(iso: string) {
     timeZone: "UTC",
   }).format(new Date(`${iso}T00:00:00Z`));
 }
+
+/**
+ * generateStaticParams() for a detail route. The static GitHub Pages export refuses a dynamic route
+ * with zero pages (a section whose entries are all drafts), so there it emits one placeholder that
+ * renders the 404 page; the Pages workflow deletes it from the output. Vercel builds are unaffected.
+ */
+export function staticParams(slugs: string[]) {
+  if (slugs.length || process.env.GITHUB_PAGES !== "1") return slugs.map((slug) => ({ slug }));
+  return [{ slug: "__empty" }];
+}

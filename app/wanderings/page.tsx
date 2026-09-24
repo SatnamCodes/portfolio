@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbs, webPage } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 import { Page } from "@/components/Page";
 import { PageLink } from "@/components/PageLink";
 import { EmptyState, SectionIntro } from "@/components/SectionIntro";
@@ -8,7 +11,12 @@ import { formatDate, getWanderings, opening } from "@/lib/content";
 import { mulberry32 } from "@/lib/session-seed";
 import s from "./wanderings.module.css";
 
-export const metadata: Metadata = { title: "Wanderings" };
+export const metadata: Metadata = pageMetadata({
+  title: "Wanderings",
+  description: "Short thoughts, fragments and questions by Satnam.",
+  path: "/wanderings",
+  type: "website",
+});
 
 function hash(text: string) {
   let h = 2166136261;
@@ -34,6 +42,12 @@ export default async function WanderingsPage() {
 
   return (
     <Page>
+      <JsonLd
+        nodes={[
+          webPage("/wanderings", "Wanderings", metadata.description!, "CollectionPage"),
+          breadcrumbs([{ name: "Wanderings", path: "/wanderings" }]),
+        ]}
+      />
       <div className={s.page}>
         <SectionIntro title="Wanderings" meta="Thoughts, fragments, questions" />
         {entries.length === 0 ? (

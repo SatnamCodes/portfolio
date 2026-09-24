@@ -1,13 +1,21 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbs, webPage } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 import { Page } from "@/components/Page";
 import Story, { metadata as story } from "@/content/new-beginnings.mdx";
 import { slugify } from "@/lib/slug";
 import prose from "@/styles/prose.module.css";
 import s from "./new-beginnings.module.css";
 
-export const metadata: Metadata = { title: "New Beginnings" };
+export const metadata: Metadata = pageMetadata({
+  title: "New Beginnings",
+  description: "Satnam's story, told in chapters.",
+  path: "/new-beginnings",
+  type: "profile",
+});
 
 function textOf(node: React.ReactNode): string {
   if (typeof node === "string" || typeof node === "number") return String(node);
@@ -26,6 +34,12 @@ export default function NewBeginningsPage() {
   const placeholder = story?.isPlaceholder === true;
   return (
     <Page>
+      <JsonLd
+        nodes={[
+          webPage("/new-beginnings", "New Beginnings", metadata.description!, "ProfilePage"),
+          breadcrumbs([{ name: "New Beginnings", path: "/new-beginnings" }]),
+        ]}
+      />
       <article className={s.page}>
         <header className={s.header}>
           <h1 className={s.title}>New Beginnings</h1>

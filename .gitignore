@@ -44,3 +44,6 @@ next-env.d.ts
 # Private, local-only writing: never committed, never deployed.
 content/private/*
 !content/private/README.md
+
+# SEO agent history, reports and private dashboard (local only)
+.seo/

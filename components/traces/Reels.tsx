@@ -7,6 +7,7 @@ import { placeOnCurve, stepFollower, stepLead, wrap, type Reel } from "@/lib/ree
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Viewer, type GalleryPhoto } from "./Gallery";
 import s from "./Reels.module.css";
+import { asset } from "@/lib/base-path";
 
 // The lower reel counter-runs at this fraction of the upper one.
 const FOLLOW_RATIO = 0.82;
@@ -38,8 +39,8 @@ function ReelVideo({ src, poster, reduced }: { src: string; poster: string; redu
   return (
     <video
       ref={ref}
-      src={src}
-      poster={poster}
+      src={asset(src)}
+      poster={asset(poster)}
       muted
       loop
       playsInline

@@ -1,0 +1,61 @@
+# SEO/AEO checks. On every push and pull request: build, serve, and fail if discovery infrastructure
+# broke. On a schedule: crawl production, ingest search data, and run the agent (proposals only).
+name: SEO
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * *" # daily: crawl, ingest, opportunities
+    - cron: "43 4 * * 1" # weekly (Monday): deep AEO, entity and link audit
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - name: Serve and test
+        run: |
+          npx next start -p 3000 &
+          npx wait-on http://localhost:3000 --timeout 60000
+          npm run seo:test
+
+  scheduled-audit:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      GSC_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GSC_SERVICE_ACCOUNT_EMAIL }}
+      GSC_PRIVATE_KEY: ${{ secrets.GSC_PRIVATE_KEY }}
+      GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
+      BING_WEBMASTER_API_KEY: ${{ secrets.BING_WEBMASTER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      # History persists between runs as a cached .seo/ directory.
+      - uses: actions/cache@v4
+        with:
+          path: .seo
+          key: seo-history-${{ github.run_id }}
+          restore-keys: seo-history-
+      - run: node scripts/seo/ingest.mjs
+      - name: Agent pass against production
+        run: node scripts/seo/orchestrator.mjs --base https://satnamportfolio.vercel.app --cadence ${{ github.event.schedule == '43 4 * * 1' && 'weekly' || 'daily' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seo-report
+          path: |
+            .seo/dashboard.html
+            .seo/reports/

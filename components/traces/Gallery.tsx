@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDialogFocus } from "@/lib/use-dialog-focus";
 import type { Slot } from "./layout";
 import s from "./gallery.module.css";
+import { asset } from "@/lib/base-path";
 
 export type GalleryPhoto = {
   id: string;
@@ -129,8 +130,8 @@ export function Viewer({
           >
             {photo.video ? (
               <video
-                src={photo.video}
-                poster={photo.src}
+                src={asset(photo.video)}
+                poster={asset(photo.src)}
                 aria-label={photo.alt}
                 className={s.video}
                 autoPlay={!reduced}
