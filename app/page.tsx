@@ -3,11 +3,11 @@ import { Page } from "@/components/Page";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { webPage } from "@/lib/schema";
 import { pageMetadata, SITE_DESCRIPTION } from "@/lib/seo";
-import { Journey } from "@/components/home/Journey";
 import { MarginNotes } from "@/components/home/MarginNotes";
 import { PrismStage } from "@/components/home/PrismStage";
 import { ScrollCue } from "@/components/home/ScrollCue";
 import { ScrollMorph } from "@/components/home/ScrollMorph";
+import { TheQuestions } from "@/components/questions/TheQuestions";
 import { home } from "@/content/home";
 import s from "./home.module.css";
 
@@ -62,10 +62,8 @@ export default function Home() {
         </section>
       </div>
 
-      <footer className={s.footer}>
-        <MarginNotes near="corner" className={s.footerNote} />
-        <Journey places={home.path} />
-      </footer>
+      {/* The page ends in "The Questions": a live drawing, not a footer and not a video. */}
+      <TheQuestions colophon={home.path.join(" · ")} />
     </Page>
   );
 }

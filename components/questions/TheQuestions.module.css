@@ -1,0 +1,156 @@
+/* The last thing on the page: full height, drawn live, resting on its final frame. */
+.questions {
+  position: relative;
+  height: 100svh;
+  min-height: 34rem;
+  max-height: 64rem;
+  overflow: hidden;
+  background: var(--color-paper);
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Text version: present for assistive tech and crawlers; visible only with reduced motion. */
+.text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.questions[data-reduced] {
+  height: auto;
+  max-height: none;
+  padding: var(--space-xxl) var(--gutter) var(--space-xl);
+}
+
+.questions[data-reduced] .text {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+.still {
+  display: block;
+  width: 100%;
+  height: 60svh;
+  margin-top: var(--space-lg);
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.q,
+.final {
+  font-family: var(--font-display);
+  font-size: var(--type-display-md);
+  line-height: 1.15;
+}
+
+.src {
+  margin-top: 0.3rem;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.quote {
+  margin-top: 0.4rem;
+  font-family: var(--font-fountain);
+  font-size: 1.3rem;
+}
+
+.final {
+  margin-top: var(--space-xl);
+}
+
+.controls {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 2;
+}
+
+.controls button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.3em;
+  transition:
+    color 200ms var(--ease-out),
+    text-decoration-color 200ms var(--ease-out);
+}
+
+.controls button:hover,
+.controls button:focus-visible {
+  color: var(--color-ink);
+  text-decoration-color: currentColor;
+}
+
+.controls button:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* The colophon is drawn on the canvas at the end; this copy is for the reduced-motion page. */
+.colophon {
+  display: none;
+}
+
+.questions[data-reduced] .colophon {
+  display: block;
+  margin-top: var(--space-xl);
+  text-align: center;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-sm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.debug {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 3;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 10px;
+  font:
+    12px/1 ui-monospace,
+    monospace;
+  color: var(--color-ink);
+  background: rgb(255 244 228 / 0.9);
+  border: 1px solid var(--color-rule);
+}
