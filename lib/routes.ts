@@ -1,5 +1,13 @@
 import "server-only";
-import { getBooks, getProjects, getResearch, getRoads, getWanderings, opening } from "./content";
+import {
+  excerpt,
+  getBooks,
+  getProjects,
+  getResearch,
+  getRoads,
+  getWanderings,
+  opening,
+} from "./content";
 
 // Every public, indexable URL on the site, with what we genuinely know about it. The sitemap,
 // llms.txt and the SEO tests all read from here, so a new page is picked up everywhere at once.
@@ -105,7 +113,7 @@ export async function publicRoutes(): Promise<PublicRoute[]> {
       path: `/wanderings/${w.slug}`,
       title: w.meta.title ?? opening(w.source, 8),
       section: "Wanderings",
-      description: opening(w.source, 30),
+      description: excerpt(w.source),
       lastModified: w.meta.date,
     })),
   ];

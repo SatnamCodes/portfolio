@@ -42,8 +42,19 @@ const nextConfig: NextConfig = {
     "/*": ["content/**/*"],
   },
   // Static hosting can't send headers; the export skips them.
-  ...(pages ? {} : { headers }),
+  ...(pages ? {} : { headers, redirects }),
 };
+
+// Old addresses that moved: permanent redirects so links and search results carry over.
+async function redirects() {
+  return [
+    {
+      source: "/wanderings/one-wednesday-afternoon",
+      destination: "/wanderings/what-survives-the-answer",
+      permanent: true,
+    },
+  ];
+}
 
 async function headers() {
   return [

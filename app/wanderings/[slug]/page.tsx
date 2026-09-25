@@ -5,9 +5,10 @@ import { Page } from "@/components/Page";
 import { PageLink } from "@/components/PageLink";
 import { PlainTypeFrame, PlainTypeToggle } from "@/components/PlainType";
 import { inkComponents } from "@/components/wanderings/Ink";
-import { plates } from "@/components/wanderings/Plates";
+import { Unravel } from "@/components/wanderings/Unravel";
+import { VortexPlate } from "@/components/wanderings/Vortex";
 import ink from "@/components/wanderings/ink.module.css";
-import { formatDate, getWanderings, opening, staticParams } from "@/lib/content";
+import { excerpt, formatDate, getWanderings, opening, staticParams } from "@/lib/content";
 import { article, breadcrumbs, webPage } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 import s from "./entry.module.css";
@@ -32,7 +33,7 @@ export async function generateMetadata({
   if (!entry) return {};
   return pageMetadata({
     title: entry.meta.title ?? opening(entry.source, 8),
-    description: opening(entry.source, 30),
+    description: excerpt(entry.source),
     path: `/wanderings/${entry.slug}`,
     type: "article",
     published: entry.meta.date,
@@ -45,7 +46,7 @@ export default async function WanderingEntry({ params }: { params: Promise<{ slu
   const { meta, Body, words } = entry;
   const path = `/wanderings/${entry.slug}`;
   const title = meta.title ?? opening(entry.source, 8);
-  const description = opening(entry.source, 30);
+  const description = excerpt(entry.source);
 
   return (
     <Page>
@@ -56,7 +57,17 @@ export default async function WanderingEntry({ params }: { params: Promise<{ slu
             { name: "Wanderings", path: "/wanderings" },
             { name: title, path },
           ]),
-          article({ path, title, description, date: meta.date }),
+          article({
+            path,
+            title,
+            description,
+            date: meta.date,
+            wordCount: words,
+            // Professors the essay links to by name ("[Professor Name](profile)").
+            mentions: [...entry.source.matchAll(/\[Professor ([^\]]+)\]\((https?:[^)]+)\)/g)]
+              .map((m) => ({ name: m[1], url: m[2] }))
+              .filter((m, i, all) => all.findIndex((x) => x.url === m.url) === i),
+          }),
         ]}
       />
       <PlainTypeFrame className={s.entry}>
@@ -68,16 +79,17 @@ export default async function WanderingEntry({ params }: { params: Promise<{ slu
           </p>
           <PlainTypeToggle className={s.toggle} />
         </header>
-        <article className={s.article} data-length={words < 40 ? "fragment" : undefined}>
+        <article id="essay" className={s.article} data-length={words < 40 ? "fragment" : undefined}>
           {meta.title ? (
             <h1 className={s.title}>{meta.title}</h1>
           ) : (
             <h1 className="visually-hidden">Untitled, {formatDate(meta.date)}</h1>
           )}
           <div className={ink.ink}>
-            <Body components={{ ...inkComponents(words), ...plates }} />
+            <Body components={{ ...inkComponents(words), VortexPlate }} />
           </div>
         </article>
+        {meta.ending === "feynman" && <Unravel articleId="essay" />}
       </PlainTypeFrame>
     </Page>
   );

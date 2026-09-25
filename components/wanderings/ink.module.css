@@ -16,7 +16,8 @@
 .ink h3 {
   font-family: var(--font-fountain);
   font-weight: 400;
-  font-size: 1.35em;
+  font-size: 1.55em;
+  margin-top: 1.6em;
 }
 
 .ink blockquote {
@@ -139,4 +140,11 @@
 [data-plain] .aside {
   font-family: var(--font-body);
   font-style: italic;
+}
+
+[data-plain] .ink h2,
+[data-plain] .ink h3 {
+  font-family: var(--font-display);
+  font-size: 1.5em;
+  line-height: 1.2;
 }

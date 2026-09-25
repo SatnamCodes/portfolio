@@ -78,6 +78,9 @@ export function article(opts: {
   section?: string;
   image?: string;
   type?: "BlogPosting" | "Article";
+  wordCount?: number;
+  // People the text names and links to, identified by the page they link to.
+  mentions?: { name: string; url: string }[];
 }): Node {
   return {
     "@type": opts.type ?? "BlogPosting",
@@ -85,6 +88,7 @@ export function article(opts: {
     headline: opts.title,
     ...(opts.description ? { description: opts.description } : {}),
     datePublished: opts.date,
+    dateModified: opts.date,
     url: absolute(opts.path),
     mainEntityOfPage: { "@id": `${absolute(opts.path)}#webpage` },
     author: { "@id": IDS.person },
@@ -92,6 +96,10 @@ export function article(opts: {
     inLanguage: "en",
     ...(opts.section ? { articleSection: opts.section } : {}),
     ...(opts.image ? { image: absolute(opts.image) } : {}),
+    ...(opts.wordCount ? { wordCount: opts.wordCount } : {}),
+    ...(opts.mentions?.length
+      ? { mentions: opts.mentions.map((m) => ({ "@type": "Person", name: m.name, sameAs: m.url })) }
+      : {}),
   };
 }
 

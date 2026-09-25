@@ -81,6 +81,8 @@ export const bookSchema = z.strictObject({
 export const wanderingSchema = z.strictObject({
   title: z.string().min(1).optional(),
   date: isoDate,
+  // An optional closing piece drawn after the essay (see components/wanderings/Unravel).
+  ending: z.enum(["feynman"]).optional(),
   draft,
 });
 
@@ -129,6 +131,7 @@ function parse<T extends z.ZodType>(schema: T, data: unknown, where: string): z.
 export function proseText(source: string) {
   return source
     .replace(/^export const metadata = \{[\s\S]*?\n\};?\s*$/m, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/[#>*_`~\[\]()!|-]/g, " ");
@@ -236,4 +239,24 @@ export function formatDate(iso: string) {
 export function staticParams(slugs: string[]) {
   if (slugs.length || process.env.GITHUB_PAGES !== "1") return slugs.map((slug) => ({ slug }));
   return [{ slug: "__empty" }];
+}
+
+/**
+ * The author's own opening sentences, character for character (no markdown, headings, links'
+ * addresses or components), cut at a sentence end near `max` characters. Used as a page's
+ * description so search engines and AI answers quote the actual words.
+ */
+export function excerpt(source: string, max = 160) {
+  const body = source
+    .replace(/^export const metadata = \{[\s\S]*?\n\};?\s*$/m, "")
+    .replace(/^#{1,6} .*$/gm, "")
+    .replace(/<[A-Z][^>]*\/>/g, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/\*\*|__/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (body.length <= max) return body;
+  const cut = body.slice(0, max + 80);
+  const end = Math.max(cut.lastIndexOf(". ", max + 40), cut.lastIndexOf("? ", max + 40));
+  return end > 60 ? cut.slice(0, end + 1) : `${body.slice(0, body.lastIndexOf(" ", max))}…`;
 }
