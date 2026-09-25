@@ -10,6 +10,11 @@ import { EmptyState, SectionIntro } from "@/components/SectionIntro";
 import { getProjects } from "@/lib/content";
 import s from "./projects.module.css";
 
+// Built once per deploy, with the projects baked in (content/ is not available at runtime).
+// The heatmaps stay current in the browser through /api/activity.
+export const dynamic = "force-static";
+export const revalidate = false;
+
 export const metadata: Metadata = pageMetadata({
   title: "Projects",
   description:
