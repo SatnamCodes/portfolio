@@ -5,6 +5,7 @@ import { AnimatePresence, MotionConfig } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { BookVariation } from "@/lib/book-variation";
+import type { Spine } from "@/lib/content";
 import { BookSymbols, Shelf } from "./Shelf";
 import { ReadingView } from "./ReadingView";
 import s from "./shelves.module.css";
@@ -16,6 +17,7 @@ export type BookData = {
   kindLabel: string;
   author?: string;
   source?: { detail?: string; link?: string };
+  spine?: Spine;
   variation: BookVariation;
 };
 

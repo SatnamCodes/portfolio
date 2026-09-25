@@ -35,16 +35,24 @@ function hash(text: string) {
 
 // Deterministic per book id: the same book always looks the same, and no two ids collide visually
 // unless their hashes do.
-export function bookVariation(id: string, override?: { orientation?: Orientation }): BookVariation {
+export function bookVariation(
+  id: string,
+  override?: { orientation?: Orientation; height?: number; thickness?: number; upright?: boolean },
+): BookVariation {
   const r = mulberry32(hash(id));
   const pick = <T>(xs: readonly T[]) => xs[Math.floor(r() * xs.length)];
   const roll = r();
   const tone = Math.floor(r() * TONES.length);
+  // `upright` keeps a book off its side (a lettered spine reads wrongly when laid flat).
   const orientation: Orientation =
-    override?.orientation ?? (roll < 0.08 ? "flat" : roll < 0.2 ? "leaning" : "upright");
+    override?.orientation ??
+    (roll < 0.08 ? (override?.upright ? "upright" : "flat") : roll < 0.2 ? "leaning" : "upright");
+  // Always drawn, so a book's other features don't shift when its size is set by hand.
+  const height = Math.round(150 + r() * 80);
+  const thickness = Math.round(24 + r() * 30);
   return {
-    height: Math.round(150 + r() * 80),
-    thickness: Math.round(24 + r() * 30),
+    height: override?.height ?? height,
+    thickness: override?.thickness ?? thickness,
     orientation,
     lean: orientation === "leaning" ? -(3 + r() * 5) : 0,
     tone,

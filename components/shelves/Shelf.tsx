@@ -2,7 +2,9 @@
 
 import { motion } from "motion/react";
 import { useCallback, useEffect, useId, useRef } from "react";
+import { asset } from "@/lib/base-path";
 import { TONES } from "@/lib/book-variation";
+import type { Spine } from "@/lib/content";
 import { body, shadowFor, step, type BookBody } from "@/lib/shelf-physics";
 import type { BookData } from "./Library";
 import s from "./shelves.module.css";
@@ -43,6 +45,121 @@ export function BookSymbols() {
         </symbol>
       </defs>
     </svg>
+  );
+}
+
+// A book's own spine, from its metadata: a photo when there is one, otherwise its colours and
+// lettering laid out head to foot like the printed original.
+// Rough advance of one character, as a fraction of the font size.
+const ADVANCE = { serif: 0.5, sans: 0.74, meta: 0.6 };
+
+// Splits a long title over two columns when the spine is thick enough to carry them.
+function spineLines(label: string, thickness: number) {
+  const words = label.split(" ");
+  if (thickness < 36 || label.length < 22 || words.length < 2) return [label];
+  let best = [label, ""];
+  for (let i = 1; i < words.length; i++) {
+    const pair = [words.slice(0, i).join(" "), words.slice(i).join(" ")];
+    if (Math.max(...pair.map((l) => l.length)) < Math.max(...best.map((l) => l.length)))
+      best = pair;
+  }
+  return best;
+}
+
+// Largest type (up to `max`) that fits `chars` along `share` of the spine's height and `lines`
+// columns across its thickness. --h, --w and --s are set on the book's slot.
+const fit = (max: string, chars: number, advance: number, share: number, lines = 1) =>
+  `min(${max}, calc(var(--h) * var(--s) * ${(share / (chars * advance)).toFixed(4)}px), ` +
+  `calc(var(--w) * var(--s) * ${(0.7 / lines).toFixed(4)}px))`;
+
+// A book's own spine, from its metadata: a photo when there is one, otherwise its colours and
+// lettering laid out head to foot like the printed original, sized to fit.
+function RealSpine({
+  spine,
+  title,
+  fallback,
+  thickness,
+}: {
+  spine: Spine;
+  title: React.ReactNode;
+  fallback: string;
+  thickness: number;
+}) {
+  if (spine.image) {
+    return (
+      <>
+        {/* eslint-disable-next-line @next/next/no-img-element -- a few KB, drawn at spine size */}
+        <img className={s.spinePhoto} src={asset(spine.image)} alt="" />
+        <span className="visually-hidden">{title}</span>
+      </>
+    );
+  }
+  const type = spine.type ?? "serif";
+  const lines = spineLines(spine.label ?? fallback, thickness);
+  const longest = Math.max(...lines.map((l) => l.length));
+  const titleShare = 0.72 - (spine.byline ? 0.22 : 0) - (spine.imprint ? 0.12 : 0);
+  return (
+    <>
+      <svg className={s.spineArt} aria-hidden="true" data-real>
+        <use href="#spine-art" />
+      </svg>
+      <span
+        className={s.real}
+        data-type={type}
+        style={{ "--accent": spine.accent ?? spine.ink } as React.CSSProperties}
+      >
+        {spine.accent && <span className={s.rule} aria-hidden="true" />}
+        <span className={s.realTitle}>
+          <span
+            aria-hidden="true"
+            style={{
+              fontSize: fit(
+                type === "sans" ? "calc(var(--spine-type) * 0.86)" : "var(--spine-type)",
+                longest,
+                ADVANCE[type],
+                titleShare,
+                lines.length,
+              ),
+            }}
+          >
+            {lines.map((line, i) => (
+              <span key={i} className={s.titleLine}>
+                {line}
+              </span>
+            ))}
+          </span>
+          <span className="visually-hidden">{title}</span>
+        </span>
+        {spine.byline && (
+          <span
+            className={s.byline}
+            aria-hidden="true"
+            style={{
+              fontSize: fit(
+                "calc(var(--spine-type) * 0.7)",
+                spine.byline.length,
+                ADVANCE.meta,
+                0.2,
+              ),
+            }}
+          >
+            {spine.byline}
+          </span>
+        )}
+        {spine.accent && <span className={s.rule} aria-hidden="true" />}
+        {spine.imprint && (
+          <span
+            className={s.imprint}
+            aria-hidden="true"
+            style={{
+              fontSize: fit("calc(var(--spine-type) * 0.6)", spine.imprint.length, 0.72, 0.1),
+            }}
+          >
+            {spine.imprint}
+          </span>
+        )}
+      </span>
+    </>
   );
 }
 
@@ -148,29 +265,46 @@ function Book({
             layoutId={reduced ? undefined : `book-${book.slug}`}
             className={s.spine}
             data-flat={flat || undefined}
-            style={{ background: tone(cover), color: tone(ink), borderRadius: 2 }}
+            style={
+              book.spine
+                ? { background: book.spine.color, color: book.spine.ink, borderRadius: 2 }
+                : { background: tone(cover), color: tone(ink), borderRadius: 2 }
+            }
           >
-            <svg className={s.spineArt} aria-hidden="true" style={{ color: tone(ink) }}>
-              <use href="#spine-art" />
-            </svg>
-            {Array.from({ length: v.bands }, (_, i) => (
-              <span
-                key={i}
-                className={s.band}
-                aria-hidden="true"
-                style={{
-                  background: tone(band),
-                  [flat ? "left" : "top"]: `${(v.bandOffset + i * 0.035) * 100}%`,
-                  ...(i >= 2 ? { [flat ? "left" : "top"]: `${(1 - v.bandOffset) * 100}%` } : null),
-                }}
+            {book.spine ? (
+              <RealSpine
+                spine={book.spine}
+                title={title}
+                fallback={book.title}
+                thickness={v.thickness}
               />
-            ))}
-            {v.label === "patch" ? (
-              <span className={s.patch}>{title}</span>
             ) : (
-              <span className={s.plainTitle} data-foil={v.label === "foil" || undefined}>
-                {title}
-              </span>
+              <>
+                <svg className={s.spineArt} aria-hidden="true" style={{ color: tone(ink) }}>
+                  <use href="#spine-art" />
+                </svg>
+                {Array.from({ length: v.bands }, (_, i) => (
+                  <span
+                    key={i}
+                    className={s.band}
+                    aria-hidden="true"
+                    style={{
+                      background: tone(band),
+                      [flat ? "left" : "top"]: `${(v.bandOffset + i * 0.035) * 100}%`,
+                      ...(i >= 2
+                        ? { [flat ? "left" : "top"]: `${(1 - v.bandOffset) * 100}%` }
+                        : null),
+                    }}
+                  />
+                ))}
+                {v.label === "patch" ? (
+                  <span className={s.patch}>{title}</span>
+                ) : (
+                  <span className={s.plainTitle} data-foil={v.label === "foil" || undefined}>
+                    {title}
+                  </span>
+                )}
+              </>
             )}
           </motion.span>
         )}

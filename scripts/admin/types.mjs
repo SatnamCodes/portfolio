@@ -49,7 +49,7 @@ export const TYPES = {
     dir: "content/shelves",
     fields: [
       { name: "title", label: "Title", type: "text", required: true },
-      { name: "category", label: "Shelf", type: "select", options: ["Computer Science", "Physics & Mathematics", "Current Reads", "Philosophy"], required: true },
+      { name: "category", label: "Shelf", type: "select", options: ["Current Reads", "Physics & Mathematics", "Engineering & Electronics", "Computer Science", "Literature", "Philosophy"], required: true },
       { name: "kind", label: "Kind", type: "select", options: ["book", "notebook", "notes", "reference", "scan"], required: true },
       { name: "author", label: "Author(s)", type: "text" },
       { name: "published", label: "Publisher, edition, year", type: "text" },

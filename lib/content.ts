@@ -47,11 +47,36 @@ export const projectSchema = z.strictObject({
 });
 
 export const SHELF_CATEGORIES = [
-  "Physics & Mathematics",
-  "Computer Science",
   "Current Reads",
+  "Physics & Mathematics",
+  "Engineering & Electronics",
+  "Computer Science",
+  "Literature",
   "Philosophy",
 ] as const;
+
+const hex = z.string().regex(/^#[0-9a-f]{6}$/i, "use a #rrggbb colour");
+
+// How a real copy's spine looks, so the shelf shows the book rather than a generated one.
+// Without it a book gets a deterministic spine in the site's own tones (lib/book-variation.ts).
+export const spineSchema = z.strictObject({
+  color: hex,
+  ink: hex,
+  // Rules or bands printed near the head and foot.
+  accent: hex.optional(),
+  type: z.enum(["serif", "sans"]).optional(),
+  // What the spine itself says, when it's shorter than the full title.
+  label: z.string().min(1).optional(),
+  byline: z.string().min(1).optional(),
+  imprint: z.string().min(1).optional(),
+  // Size on the shelf in the same units as generated spines: height 100–240, thickness 10–70.
+  height: z.number().int().min(100).max(240).optional(),
+  thickness: z.number().int().min(10).max(70).optional(),
+  // A photo of the actual spine (under /public), drawn instead of the lettering above.
+  image: z.string().startsWith("/").optional(),
+});
+
+export type Spine = z.infer<typeof spineSchema>;
 
 export const NOTE_KINDS = {
   book: "Book notes",
@@ -74,6 +99,7 @@ export const bookSchema = z.strictObject({
   // Lower numbers sit further left on the shelf.
   order: z.number().optional(),
   orientation: z.enum(["upright", "leaning", "flat"]).optional(),
+  spine: spineSchema.optional(),
   draft,
 });
 

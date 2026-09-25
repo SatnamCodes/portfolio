@@ -15,7 +15,13 @@ export async function LibraryFromContent() {
     kindLabel: NOTE_KINDS[meta.kind],
     author: meta.author,
     source: meta.published || meta.link ? { detail: meta.published, link: meta.link } : undefined,
-    variation: bookVariation(slug, { orientation: meta.orientation }),
+    spine: meta.spine,
+    variation: bookVariation(slug, {
+      orientation: meta.orientation,
+      height: meta.spine?.height,
+      thickness: meta.spine?.thickness,
+      upright: !!meta.spine,
+    }),
   }));
   const notes = Object.fromEntries(books.map(({ slug, Body }) => [slug, <Body key={slug} />]));
 
