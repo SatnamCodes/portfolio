@@ -11,7 +11,7 @@ const ALLOWED = (process.env.POST_ALLOWED_ORIGINS ?? "https://satnamcodes.github
 
 export async function GET(request: Request) {
   const origin = request.headers.get("origin");
-  return Response.json(await getActivity(), {
+  return Response.json(await getActivity({ live: true }), {
     headers: {
       "Cache-Control": "public, s-maxage=600, stale-while-revalidate=3600",
       ...(origin && ALLOWED.includes(origin)

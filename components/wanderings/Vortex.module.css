@@ -1,0 +1,12 @@
+/* No background, no frame: just ink, in the text's own colour. */
+.vortex {
+  margin: 2em 0;
+  color: inherit;
+}
+
+.vortex canvas {
+  display: block;
+  width: 100%;
+  height: clamp(10rem, 42vw, 16rem);
+  color: currentColor;
+}

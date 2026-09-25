@@ -17,9 +17,9 @@ function tally(days: Record<string, number>): Activity {
   return { days, total: Object.values(days).reduce((a, b) => a + b, 0) };
 }
 
-async function github(): Promise<Activity> {
+async function github(cache: RequestInit): Promise<Activity> {
   const res = await fetch(`https://github.com/users/${PROFILES.github.user}/contributions`, {
-    next: { revalidate: REVALIDATE },
+    ...cache,
   });
   if (!res.ok) throw new Error(`GitHub ${res.status}`);
   const html = await res.text();
@@ -37,7 +37,7 @@ async function github(): Promise<Activity> {
   return tally(days);
 }
 
-async function leetcode(): Promise<Activity> {
+async function leetcode(cache: RequestInit): Promise<Activity> {
   const res = await fetch("https://leetcode.com/graphql", {
     method: "POST",
     headers: { "Content-Type": "application/json", Referer: "https://leetcode.com" },
@@ -45,7 +45,7 @@ async function leetcode(): Promise<Activity> {
       query: "query($u:String!){matchedUser(username:$u){userCalendar{submissionCalendar}}}",
       variables: { u: PROFILES.leetcode.user },
     }),
-    next: { revalidate: REVALIDATE },
+    ...cache,
   });
   if (!res.ok) throw new Error(`LeetCode ${res.status}`);
   const json = await res.json();
@@ -60,10 +60,10 @@ async function leetcode(): Promise<Activity> {
   return tally(days);
 }
 
-async function codeforces(): Promise<Activity> {
+async function codeforces(cache: RequestInit): Promise<Activity> {
   const res = await fetch(
     `https://codeforces.com/api/user.status?handle=${PROFILES.codeforces.user}`,
-    { next: { revalidate: REVALIDATE } },
+    cache,
   );
   if (!res.ok) throw new Error(`Codeforces ${res.status}`);
   const json = await res.json();
@@ -78,11 +78,17 @@ async function codeforces(): Promise<Activity> {
 
 const settle = (p: Promise<Activity>) => p.catch(() => null);
 
-export async function getActivity() {
+/**
+ * `live: true` (the /api/activity endpoint) refreshes every ten minutes. The default is for pages:
+ * fetched once at build time, so a page never becomes a timed re-render. That matters because the
+ * content/ folder isn't shipped to the server, so a re-rendered page would lose its projects.
+ */
+export async function getActivity({ live = false }: { live?: boolean } = {}) {
+  const cache: RequestInit = live ? { next: { revalidate: REVALIDATE } } : { cache: "force-cache" };
   const [gh, lc, cf] = await Promise.all([
-    settle(github()),
-    settle(leetcode()),
-    settle(codeforces()),
+    settle(github(cache)),
+    settle(leetcode(cache)),
+    settle(codeforces(cache)),
   ]);
   return { at: new Date().toISOString(), github: gh, leetcode: lc, codeforces: cf };
 }

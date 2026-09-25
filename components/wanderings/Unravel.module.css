@@ -1,0 +1,78 @@
+/* The overlay the dust is drawn on: transparent, above the essay, never catching the pointer. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.overlay[data-on] {
+  opacity: 1;
+}
+
+/* The finished state, under the essay. Present in the HTML from the start (screen readers and
+   search engines read it), shown after the animation or at once with reduced motion. */
+.coda {
+  display: grid;
+  justify-items: center;
+  gap: 1.5rem;
+  margin: 4rem auto 2rem;
+  max-width: 36rem;
+  text-align: center;
+  color: var(--color-espresso);
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+.coda[data-shown] {
+  opacity: 1;
+}
+
+/* Until it is shown it takes no room (no blank scroll under the essay), but stays readable to
+   screen readers and search engines. */
+.coda:not([data-shown]) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.portrait {
+  width: min(440px, 88vw);
+}
+
+.quote {
+  margin: 0;
+}
+
+.quote p {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 1.2rem + 2vw, 2.8rem);
+  line-height: 1.2;
+}
+
+.quote footer {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--color-ink-muted);
+}
+
+/* The end of the essay: once this is fully on screen (and stays), the ending plays. */
+.sentinel {
+  height: 1px;
+}
+
+/* The portrait while it draws itself, above the quote on the overlay. */
+.drawing {
+  position: fixed;
+  z-index: 41;
+  pointer-events: none;
+  color: var(--color-espresso);
+}

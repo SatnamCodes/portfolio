@@ -10,7 +10,7 @@ export const dynamic = "force-static";
 export async function GET() {
   const routes = await publicRoutes();
   const bySection = (section: string) =>
-    routes.filter((r) => r.section === section && !SECTIONS.includes(r));
+    routes.filter((r) => r.section === section && !SECTIONS.some((x) => x.path === r.path));
   const list = (section: string) =>
     bySection(section)
       .map((r) => `- [${r.title}](${absolute(r.path)})${r.description ? `: ${r.description}` : ""}`)
@@ -37,6 +37,10 @@ ${list("Research") || "- None published yet."}
 ## Blogs (Roads)
 
 ${list("Roads") || "- None published yet."}
+
+## Essays and thoughts (Wanderings)
+
+${list("Wanderings") || "- None published yet."}
 
 ## Book notes (Shelves)
 
