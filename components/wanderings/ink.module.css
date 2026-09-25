@@ -148,3 +148,13 @@
   font-size: 1.5em;
   line-height: 1.2;
 }
+
+/* Links (the professor's name): italic, one continuous underline under the whole name. The words
+   are inline-blocks, so a text underline would only show in the gaps; draw it as a background. */
+.ink a {
+  font-style: italic;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 92% / 100% 1px no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}

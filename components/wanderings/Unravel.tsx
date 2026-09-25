@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FeynmanLines } from "./FeynmanLines";
 import s from "./Unravel.module.css";
 
@@ -81,6 +81,10 @@ function locate(article: HTMLElement, word: string, phrase: string): HTMLElement
 export function Unravel({ articleId }: { articleId: string }) {
   const overlay = useRef<HTMLCanvasElement>(null);
   const sentinel = useRef<HTMLDivElement>(null);
+  const coda = useRef<HTMLElement>(null);
+  const codaPortrait = useRef<HTMLDivElement>(null);
+  // Where the finished portrait sat on screen, so the coda can glide out from there.
+  const from = useRef<{ left: number; top: number; w: number } | null>(null);
   const [portraitBox, setPortraitBox] = useState<{ left: number; top: number; w: number } | null>(
     null,
   );
@@ -188,7 +192,10 @@ export function Unravel({ articleId }: { articleId: string }) {
     const quoteTop = top + ph + 28 + size;
     // It starts drawing as the quote finishes forming, as if the dust became the ink.
     const portraitTimer = setTimeout(
-      () => setPortraitBox({ left: (vw - pw) / 2, top, w: pw }),
+      () => {
+        from.current = { left: (vw - pw) / 2, top, w: pw };
+        setPortraitBox(from.current);
+      },
       5100,
     );
     const slots: { x: number; y: number }[] = [];
@@ -313,7 +320,7 @@ export function Unravel({ articleId }: { articleId: string }) {
         setPortraitBox(null);
         article.style.transition = "opacity 700ms ease";
         article.style.opacity = "1";
-        cv.style.transition = "opacity 500ms ease";
+        cv.style.transition = "none";
         cv.style.opacity = "0";
         setPhase("done");
       }
@@ -340,6 +347,32 @@ export function Unravel({ articleId }: { articleId: string }) {
   }, [reduced]);
 
   const showStill = reduced || phase === "done";
+
+  // Scrolling back up: the portrait and quote don't jump to their place under the essay, they
+  // move there, shrinking from their size on screen to their resting size in one motion.
+  useLayoutEffect(() => {
+    const box = from.current;
+    const el = coda.current;
+    const pic = codaPortrait.current;
+    if (phase !== "done" || !box || !el || !pic) return;
+    from.current = null;
+    const r = pic.getBoundingClientRect();
+    const k = box.w / r.width;
+    const origin = el.getBoundingClientRect();
+    const ox = r.left - origin.left;
+    const oy = r.top - origin.top;
+    el.animate(
+      [
+        {
+          transformOrigin: `${ox}px ${oy}px`,
+          transform: `translate(${box.left - r.left}px, ${box.top - r.top}px) scale(${k})`,
+          opacity: 1,
+        },
+        { transformOrigin: `${ox}px ${oy}px`, transform: "none", opacity: 1 },
+      ],
+      { duration: 900, easing: "cubic-bezier(0.45, 0, 0.2, 1)" },
+    );
+  }, [phase]);
   return (
     <>
       <div ref={sentinel} className={s.sentinel} aria-hidden="true" />
@@ -360,8 +393,10 @@ export function Unravel({ articleId }: { articleId: string }) {
       )}
       {/* The same quote, kept in the page under the essay: the finished state, and what
           screen readers, search engines and reduced motion get. */}
-      <section className={s.coda} data-shown={showStill || undefined} aria-label="Coda">
-        <FeynmanLines className={s.portrait} />
+      <section ref={coda} className={s.coda} data-shown={showStill || undefined} aria-label="Coda">
+        <div ref={codaPortrait} className={s.portrait}>
+          <FeynmanLines />
+        </div>
         <blockquote className={s.quote}>
           <p>What I cannot create, I do not understand.</p>
           <footer>{ATTRIBUTION}</footer>
