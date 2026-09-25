@@ -131,10 +131,13 @@ export const slugify = (s) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
 
-/** Form values → file contents. */
-export function toMdx(type, values) {
+/** Form values → file contents. `previous` (the file's values before this edit) keeps what the
+ *  form can't show: MDX imports and metadata such as a book's spine or an entry's collaborators. */
+export function toMdx(type, values, previous) {
   const t = TYPES[type];
   const meta = {};
+  const own = new Set([...t.fields.map((f) => f.name), "sections", "body", "imports"]);
+  const kept = Object.entries(previous ?? {}).filter(([k]) => !own.has(k));
   for (const f of t.fields) {
     let v = values[f.name];
     if (f.type === "checkbox") {
@@ -150,13 +153,15 @@ export function toMdx(type, values) {
         .filter(Boolean);
     meta[f.name] = v;
   }
+  for (const [k, v] of kept) meta[k] = v;
   let body = "";
   if (t.body === "research") {
     body = RESEARCH_FIELDS.filter(([k]) => values.sections?.[k]?.trim())
       .map(([k]) => `<Field name="${k}">\n\n${values.sections[k].trim()}\n\n</Field>`)
       .join("\n\n");
   } else body = (values.body ?? "").trim();
-  return `export const metadata = ${JSON.stringify(meta, null, 2)};\n${body ? `\n${body}\n` : ""}`;
+  const imports = previous?.imports ? `${previous.imports}\n\n` : "";
+  return `${imports}export const metadata = ${JSON.stringify(meta, null, 2)};\n${body ? `\n${body}\n` : ""}`;
 }
 
 /** File contents → form values (for editing). */
@@ -166,6 +171,8 @@ export function fromMdx(type, src) {
   const meta = m ? new Function(`return (${m[1]})`)() : {};
   const rest = m ? src.slice(src.indexOf(m[0]) + m[0].length).trim() : src;
   const values = { ...meta };
+  const imports = src.match(/^import .+$/gm);
+  if (imports) values.imports = imports.join("\n");
   if (Array.isArray(values.technologies)) values.technologies = values.technologies.join(", ");
   if (TYPES[type].body === "research") {
     values.sections = {};

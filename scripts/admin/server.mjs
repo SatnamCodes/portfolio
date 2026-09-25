@@ -35,11 +35,19 @@ const api = {
   },
   async list({ type }) {
     const dir = path.join(ROOT, TYPES[type].dir);
-    const items = fs.readdirSync(dir).filter((f) => f.endsWith(".mdx")).map((f) => {
-      const slug = f.slice(0, -4);
-      const v = fromMdx(type, fs.readFileSync(path.join(dir, f), "utf8"));
-      return { slug, title: v.title ?? "(untitled)", date: v.date ?? v.year ?? "", draft: Boolean(v.draft) };
-    });
+    const items = fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(".mdx"))
+      .map((f) => {
+        const slug = f.slice(0, -4);
+        const v = fromMdx(type, fs.readFileSync(path.join(dir, f), "utf8"));
+        return {
+          slug,
+          title: v.title ?? "(untitled)",
+          date: v.date ?? v.year ?? "",
+          draft: Boolean(v.draft),
+        };
+      });
     return { items: items.sort((a, b) => String(b.date).localeCompare(String(a.date))) };
   },
   async get({ type, slug }) {
@@ -51,8 +59,14 @@ const api = {
     const s = slug || slugify(values.title || `${values.date}-thought`);
     if (!s) return { ok: false, errors: ["Give it a title so it has an address."] };
     const file = fileOf(type, s);
-    if (!slug && fs.existsSync(file)) return { ok: false, errors: [`Something already lives at ${TYPES[type].dir}/${s}.mdx. Change the title.`] };
-    fs.writeFileSync(file, toMdx(type, values));
+    if (!slug && fs.existsSync(file))
+      return {
+        ok: false,
+        errors: [`Something already lives at ${TYPES[type].dir}/${s}.mdx. Change the title.`],
+      };
+    const previous =
+      slug && fs.existsSync(file) ? fromMdx(type, fs.readFileSync(file, "utf8")) : undefined;
+    fs.writeFileSync(file, toMdx(type, values, previous));
     return { ok: true, slug: s, path: path.relative(ROOT, file) };
   },
   async remove({ type, slug }) {
@@ -67,21 +81,28 @@ const api = {
     const resumes = JSON.parse(fs.readFileSync(path.join(ROOT, "content/resumes.json"), "utf8"));
     return {
       home,
-      newBeginnings: { isPlaceholder: /isPlaceholder:\s*true/.test(nbMeta?.[0] ?? ""), body: nb.slice(nbMeta ? nbMeta[0].length : 0).trim() },
+      newBeginnings: {
+        isPlaceholder: /isPlaceholder:\s*true/.test(nbMeta?.[0] ?? ""),
+        body: nb.slice(nbMeta ? nbMeta[0].length : 0).trim(),
+      },
       resumes,
     };
   },
   async saveHome({ home }) {
     const errors = [];
     if (!home.heading?.trim()) errors.push("The homepage heading is required.");
-    if (!Array.isArray(home.interests) || home.interests.length !== 7) errors.push("Interests: exactly seven, one per band of the spectrum (red → violet).");
+    if (!Array.isArray(home.interests) || home.interests.length !== 7)
+      errors.push("Interests: exactly seven, one per band of the spectrum (red → violet).");
     if (errors.length) return { ok: false, errors };
     fs.writeFileSync(path.join(ROOT, "content/home.json"), JSON.stringify(home, null, 2) + "\n");
     return { ok: true, path: "content/home.json" };
   },
   async saveNewBeginnings({ isPlaceholder, body }) {
     const head = `export const metadata = {\n  isPlaceholder: ${Boolean(isPlaceholder)},\n};\n\n`;
-    fs.writeFileSync(path.join(ROOT, "content/new-beginnings.mdx"), head + String(body).trim() + "\n");
+    fs.writeFileSync(
+      path.join(ROOT, "content/new-beginnings.mdx"),
+      head + String(body).trim() + "\n",
+    );
     return { ok: true, path: "content/new-beginnings.mdx" };
   },
   async saveResumes({ resumes }) {
@@ -94,9 +115,17 @@ const api = {
       if (r.pdf) {
         // A new PDF, sent from the form as base64.
         fs.writeFileSync(path.join(dir, `${file}.pdf`), Buffer.from(r.pdf, "base64"));
-        await run("pdftoppm", ["-png", "-r", "90", "-singlefile", path.join(dir, `${file}.pdf`), path.join(dir, file)]);
+        await run("pdftoppm", [
+          "-png",
+          "-r",
+          "90",
+          "-singlefile",
+          path.join(dir, `${file}.pdf`),
+          path.join(dir, file),
+        ]);
       }
-      if (!fs.existsSync(path.join(dir, `${file}.pdf`))) errors.push(`${r.role || "A résumé"} has no PDF yet: choose one.`);
+      if (!fs.existsSync(path.join(dir, `${file}.pdf`)))
+        errors.push(`${r.role || "A résumé"} has no PDF yet: choose one.`);
       out.push({ file, role: r.role.trim(), note: (r.note ?? "").trim() });
     }
     if (errors.length) return { ok: false, errors };
@@ -112,10 +141,23 @@ const api = {
     let log = "";
     try {
       // The same checks the site's build runs: a broken entry never reaches the live site.
-      const check = await run("node", ["scripts/check-content.mjs"], { cwd: ROOT }).catch((e) => ({ failed: true, stdout: e.stdout, stderr: e.stderr }));
-      if (check.failed) return { ok: false, log: `Content check failed:\n${check.stdout}${check.stderr}` };
+      const check = await run("node", ["scripts/check-content.mjs"], { cwd: ROOT }).catch((e) => ({
+        failed: true,
+        stdout: e.stdout,
+        stderr: e.stderr,
+      }));
+      if (check.failed)
+        return { ok: false, log: `Content check failed:\n${check.stdout}${check.stderr}` };
       log += await git("add", "--", "content", "public/resumes");
-      log += "\n" + (await git("commit", "-m", message || "Update content", "-m", "Published from the local admin."));
+      log +=
+        "\n" +
+        (await git(
+          "commit",
+          "-m",
+          message || "Update content",
+          "-m",
+          "Published from the local admin.",
+        ));
       log += "\n" + (await git("push"));
       return { ok: true, log };
     } catch (e) {
@@ -136,7 +178,10 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   if (req.method === "POST" && url.pathname.startsWith("/api/")) {
-    if (req.headers["x-admin-token"] !== TOKEN || !["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress)) {
+    if (
+      req.headers["x-admin-token"] !== TOKEN ||
+      !["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress)
+    ) {
       res.writeHead(403).end();
       return;
     }
@@ -147,7 +192,9 @@ const server = http.createServer(async (req, res) => {
       const out = await api[name](JSON.parse(body || "{}"));
       res.writeHead(200, { "Content-Type": "application/json" }).end(JSON.stringify(out));
     } catch (e) {
-      res.writeHead(400, { "Content-Type": "application/json" }).end(JSON.stringify({ ok: false, errors: [e.message] }));
+      res
+        .writeHead(400, { "Content-Type": "application/json" })
+        .end(JSON.stringify({ ok: false, errors: [e.message] }));
     }
     return;
   }
@@ -157,6 +204,7 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, "127.0.0.1", () => {
   const link = `http://127.0.0.1:${PORT}/?token=${TOKEN}`;
   console.log(`\n  Admin (this machine only): ${link}\n`);
-  const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
+  const opener =
+    process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
   execFile(opener, [link], () => {});
 });

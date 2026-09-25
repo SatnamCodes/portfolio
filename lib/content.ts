@@ -35,6 +35,8 @@ export const researchSchema = z.strictObject({
   status: z.enum(RESEARCH_STATUSES).optional(),
   // Co-authors, named on the entry beside the owner.
   collaborators: z.array(z.string().min(1)).optional(),
+  // Where the work has been sent, e.g. a conference abstract; shown under the title.
+  submission: z.string().min(1).optional(),
   draft,
 });
 
@@ -160,12 +162,16 @@ function parse<T extends z.ZodType>(schema: T, data: unknown, where: string): z.
 
 // Prose-only text: drop the metadata export, code fences, JSX tags and markdown punctuation.
 export function proseText(source: string) {
-  return source
-    .replace(/^export const metadata = \{[\s\S]*?\n\};?\s*$/m, "")
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/[#>*_`~\[\]()!|-]/g, " ");
+  return (
+    source
+      .replace(/^export const metadata = \{[\s\S]*?\n\};?\s*$/m, "")
+      // MDX imports (a component used by one entry only) aren't prose.
+      .replace(/^import .* from ["'][^"']+["'];?\s*$/gm, "")
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      .replace(/```[\s\S]*?```/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/[#>*_`~\[\]()!|-]/g, " ")
+  );
 }
 
 export function readingMinutes(source: string, wpm = 225) {
@@ -280,6 +286,8 @@ export function staticParams(slugs: string[]) {
 export function excerpt(source: string, max = 160) {
   const body = source
     .replace(/^export const metadata = \{[\s\S]*?\n\};?\s*$/m, "")
+    // MDX imports (a component used by one entry only) aren't prose.
+    .replace(/^import .* from ["'][^"']+["'];?\s*$/gm, "")
     .replace(/^#{1,6} .*$/gm, "")
     .replace(/<[A-Z][^>]*\/>/g, "")
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")

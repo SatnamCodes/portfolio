@@ -84,6 +84,7 @@ export default async function ResearchEntry({ params }: { params: Promise<{ slug
               {site.owner}, with {listFormat.format(meta.collaborators)}
             </p>
           ) : null}
+          {meta.submission && <p className={s.byline}>{meta.submission}</p>}
         </header>
         {showNav && (
           <nav className={s.nav} aria-label="In this entry">
