@@ -58,6 +58,7 @@ content/private/*
 /banner.png
 /Firefly*.png
 /sources/
+/Wanderings/
 
 # Editor and OS clutter
 .vscode/*
