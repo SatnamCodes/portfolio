@@ -16,8 +16,8 @@ import s from "./Unravel.module.css";
 
 const QUOTE = ["What", "I", "cannot", "create,", "I", "do", "not", "understand."];
 const ATTRIBUTION = "Richard Feynman, on his blackboard at Caltech, 1988";
-// The portrait's box (viewBox 260 × 250).
-const PORTRAIT_RATIO = 250 / 260;
+// The portrait's box (viewBox 375 × 305).
+const PORTRAIT_RATIO = 305 / 375;
 
 // Each quote word, and the exact place in the essay it comes from.
 const SOURCES: { word: string; phrase: string }[] = [
@@ -181,7 +181,7 @@ export function Unravel({ articleId }: { articleId: string }) {
     const lines =
       ctx.measureText(full).width > vw * 0.88 ? [QUOTE.slice(0, 4), QUOTE.slice(4)] : [QUOTE];
     // The portrait sits above the quote; the whole group is centred on screen.
-    const pw = Math.min(260, vw * 0.62, (vh * 0.34) / PORTRAIT_RATIO);
+    const pw = Math.min(440, vw * 0.88, (vh * 0.42) / PORTRAIT_RATIO);
     const ph = pw * PORTRAIT_RATIO;
     const blockH = ph + 28 + lines.length * size * 1.25 + 40;
     const top = (vh - blockH) / 2;
@@ -325,29 +325,17 @@ export function Unravel({ articleId }: { articleId: string }) {
     if (reduced) return;
     const article = document.getElementById(articleId);
     if (!article) return;
-    // Only at the true end: the marker after the sources must be fully on screen, and stay
-    // there for a moment (a reader who has finished, not one scrolling past).
+    // At the true end: the moment the marker after the sources (just above the footer) comes
+    // on screen, or has already been scrolled past, the ending plays. No waiting.
     const end = sentinel.current;
     if (!end) return;
-    let played = false;
-    let dwell = 0;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        clearTimeout(dwell);
-        if (!e.isIntersecting || played) return;
-        dwell = window.setTimeout(() => {
-          played = true;
-          io.disconnect();
-          play(article);
-        }, 1400);
-      },
-      { threshold: 1 },
-    );
-    io.observe(end);
-    return () => {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting && e.boundingClientRect.top >= 0) return;
       io.disconnect();
-      clearTimeout(dwell);
-    };
+      play(article);
+    });
+    io.observe(end);
+    return () => io.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduced]);
 

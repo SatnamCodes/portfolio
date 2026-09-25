@@ -31,8 +31,19 @@
   opacity: 1;
 }
 
+/* Until it is shown it takes no room (no blank scroll under the essay), but stays readable to
+   screen readers and search engines. */
+.coda:not([data-shown]) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
 .portrait {
-  width: min(260px, 70vw);
+  width: min(440px, 88vw);
 }
 
 .quote {
