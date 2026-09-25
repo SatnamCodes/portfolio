@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { asset } from "@/lib/base-path";
-import { engrave, type Stroke } from "./engrave";
+import { FeynmanLines } from "./FeynmanLines";
 import s from "./Unravel.module.css";
 
-// The end of "What Survives the Answer". When the last thank-you paragraph comes into view, the
-// essay turns to dust except seven words, which travel into Feynman's line; "create" (not in the
-// essay) is built from six drifting letters. Then the attribution, then his portrait engraves
-// itself from the dust. Scrolling back up restores the essay; the quote stays below it.
+// The end of "What Survives the Answer". Only once the reader has reached the very end (past the
+// sources) and paused there, the essay turns to dust except seven words, which travel into
+// Feynman's line; "create" (not in the essay) is built from six drifting letters. Then the
+// attribution, then an abstract line portrait draws itself. Scrolling back up restores the essay;
+// the quote stays below it.
 //
 // The essay is ordinary, fully readable HTML until this plays. The effect is drawn on one canvas
 // overlay (thousands of DOM letters would be too heavy for a phone); only words near the screen
@@ -16,7 +16,8 @@ import s from "./Unravel.module.css";
 
 const QUOTE = ["What", "I", "cannot", "create,", "I", "do", "not", "understand."];
 const ATTRIBUTION = "Richard Feynman, on his blackboard at Caltech, 1988";
-const PORTRAIT = "/wanderings/feynman.jpg";
+// The portrait's box (viewBox 260 × 250).
+const PORTRAIT_RATIO = 250 / 260;
 
 // Each quote word, and the exact place in the essay it comes from.
 const SOURCES: { word: string; phrase: string }[] = [
@@ -79,35 +80,14 @@ function locate(article: HTMLElement, word: string, phrase: string): HTMLElement
 
 export function Unravel({ articleId }: { articleId: string }) {
   const overlay = useRef<HTMLCanvasElement>(null);
-  const still = useRef<HTMLCanvasElement>(null);
+  const sentinel = useRef<HTMLDivElement>(null);
+  const [portraitBox, setPortraitBox] = useState<{ left: number; top: number; w: number } | null>(
+    null,
+  );
   const [phase, setPhase] = useState<"idle" | "playing" | "done">("idle");
   const [reduced] = useState(
     () => typeof window !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
-  const portrait = useRef<{ strokes: Stroke[]; w: number; h: number } | null>(null);
-
-  // The still version under the essay: shown after the animation, or at once with reduced motion.
-  function drawStill() {
-    const cv = still.current,
-      p = portrait.current;
-    if (!cv || !p) return;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    cv.width = Math.round(p.w * dpr);
-    cv.height = Math.round(p.h * dpr);
-    cv.style.width = `${p.w}px`;
-    cv.style.height = `${p.h}px`;
-    const ctx = cv.getContext("2d")!;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.strokeStyle = getComputedStyle(cv).color;
-    ctx.lineCap = "round";
-    for (const st of p.strokes) {
-      ctx.lineWidth = st.w;
-      ctx.beginPath();
-      ctx.moveTo(st.x1, st.y1);
-      ctx.lineTo(st.x2, st.y2);
-      ctx.stroke();
-    }
-  }
 
   function play(article: HTMLElement) {
     const cv = overlay.current!;
@@ -200,12 +180,17 @@ export function Unravel({ articleId }: { articleId: string }) {
     const full = QUOTE.join(" ");
     const lines =
       ctx.measureText(full).width > vw * 0.88 ? [QUOTE.slice(0, 4), QUOTE.slice(4)] : [QUOTE];
-    const p = portrait.current;
-    const ph = p ? Math.min(p.h, vh * 0.42) : 0;
-    const pk = p ? ph / p.h : 1;
-    const blockH = ph + (ph ? 28 : 0) + lines.length * size * 1.25 + 40;
+    // The portrait sits above the quote; the whole group is centred on screen.
+    const pw = Math.min(260, vw * 0.62, (vh * 0.34) / PORTRAIT_RATIO);
+    const ph = pw * PORTRAIT_RATIO;
+    const blockH = ph + 28 + lines.length * size * 1.25 + 40;
     const top = (vh - blockH) / 2;
-    const quoteTop = top + ph + (ph ? 28 : 0) + size;
+    const quoteTop = top + ph + 28 + size;
+    // It starts drawing as the quote finishes forming, as if the dust became the ink.
+    const portraitTimer = setTimeout(
+      () => setPortraitBox({ left: (vw - pw) / 2, top, w: pw }),
+      5100,
+    );
     const slots: { x: number; y: number }[] = [];
     lines.forEach((line, li) => {
       const lw =
@@ -313,27 +298,8 @@ export function Unravel({ articleId }: { articleId: string }) {
         );
         ctx.textAlign = "left";
       }
-      // The portrait, engraving itself stroke by stroke, as if the dust became the ink.
-      if (p) {
-        const drawn = Math.floor(p.strokes.length * seg(t, 5.2, 8.8));
-        ctx.save();
-        ctx.translate((vw - p.w * pk) / 2, top);
-        ctx.scale(pk, pk);
-        ctx.strokeStyle = ink;
-        ctx.lineCap = "round";
-        ctx.globalAlpha = 1;
-        for (let i = 0; i < drawn; i++) {
-          const st = p.strokes[i];
-          ctx.lineWidth = st.w;
-          ctx.beginPath();
-          ctx.moveTo(st.x1, st.y1);
-          ctx.lineTo(st.x2, st.y2);
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
       ctx.globalAlpha = 1;
-      if (t < 9.2) frame = requestAnimationFrame(draw);
+      if (t < 6.4) frame = requestAnimationFrame(draw);
       // Finished: the quote holds on screen until the reader scrolls back up.
     };
     frame = requestAnimationFrame(draw);
@@ -342,79 +308,72 @@ export function Unravel({ articleId }: { articleId: string }) {
     const onScroll = () => {
       if (window.scrollY < startY - 120) {
         cancelAnimationFrame(frame);
+        clearTimeout(portraitTimer);
         window.removeEventListener("scroll", onScroll);
+        setPortraitBox(null);
         article.style.transition = "opacity 700ms ease";
         article.style.opacity = "1";
         cv.style.transition = "opacity 500ms ease";
         cv.style.opacity = "0";
         setPhase("done");
-        setTimeout(drawStill, 50);
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
-  // The portrait's strokes (only if the reference photo exists).
-  useEffect(() => {
-    let off = false;
-    const width = Math.min(320, window.innerWidth - 48);
-    fetch(asset(PORTRAIT), { method: "HEAD" })
-      .then((r) => (r.ok ? engrave(asset(PORTRAIT), width) : null))
-      .then((p) => {
-        if (off || !p) return;
-        portrait.current = p;
-        drawStill();
-      })
-      .catch(() => {});
-    return () => {
-      off = true;
-    };
-  }, []);
-
   useEffect(() => {
     if (reduced) return;
     const article = document.getElementById(articleId);
     if (!article) return;
-    // The last paragraph of the thank-you section.
-    const heads = [...article.querySelectorAll("h2")];
-    const thanks = heads.find((h) => h.textContent?.trim() === "A thank you");
-    let last: Element | null = null;
-    for (let el = thanks?.nextElementSibling; el && el.tagName !== "H2"; el = el.nextElementSibling)
-      if (el.tagName === "P") last = el;
-    if (!last) return;
+    // Only at the true end: the marker after the sources must be fully on screen, and stay
+    // there for a moment (a reader who has finished, not one scrolling past).
+    const end = sentinel.current;
+    if (!end) return;
     let played = false;
+    let dwell = 0;
     const io = new IntersectionObserver(
       ([e]) => {
+        clearTimeout(dwell);
         if (!e.isIntersecting || played) return;
-        played = true;
-        io.disconnect();
-        play(article);
+        dwell = window.setTimeout(() => {
+          played = true;
+          io.disconnect();
+          play(article);
+        }, 1400);
       },
-      { threshold: 0.9 },
+      { threshold: 1 },
     );
-    io.observe(last);
-    return () => io.disconnect();
+    io.observe(end);
+    return () => {
+      io.disconnect();
+      clearTimeout(dwell);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduced]);
 
   const showStill = reduced || phase === "done";
   return (
     <>
+      <div ref={sentinel} className={s.sentinel} aria-hidden="true" />
       <canvas
         ref={overlay}
         className={s.overlay}
         data-on={phase === "playing" || undefined}
         aria-hidden="true"
       />
+      {phase === "playing" && portraitBox && (
+        <div
+          className={s.drawing}
+          style={{ left: portraitBox.left, top: portraitBox.top, width: portraitBox.w }}
+          aria-hidden="true"
+        >
+          <FeynmanLines animate />
+        </div>
+      )}
       {/* The same quote, kept in the page under the essay: the finished state, and what
           screen readers, search engines and reduced motion get. */}
       <section className={s.coda} data-shown={showStill || undefined} aria-label="Coda">
-        <canvas
-          ref={still}
-          className={s.portrait}
-          role="img"
-          aria-label="A portrait of Richard Feynman, drawn as an ink engraving."
-        />
+        <FeynmanLines className={s.portrait} />
         <blockquote className={s.quote}>
           <p>What I cannot create, I do not understand.</p>
           <footer>{ATTRIBUTION}</footer>

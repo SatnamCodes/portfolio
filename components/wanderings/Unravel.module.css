@@ -32,10 +32,7 @@
 }
 
 .portrait {
-  display: block;
-  max-width: min(320px, 100%);
-  height: auto;
-  color: inherit;
+  width: min(260px, 70vw);
 }
 
 .quote {
@@ -54,4 +51,17 @@
   font-style: italic;
   font-size: 1rem;
   color: var(--color-ink-muted);
+}
+
+/* The end of the essay: once this is fully on screen (and stays), the ending plays. */
+.sentinel {
+  height: 1px;
+}
+
+/* The portrait while it draws itself, above the quote on the overlay. */
+.drawing {
+  position: fixed;
+  z-index: 41;
+  pointer-events: none;
+  color: var(--color-espresso);
 }

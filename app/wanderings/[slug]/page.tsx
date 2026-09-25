@@ -5,6 +5,7 @@ import { Page } from "@/components/Page";
 import { PageLink } from "@/components/PageLink";
 import { PlainTypeFrame, PlainTypeToggle } from "@/components/PlainType";
 import { inkComponents } from "@/components/wanderings/Ink";
+import { BellPlates, InversePlate } from "@/components/wanderings/Plates";
 import { Unravel } from "@/components/wanderings/Unravel";
 import { VortexPlate } from "@/components/wanderings/Vortex";
 import ink from "@/components/wanderings/ink.module.css";
@@ -86,7 +87,7 @@ export default async function WanderingEntry({ params }: { params: Promise<{ slu
             <h1 className="visually-hidden">Untitled, {formatDate(meta.date)}</h1>
           )}
           <div className={ink.ink}>
-            <Body components={{ ...inkComponents(words), VortexPlate }} />
+            <Body components={{ ...inkComponents(words), VortexPlate, BellPlates, InversePlate }} />
           </div>
         </article>
         {meta.ending === "feynman" && <Unravel articleId="essay" />}
