@@ -29,6 +29,13 @@
   line-height: var(--leading-display);
 }
 
+.byline {
+  margin-top: var(--space-sm);
+  font-family: var(--font-meta);
+  font-size: var(--type-body-sm);
+  color: var(--color-ink-muted);
+}
+
 .nav ol {
   list-style: none;
   padding: 0;

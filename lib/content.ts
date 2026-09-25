@@ -27,9 +27,14 @@ export const roadSchema = z.strictObject({
   draft,
 });
 
+export const RESEARCH_STATUSES = ["in progress", "complete"] as const;
+
 export const researchSchema = z.strictObject({
   title: z.string().min(1),
   date: isoDate,
+  status: z.enum(RESEARCH_STATUSES).optional(),
+  // Co-authors, named on the entry beside the owner.
+  collaborators: z.array(z.string().min(1)).optional(),
   draft,
 });
 

@@ -51,6 +51,12 @@ export default async function ResearchPage() {
                     </h2>
                     <p className={s.meta}>
                       <time dateTime={e.meta.date}>{formatDate(e.meta.date)}</time>
+                      {e.meta.status && (
+                        <>
+                          <span aria-hidden="true"> · </span>
+                          {e.meta.status}
+                        </>
+                      )}
                     </p>
                     {question && (
                       <p className={s.question}>

@@ -8,7 +8,10 @@ import { article, breadcrumbs, webPage } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 import { fieldLabel } from "@/lib/research-fields";
 import prose from "@/styles/prose.module.css";
+import { site } from "@/lib/site";
 import s from "./entry.module.css";
+
+const listFormat = new Intl.ListFormat("en", { style: "long", type: "conjunction" });
 
 export const dynamicParams = false;
 
@@ -68,8 +71,19 @@ export default async function ResearchEntry({ params }: { params: Promise<{ slug
             No. {String(number).padStart(3, "0")}
             <span aria-hidden="true"> · </span>
             <time dateTime={meta.date}>{formatDate(meta.date)}</time>
+            {meta.status && (
+              <>
+                <span aria-hidden="true"> · </span>
+                {meta.status}
+              </>
+            )}
           </p>
           <h1 className={s.title}>{meta.title}</h1>
+          {meta.collaborators?.length ? (
+            <p className={s.byline}>
+              {site.owner}, with {listFormat.format(meta.collaborators)}
+            </p>
+          ) : null}
         </header>
         {showNav && (
           <nav className={s.nav} aria-label="In this entry">

@@ -4,6 +4,7 @@ import { Field } from "@/components/mdx/Field";
 import { Formula, Scan } from "@/components/mdx/Scan";
 import { Aside } from "@/components/wanderings/Ink";
 import { KernelAnimation } from "@/components/kernels/KernelAnimation";
+import { DopantGraph } from "@/components/research/DopantGraph";
 
 const components: MDXComponents = {
   Field,
@@ -13,6 +14,7 @@ const components: MDXComponents = {
   PullQuote,
   Photo,
   KernelAnimation,
+  DopantGraph,
 };
 
 export function useMDXComponents(): MDXComponents {

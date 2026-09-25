@@ -1,0 +1,65 @@
+export const metadata = {
+  title: "Finding p-type dopants for β-Ga₂O₃ with structure-aware graph neural networks",
+  date: "2026-09-25",
+  status: "in progress",
+  collaborators: ["Erin Liju Thomas", "John Silvister Raju"],
+};
+
+<Field name="question">
+
+Which divalent dopants, sitting on which gallium site, could finally make β-Ga₂O₃ conduct as a p-type semiconductor? And can a graph neural network that looks at the defect's real local structure answer that faster than a separate DFT calculation for every candidate?
+
+</Field>
+
+<Field name="motivation">
+
+β-Ga₂O₃ has an extremely wide bandgap and can withstand an electric field of roughly 8 MV/cm before breaking down. That is more than twice what SiC or GaN can take (about 3 MV/cm each), which makes it one of the most promising materials for the next generation of power electronics.
+
+The catch is that it only works well in one direction. Making it n-type is routine, with silicon, tin or germanium. Making it p-type is not: nobody has a dependable acceptor yet. Without p-type material there are no p–n junctions or bipolar devices, and that gap is what holds the material back from wider use.
+
+The usual ways of hunting for an acceptor are growing doped crystals in the lab, or running a density functional theory (DFT) calculation for each dopant. Both are slow, and the search space grows quickly: every dopant can sit on more than one lattice site, in more than one charge state.
+
+</Field>
+
+<Field name="background">
+
+Machine learning on crystal graphs is well established. CGCNN [1] and ALIGNN [2] learn material properties directly from how atoms are arranged and bonded, and recent work has pointed graph networks at point defects in semiconductors [3] and in materials for clean energy [4]. The quantities we care about, defect formation energy and charge-transition (ionization) levels, come from the standard first-principles treatment of point defects [5].
+
+Earlier screening for p-type β-Ga₂O₃ has mostly described each dopant through elemental descriptors [6, 7]: numbers for the element, not the structure it ends up in. Other groups have explored different routes to p-type conduction, such as alloying with bismuth [9]. Strontium has been studied with first-principles calculations [8], but never through a machine-learning screen of formation energy or ionization level.
+
+</Field>
+
+<Field name="method">
+
+The core idea is a crystal graph built around the defect itself. Its nodes and edges record four things a descriptor table leaves out: which element the dopant is, which of the two inequivalent gallium sites it replaces (tetrahedral Ga(I) or octahedral Ga(II)), how the atoms around it are coordinated, and the defect's charge state. From that graph, the network predicts the defect formation energy and the ionization level directly.
+
+- **Candidates:** five divalent acceptors, Be, Mg, Zn, Cd and Sr, each on both gallium sites.
+- **Data:** a training set derived from DFT calculations.
+- **Baselines:** random forest and gradient-boosted models trained on standard materials descriptors, to show what the structure adds.
+- **Outcome:** once validated, the model ranks the five dopants by how viable they are as p-type acceptors. Strontium doubles as a test of how well it generalizes to dopant chemistry it has seen little of.
+
+The hope is to get two things out of it: a physically interpretable ranking of acceptors for β-Ga₂O₃, and a way of building defect graphs that carries over to other wide-bandgap oxide semiconductors.
+
+This work is in progress. Results will be added here as they come in.
+
+</Field>
+
+<Field name="visualizations">
+
+<DopantGraph />
+
+</Field>
+
+<Field name="references">
+
+1. Xie, T. and Grossman, J. C. (2018). Crystal graph convolutional neural networks for an accurate and interpretable prediction of material properties. *Physical Review Letters* 120, 145301.
+2. Choudhary, K. and DeCost, B. (2021). Atomistic line graph neural network for improved materials property predictions. *npj Computational Materials* 7, 185.
+3. Rahman, M. H. et al. (2024). Accelerating defect predictions in semiconductors using graph neural networks. *APL Machine Learning* 2, 016122.
+4. Witman, M. D. et al. (2023). Defect graph neural networks for materials discovery in high-temperature clean-energy applications. *Nature Computational Science* 3, 675–683.
+5. Freysoldt, C. et al. (2014). First-principles calculations for point defects in solids. *Reviews of Modern Physics* 86, 253–305.
+6. Ward, L. et al. (2016). A general-purpose machine learning framework for predicting properties of inorganic materials. *npj Computational Materials* 2, 16028.
+7. Unveiling p-type doping strategies in β-Ga₂O₃: insights from machine learning and first-principles calculations (2025). *Materials Today Communications*.
+8. Samat, M. H. et al. (2021). First-principles studies for electronic structure and optical properties of strontium doped β-Ga₂O₃. *Micromachines* 12, 348.
+9. Cai, X. et al. (2021). Approach to achieving a p-type transparent conducting oxide: doping of bismuth-alloyed Ga₂O₃ with a strongly correlated band edge state. *Physical Review B* 103, 115205.
+
+</Field>

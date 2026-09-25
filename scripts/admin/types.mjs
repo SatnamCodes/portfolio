@@ -38,7 +38,13 @@ export const TYPES = {
   research: {
     label: "Research entry",
     dir: "content/research",
-    fields: [{ name: "title", label: "Title", type: "text", required: true }, date, draft],
+    fields: [
+      { name: "title", label: "Title", type: "text", required: true },
+      date,
+      // The blank first option leaves status out.
+      { name: "status", label: "Status", type: "select", options: ["", "in progress", "complete"] },
+      draft,
+    ],
     body: "research",
   },
   projects: {
