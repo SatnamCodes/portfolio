@@ -5,6 +5,7 @@ import { Page } from "@/components/Page";
 import { PageLink } from "@/components/PageLink";
 import { PlainTypeFrame, PlainTypeToggle } from "@/components/PlainType";
 import { inkComponents } from "@/components/wanderings/Ink";
+import { plates } from "@/components/wanderings/Plates";
 import ink from "@/components/wanderings/ink.module.css";
 import { formatDate, getWanderings, opening, staticParams } from "@/lib/content";
 import { article, breadcrumbs, webPage } from "@/lib/schema";
@@ -74,7 +75,7 @@ export default async function WanderingEntry({ params }: { params: Promise<{ slu
             <h1 className="visually-hidden">Untitled, {formatDate(meta.date)}</h1>
           )}
           <div className={ink.ink}>
-            <Body components={inkComponents(words)} />
+            <Body components={{ ...inkComponents(words), ...plates }} />
           </div>
         </article>
       </PlainTypeFrame>
