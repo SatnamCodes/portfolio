@@ -178,7 +178,9 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       const w = el.clientWidth;
       const section = el.parentElement!;
       section.style.setProperty("--details-top", `${el.offsetTop + el.offsetHeight / 2}px`);
-      const h = Math.round(Math.min(330, window.innerHeight * 0.33, Math.max(160, w * 0.175)));
+      // Phones have height to spare under the film, so frames there are sized off the screen's height.
+      const floor = w < 768 ? Math.min(230, window.innerHeight * 0.3) : 160;
+      const h = Math.round(Math.min(330, window.innerHeight * 0.33, Math.max(floor, w * 0.175)));
       el.style.setProperty("--frame-h", `${h}px`);
       // A fixed perspective pulls the bent ends in from the edges on wide screens; scale it so the
       // film always runs off both sides.

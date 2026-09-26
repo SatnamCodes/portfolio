@@ -189,6 +189,11 @@
   color: var(--color-espresso);
 }
 
+.viewer .caption {
+  font-size: clamp(1.15rem, 0.95rem + 0.8vw, 1.6rem);
+  line-height: 1.3;
+}
+
 .viewer .meta {
   color: var(--color-ink-muted);
 }
