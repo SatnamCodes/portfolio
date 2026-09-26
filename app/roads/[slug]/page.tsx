@@ -7,6 +7,7 @@ import { Page } from "@/components/Page";
 import { formatDate, getRoads, staticParams } from "@/lib/content";
 import { article, breadcrumbs, webPage } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
+import { shareCard } from "@/lib/share";
 import prose from "@/styles/prose.module.css";
 import s from "../article.module.css";
 
@@ -34,6 +35,7 @@ export async function generateMetadata({
     path: `/roads/${road.slug}`,
     type: "article",
     published: road.meta.date,
+    image: shareCard("roads", road.slug, road.meta.title),
   });
 }
 

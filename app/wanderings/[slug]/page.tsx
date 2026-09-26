@@ -12,6 +12,7 @@ import ink from "@/components/wanderings/ink.module.css";
 import { excerpt, formatDate, getWanderings, opening, staticParams } from "@/lib/content";
 import { article, breadcrumbs, webPage } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
+import { shareCard } from "@/lib/share";
 import s from "./entry.module.css";
 
 export const dynamicParams = false;
@@ -38,6 +39,7 @@ export async function generateMetadata({
     path: `/wanderings/${entry.slug}`,
     type: "article",
     published: entry.meta.date,
+    image: shareCard("wanderings", entry.slug, entry.meta.title ?? opening(entry.source, 8)),
   });
 }
 
