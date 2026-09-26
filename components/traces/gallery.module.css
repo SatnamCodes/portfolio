@@ -153,12 +153,35 @@
 
 .bar {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
   gap: var(--space-sm) var(--space-lg);
   padding: var(--space-sm) clamp(1rem, 4vw, 4rem) var(--space-md);
+}
+
+/* The caption sits centred, right under the photograph; the controls keep to the right. */
+.viewer .viewerDetails {
+  grid-column: 2;
+  text-align: center;
+}
+
+.viewer .controls {
+  grid-column: 3;
+  justify-self: end;
+}
+
+@media (max-width: 47.99rem) {
+  .bar {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .viewer .viewerDetails,
+  .viewer .controls {
+    grid-column: 1;
+    justify-self: center;
+  }
 }
 
 .viewer .caption,
