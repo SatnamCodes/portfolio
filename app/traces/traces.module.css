@@ -3,3 +3,13 @@
   margin-inline: auto;
   padding: 0 var(--gutter) var(--space-xxxl);
 }
+
+/* The whole first screen (title, figure, film and the centred frame's details) fits without
+   scrolling, so the intro is tighter here than on other sections. */
+.page > header {
+  padding-block: clamp(1rem, 3svh, var(--space-xl)) 0;
+}
+
+.page > header h1 {
+  font-size: clamp(2.4rem, min(1.6rem + 3vw, 7svh), 4.5rem);
+}

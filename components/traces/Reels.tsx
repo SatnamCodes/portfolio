@@ -4,6 +4,7 @@ import { AnimatePresence, MotionConfig } from "motion/react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  IDLE_AFTER,
   layFilm,
   nearestSlot,
   offsetTo,
@@ -20,6 +21,11 @@ import { asset } from "@/lib/base-path";
 
 // The lower reel counter-runs at this fraction of the upper one.
 const FOLLOW_RATIO = 0.82;
+// A frame crossing the centre under momentum is caught there for a moment, then flung on with the
+// speed it arrived with: a catapult, not a stop.
+const CATCH_FOR = 0.14; // s
+const CATCH_ABOVE = 140; // px/s: slower than this, the ordinary snap takes over
+const FLING = 1.08;
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/·—";
 const pad = (n: number) => String(n).padStart(2, "0");
 // Share of a cell's height the picture takes (the rest is sprocket holes), and its side margins.
@@ -112,6 +118,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
     follow: { x: 0, v: 0 } as Reel,
     goal: null as number | null,
     lastInput: -Infinity,
+    caught: null as null | { x: number; v: number; until: number },
     drag: null as null | { strip: number; x: number; t: number; v: number; moved: number },
     film: layFilm([300]) as Film,
     active: -1,
@@ -132,7 +139,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       const w = el.clientWidth;
       const section = el.parentElement!;
       section.style.setProperty("--details-top", `${el.offsetTop + el.offsetHeight / 2}px`);
-      const h = Math.round(Math.min(256, Math.max(144, w * 0.152)));
+      const h = Math.round(Math.min(256, window.innerHeight * 0.27, Math.max(144, w * 0.152)));
       el.style.setProperty("--frame-h", `${h}px`);
       setFrameH(h);
       const cycle = photos.reduce((a, p) => a + h * PICTURE_H * aspectOf(p) + PICTURE_MARGIN, 0);
@@ -205,12 +212,13 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
           const kid = kids[i];
           const W = f.widths[i] ?? 0;
           const pos = offsetTo(f, reel.x, i);
-          // Past the bend's limit frames would pile up on the clamped edge; they're out of sight anyway.
-          if (Math.abs(pos) > half + W * 1.5 || Math.abs(pos) / radius > 1.3) {
+          // The bend pulls frames in towards the centre, so cull by where a frame lands on screen, not
+          // by its distance along the film; past the bend's limit frames would pile up on the edge.
+          const c = placeOnCurve(pos, radius, si === 0 ? -34 : 34, half);
+          if (Math.abs(pos) / radius > 1.35 || Math.abs(c.x) - W > half) {
             kid.style.visibility = "hidden";
             continue;
           }
-          const c = placeOnCurve(pos, radius, si === 0 ? -34 : 34, half);
           kid.style.visibility = "";
           kid.style.transform = `translate3d(${c.x - W / 2}px, ${c.y}px, ${c.z}px) rotateY(${c.rotateY}deg) skewX(${skew}deg)`;
         }
@@ -232,7 +240,16 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       const dt = last ? (now - last) / 1000 : 1 / 60;
       last = now;
       const idle = now / 1000 - st.lastInput;
-      if (!st.drag) {
+      const f = st.film;
+      if (st.caught && !st.drag) {
+        // Held on the centre; the momentum is kept, not spent.
+        st.lead.x = st.caught.x;
+        st.lead.v = 0;
+        if (now / 1000 >= st.caught.until) {
+          st.lead.v = st.caught.v * FLING;
+          st.caught = null;
+        }
+      } else if (!st.drag) {
         if (st.goal !== null) {
           const k = 90;
           const a = k * (st.goal - st.lead.x) - 2 * Math.sqrt(k) * st.lead.v;
@@ -244,9 +261,23 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
             st.goal = null;
           }
         } else {
-          const f = st.film;
           const snap = (x: number) => x + offsetTo(f, x, nearestSlot(f, x));
+          const from = st.lead.x;
           stepLead(st.lead, dt, snap, reduced ? 0 : idle, reduced);
+          // Did a frame's centre pass the middle during a flick? Catch it there.
+          if (!reduced && idle < IDLE_AFTER && Math.abs(st.lead.v) > CATCH_ABOVE) {
+            const slot = nearestSlot(f, st.lead.x);
+            const before = offsetTo(f, from, slot);
+            const after = offsetTo(f, st.lead.x, slot);
+            if (before * after < 0 && Math.abs(before) < f.widths[slot]) {
+              st.caught = {
+                x: st.lead.x + after,
+                v: st.lead.v,
+                until: now / 1000 + CATCH_FOR,
+              };
+              st.lead.x = st.caught.x;
+            }
+          }
         }
       }
       stepFollower(st.follow, st.lead, dt, FOLLOW_RATIO, reduced);
@@ -273,7 +304,9 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       if (!d) return;
       e.preventDefault();
       st.goal = null;
-      st.lead.v = Math.max(-4200, Math.min(4200, st.lead.v + d * (e.deltaMode === 1 ? 90 : 5.5)));
+      const push = d * (e.deltaMode === 1 ? 40 : 2.4);
+      if (st.caught) st.caught.v = Math.max(-2400, Math.min(2400, st.caught.v + push));
+      else st.lead.v = Math.max(-2400, Math.min(2400, st.lead.v + push));
       nudge();
     };
     el.addEventListener("wheel", onWheel, { passive: false });
@@ -290,6 +323,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
   const onPointerDown = (strip: number) => (e: React.PointerEvent) => {
     if (e.button !== 0) return;
     sim.current.drag = { strip, x: e.clientX, t: e.timeStamp, v: 0, moved: 0 };
+    sim.current.caught = null;
     sim.current.goal = null;
     // No pointer capture yet: capturing now would send the click to the strip instead of the
     // photo under the mouse. It's taken once the pointer actually starts to drag (below).
