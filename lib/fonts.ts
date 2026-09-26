@@ -4,6 +4,7 @@ import {
   Kalam,
   La_Belle_Aurore,
   Newsreader,
+  Tiro_Gurmukhi,
 } from "next/font/google";
 
 export const display = Instrument_Serif({
@@ -53,4 +54,17 @@ export const gel = Kalam({
   fallback: ["cursive"],
 });
 
-export const fontVariables = [display, body, meta, fountain, gel].map((f) => f.variable).join(" ");
+// Punjabi translations. Not preloaded: only a page showing Gurmukhi text downloads it.
+export const gurmukhi = Tiro_Gurmukhi({
+  subsets: ["gurmukhi"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-gurmukhi",
+  preload: false,
+  fallback: ["Noto Serif Gurmukhi", "Raavi", "serif"],
+});
+
+export const fontVariables = [display, body, meta, fountain, gel, gurmukhi]
+  .map((f) => f.variable)
+  .join(" ");

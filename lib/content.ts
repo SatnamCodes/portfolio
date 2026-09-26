@@ -252,11 +252,29 @@ export function opening(source: string, words: number) {
   return all.slice(0, words).join(" ") + (all.length > words ? "…" : "");
 }
 
+// A wandering's Punjabi translation, when one exists at content/wanderings/pa/<slug>.mdx.
+const punjabiSchema = z.strictObject({ title: z.string().min(1).optional() });
+
+async function punjabi(slug: string) {
+  if (!fs.existsSync(path.join(CONTENT, "wanderings", "pa", `${slug}.mdx`))) return undefined;
+  const mod = (await import(`@/content/wanderings/pa/${slug}.mdx`)) as {
+    default: MDXContent;
+    metadata?: unknown;
+  };
+  const meta = parse(punjabiSchema, mod.metadata ?? {}, `content/wanderings/pa/${slug}.mdx`);
+  return { title: meta.title, Body: mod.default };
+}
+
 export async function getWanderings() {
   const entries = await load("wanderings", wanderingSchema);
-  return entries
-    .map((e) => ({ ...e, words: wordCount(e.source) }))
-    .sort((a, b) => b.meta.date.localeCompare(a.meta.date));
+  const withTranslations = await Promise.all(
+    entries.map(async (e) => ({
+      ...e,
+      words: wordCount(e.source),
+      punjabi: await punjabi(e.slug),
+    })),
+  );
+  return withTranslations.sort((a, b) => b.meta.date.localeCompare(a.meta.date));
 }
 
 export function formatDate(iso: string) {

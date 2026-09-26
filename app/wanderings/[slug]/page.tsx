@@ -5,6 +5,7 @@ import { Page } from "@/components/Page";
 import { PageLink } from "@/components/PageLink";
 import { PlainTypeFrame, PlainTypeToggle } from "@/components/PlainType";
 import { inkComponents } from "@/components/wanderings/Ink";
+import { LanguagePane, LanguageToggle, OnlyIn } from "@/components/wanderings/Language";
 import { BellPlates, InversePlate } from "@/components/wanderings/Plates";
 import { Unravel } from "@/components/wanderings/Unravel";
 import { VortexPlate } from "@/components/wanderings/Vortex";
@@ -45,10 +46,23 @@ export async function generateMetadata({
 export default async function WanderingEntry({ params }: { params: Promise<{ slug: string }> }) {
   const entry = await find(params);
   if (!entry) notFound();
-  const { meta, Body, words } = entry;
+  const { meta, Body, words, punjabi } = entry;
   const path = `/wanderings/${entry.slug}`;
   const title = meta.title ?? opening(entry.source, 8);
   const description = excerpt(entry.source);
+  const components = { ...inkComponents(words), VortexPlate, BellPlates, InversePlate };
+  const english = (
+    <>
+      {meta.title ? (
+        <h1 className={s.title}>{meta.title}</h1>
+      ) : (
+        <h1 className="visually-hidden">Untitled, {formatDate(meta.date)}</h1>
+      )}
+      <div className={ink.ink}>
+        <Body components={components} />
+      </div>
+    </>
+  );
 
   return (
     <Page>
@@ -79,19 +93,32 @@ export default async function WanderingEntry({ params }: { params: Promise<{ slu
             <span aria-hidden="true"> · </span>
             <time dateTime={meta.date}>{formatDate(meta.date)}</time>
           </p>
-          <PlainTypeToggle className={s.toggle} />
+          <span className={s.toggles}>
+            {punjabi && <LanguageToggle className={s.toggle} articleId="essay" />}
+            <PlainTypeToggle className={s.toggle} />
+          </span>
         </header>
         <article id="essay" className={s.article} data-length={words < 40 ? "fragment" : undefined}>
-          {meta.title ? (
-            <h1 className={s.title}>{meta.title}</h1>
+          {punjabi ? (
+            <>
+              <LanguagePane lang="en">{english}</LanguagePane>
+              <LanguagePane lang="pa" className={s.punjabi}>
+                <h1 className={s.title}>{punjabi.title ?? title}</h1>
+                <div className={ink.ink}>
+                  <punjabi.Body components={components} />
+                </div>
+              </LanguagePane>
+            </>
           ) : (
-            <h1 className="visually-hidden">Untitled, {formatDate(meta.date)}</h1>
+            english
           )}
-          <div className={ink.ink}>
-            <Body components={{ ...inkComponents(words), VortexPlate, BellPlates, InversePlate }} />
-          </div>
         </article>
-        {meta.ending === "feynman" && <Unravel articleId="essay" />}
+        {/* The ending picks words out of the English text, so it plays only with the English. */}
+        {meta.ending === "feynman" && (
+          <OnlyIn lang="en">
+            <Unravel articleId="essay" />
+          </OnlyIn>
+        )}
       </PlainTypeFrame>
     </Page>
   );

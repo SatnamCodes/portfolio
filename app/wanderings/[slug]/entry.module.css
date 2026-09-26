@@ -25,6 +25,12 @@
   text-decoration-color: var(--color-rule);
 }
 
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-md);
+}
+
 .toggle {
   min-height: 44px;
   padding: 0;
@@ -77,4 +83,20 @@
   .article[data-length="fragment"] {
     margin-inline: auto;
   }
+}
+
+/* The Punjabi translation: Gurmukhi in both the notebook and the article view. Letter-spacing
+   would break the headline stroke that joins Gurmukhi letters, so it is turned off. */
+.punjabi.punjabi :is(h1, h2, h3, p, li, blockquote, span) {
+  font-family: var(--font-gurmukhi), var(--font-body);
+  letter-spacing: normal;
+}
+
+.punjabi.punjabi :is(p, li) {
+  line-height: 1.9;
+}
+
+.punjabi .title {
+  font-size: clamp(2.1rem, 1.4rem + 3vw, 3.75rem);
+  line-height: 1.35;
 }
