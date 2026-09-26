@@ -41,7 +41,7 @@ function Details({ photo, className }: { photo: GalleryPhoto; className?: string
 const TRAILS = (() => {
   let seed = 7;
   const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-  return Array.from({ length: 380 }, () => {
+  return Array.from({ length: 410 }, () => {
     const r = 18 + Math.pow(rand(), 0.65) * 1000;
     const from = rand() * Math.PI * 2;
     const to = from + (0.12 + rand() * 0.5) * (1 - 0.4 * (r / 1000));
@@ -60,12 +60,23 @@ const TREE = (() => {
   let seed = 11;
   const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
   const out: { d: string; w: number }[] = [];
+  // The tree's own extent, so the drawing is framed to it and never cropped.
+  const box = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+  const reach = (x: number, y: number, w: number) => {
+    box.x0 = Math.min(box.x0, x - w);
+    box.x1 = Math.max(box.x1, x + w);
+    box.y0 = Math.min(box.y0, y - w);
+    box.y1 = Math.max(box.y1, y + w);
+  };
   const grow = (x: number, y: number, angle: number, len: number, w: number, depth: number) => {
     const bend = (rand() - 0.5) * 0.5;
     const mx = x + Math.cos(angle + bend) * len * 0.5;
     const my = y + Math.sin(angle + bend) * len * 0.5;
     const ex = x + Math.cos(angle) * len;
     const ey = y + Math.sin(angle) * len;
+    reach(x, y, w);
+    reach(mx, my, w);
+    reach(ex, ey, w);
     out.push({
       d: `M${x.toFixed(1)} ${y.toFixed(1)}Q${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`,
       w,
@@ -79,19 +90,25 @@ const TREE = (() => {
       grow(ex, ey, a, len * (0.68 + rand() * 0.16), w * (0.62 + rand() * 0.1), depth - 1);
     }
   };
-  grow(-230, 1000, -Math.PI / 2 + 0.08, 230, 26, 10);
-  return out;
+  grow(0, 1000, -Math.PI / 2 + 0.08, 230, 26, 10);
+  const pad = 4;
+  return {
+    branches: out,
+    viewBox: [box.x0 - pad, box.y0 - pad, box.x1 - box.x0 + pad * 2, 1000 - box.y0 + pad]
+      .map((v) => v.toFixed(0))
+      .join(" "),
+  };
 })();
 
 function Tree() {
   return (
     <svg
       className={s.tree}
-      viewBox="-260 0 760 1000"
+      viewBox={TREE.viewBox}
       preserveAspectRatio="xMinYMax meet"
       aria-hidden="true"
     >
-      {TREE.map((b, i) => (
+      {TREE.branches.map((b, i) => (
         <path
           key={i}
           d={b.d}

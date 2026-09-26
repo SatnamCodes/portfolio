@@ -100,15 +100,17 @@
   height: max(260vmax, 1600px);
   translate: -50% -50%;
   color: var(--color-espresso);
-  animation: trails-turn 240s linear infinite;
+  animation: trails-turn 170s linear infinite;
 }
 
-/* A tree against the long exposure, rooted at the bottom left, still while the sky turns. */
+/* A tree against the long exposure, whole and standing just above the caption bar, still while
+   the sky turns. */
 .tree {
   position: absolute;
-  left: 0;
-  bottom: 0;
-  height: min(92svh, 60rem);
+  left: clamp(0.5rem, 2vw, 2.5rem);
+  bottom: 5rem;
+  height: min(78svh, 52rem);
+  max-width: 34vw;
   width: auto;
   color: var(--color-espresso);
   opacity: 0.88;
