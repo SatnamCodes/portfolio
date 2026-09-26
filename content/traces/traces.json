@@ -2,6 +2,199 @@
   "$comment": "Traces: one object per photograph, newest first. Only 'id', 'src', 'width', 'height' and 'alt' are required.",
   "photos": [
     {
+      "id": "half-moon-copper",
+      "src": "/traces/photos/half-moon-copper.jpg",
+      "width": 1080,
+      "height": 1080,
+      "alt": "A copper-toned half moon, its craters crisp along the shadow line, against a dark sky.",
+      "caption": "Half moon, in copper"
+    },
+    {
+      "id": "jupiter-galilean-moons-reel",
+      "src": "/traces/video/jupiter-galilean-moons-reel.jpg",
+      "video": "/traces/video/jupiter-galilean-moons-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of Jupiter as a bright disc with its four Galilean moons strung out beside it.",
+      "caption": "Jupiter and its Galilean moons",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 70%"
+      }
+    },
+    {
+      "id": "full-moon-drift-reel",
+      "src": "/traces/video/full-moon-drift-reel.jpg",
+      "video": "/traces/video/full-moon-drift-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of a nearly full moon drifting through the frame, its grey maria and bright craters clear.",
+      "caption": "Full moon, drifting",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 53%"
+      }
+    },
+    {
+      "id": "crescent-earthshine",
+      "src": "/traces/photos/crescent-earthshine.jpg",
+      "width": 1080,
+      "height": 1080,
+      "alt": "A thin golden crescent moon, the rest of its disc faintly lit by earthshine.",
+      "caption": "Crescent, with earthshine"
+    },
+    {
+      "id": "sun-and-pigeons-reel",
+      "src": "/traces/video/sun-and-pigeons-reel.jpg",
+      "video": "/traces/video/sun-and-pigeons-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of two pigeons silhouetted on a ledge against a huge orange setting sun, a wire cutting across it.",
+      "caption": "Pigeons, against the setting sun",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 42%"
+      }
+    },
+    {
+      "id": "moon-through-leaves-reel",
+      "src": "/traces/video/moon-through-leaves-reel.jpg",
+      "video": "/traces/video/moon-through-leaves-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of a gibbous moon half hidden behind the dark leaves of a tree.",
+      "caption": "The moon, through the leaves",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 53%"
+      }
+    },
+    {
+      "id": "golden-crescent-reel",
+      "src": "/traces/video/golden-crescent-reel.jpg",
+      "video": "/traces/video/golden-crescent-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of a thin golden crescent moon sinking through a black sky.",
+      "caption": "A golden crescent, setting",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 47%"
+      }
+    },
+    {
+      "id": "half-moon-blue-sky",
+      "src": "/traces/photos/half-moon-blue-sky.jpg",
+      "width": 1080,
+      "height": 1080,
+      "alt": "A silver half moon in a deep blue daytime sky, craters sharp along the terminator.",
+      "caption": "Half moon, in a blue sky"
+    },
+    {
+      "id": "bird-on-the-wire-reel",
+      "src": "/traces/video/bird-on-the-wire-reel.jpg",
+      "video": "/traces/video/bird-on-the-wire-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of a bird silhouetted on a wire against a pale sky, a worm in its beak.",
+      "caption": "A bird on the wire",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 53%"
+      }
+    },
+    {
+      "id": "sunset-treeline-reel",
+      "src": "/traces/video/sunset-treeline-reel.jpg",
+      "video": "/traces/video/sunset-treeline-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of a huge orange sun sinking behind a line of trees until only a sliver is left.",
+      "caption": "Sunset, over the treeline",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 38%"
+      }
+    },
+    {
+      "id": "crescent-on-its-back-reel",
+      "src": "/traces/video/crescent-on-its-back-reel.jpg",
+      "video": "/traces/video/crescent-on-its-back-reel.mp4",
+      "width": 360,
+      "height": 640,
+      "alt": "A video of a golden crescent moon lying on its back in a black sky.",
+      "caption": "Crescent, on its back",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 35%"
+      }
+    },
+    {
+      "id": "half-moon-reel",
+      "src": "/traces/video/half-moon-reel.jpg",
+      "video": "/traces/video/half-moon-reel.mp4",
+      "width": 360,
+      "height": 640,
+      "alt": "A video of a half moon, craters crowding the shadow line, drifting across a black sky.",
+      "caption": "Half moon",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 55%"
+      }
+    },
+    {
+      "id": "pigeons-white-sky-reel",
+      "src": "/traces/video/pigeons-white-sky-reel.jpg",
+      "video": "/traces/video/pigeons-white-sky-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of two pigeons perched against a white sky until one of them takes off.",
+      "caption": "Pigeons, against a white sky",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 80%"
+      }
+    },
+    {
+      "id": "half-moon-glare-reel",
+      "src": "/traces/video/half-moon-glare-reel.jpg",
+      "video": "/traces/video/half-moon-glare-reel.mp4",
+      "width": 360,
+      "height": 640,
+      "alt": "A video of a half moon that slides into the eyepiece's glare and washes out to white.",
+      "caption": "Half moon, into the glare",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 54%"
+      }
+    },
+    {
+      "id": "crescent-over-town-reel",
+      "src": "/traces/video/crescent-over-town-reel.jpg",
+      "video": "/traces/video/crescent-over-town-reel.mp4",
+      "width": 720,
+      "height": 1280,
+      "alt": "A video of a tiny crescent moon hanging over a dark town, a lit water tower below.",
+      "caption": "A crescent, over the town",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 45%"
+      }
+    },
+    {
+      "id": "clouds-passing-reel",
+      "src": "/traces/video/clouds-passing-reel.jpg",
+      "video": "/traces/video/clouds-passing-reel.mp4",
+      "width": 360,
+      "height": 640,
+      "alt": "A video of white clouds rolling across a deep blue sky.",
+      "caption": "Clouds, passing",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 50%"
+      }
+    },
+    {
       "id": "crescent-moon-dec-2022",
       "src": "/traces/photos/crescent-moon-dec-2022.jpg",
       "width": 1318,
@@ -17,7 +210,11 @@
       "width": 720,
       "height": 1280,
       "alt": "A video of a gibbous moon hanging in black sky, its craters and grey maria sharp along the terminator.",
-      "caption": "Gibbous, in motion"
+      "caption": "Gibbous, in motion",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 47%"
+      }
     },
     {
       "id": "sun-sunspots-signed",
@@ -60,7 +257,11 @@
       "width": 720,
       "height": 1280,
       "alt": "A video of a huge orange setting sun, with the silhouette of a tree's branches drifting across its edge.",
-      "caption": "The sun, through the trees"
+      "caption": "The sun, through the trees",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 38%"
+      }
     },
     {
       "id": "half-moon-two-tones",
@@ -105,7 +306,11 @@
       "height": 1280,
       "alt": "A video montage: moon photographs signed Cosmic Voyagerzz, then NASA Artemis replying: Always great to see the craters in such detail. Thanks for sharing your #NASAMoonSnap with us!",
       "caption": "#NASAMoonSnap, and a reply from NASA Artemis",
-      "date": "2024-07-27"
+      "date": "2024-07-27",
+      "frame": {
+        "aspect": 0.8,
+        "focus": "50% 50%"
+      }
     },
     {
       "id": "crescent-moon-jan-2023",
@@ -140,14 +345,6 @@
       "alt": "The moon partly dimmed, its lower edge fading into shadow.",
       "caption": "A moon in shadow",
       "date": "2023-10-29"
-    },
-    {
-      "id": "comet-in-eyepiece",
-      "src": "/traces/photos/comet-in-eyepiece.jpg",
-      "width": 997,
-      "height": 1080,
-      "alt": "A faint green smudge among stars in the round field of a telescope eyepiece.",
-      "caption": "A green visitor"
     },
     {
       "id": "crescent-sharp",

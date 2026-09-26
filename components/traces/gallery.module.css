@@ -74,20 +74,45 @@
   text-decoration-color: currentColor;
 }
 
-/* Viewer: the photograph alone on Espresso, metadata as a quiet caption line. */
+/* Viewer: the photograph on a cream night of star trails, metadata as a quiet caption line. */
 .viewer {
   position: fixed;
   inset: 0;
   z-index: 70;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  color: var(--color-sea-sand);
+  color: var(--color-espresso);
 }
 
 .backdrop {
   position: absolute;
   inset: 0;
-  background: var(--color-espresso);
+  overflow: hidden;
+  background: var(--color-sea-sand);
+}
+
+/* Long-exposure star trails: arcs around a pole off the top right, turning very slowly. */
+.trails {
+  position: absolute;
+  left: 78%;
+  top: 14%;
+  width: max(260vmax, 1600px);
+  height: max(260vmax, 1600px);
+  translate: -50% -50%;
+  color: var(--color-espresso);
+  animation: trails-turn 240s linear infinite;
+}
+
+@keyframes trails-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trails {
+    animation: none;
+  }
 }
 
 .stage {
@@ -118,11 +143,19 @@
 
 .viewer .caption,
 .viewer .meta {
-  color: var(--color-sea-sand);
+  color: var(--color-espresso);
 }
 
 .viewer .meta {
-  color: var(--color-sea-sand-shade-2);
+  color: var(--color-ink-muted);
+}
+
+/* The photograph sits on the cream like a print: a thin dark mount and a soft shadow. */
+.viewer .frame {
+  background: #000;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-espresso) 60%, transparent),
+    0 24px 60px -20px color-mix(in srgb, var(--color-espresso) 55%, transparent);
 }
 
 .viewerDetails {
@@ -140,12 +173,12 @@
   font-family: var(--font-meta);
   font-size: var(--type-meta);
   letter-spacing: var(--tracking-meta);
-  color: var(--color-sea-sand-shade-2);
+  color: var(--color-ink-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .viewer .control:focus-visible {
-  outline-color: var(--color-sea-sand);
+  outline-color: var(--color-espresso);
 }
 
 @media (min-width: 64rem) {

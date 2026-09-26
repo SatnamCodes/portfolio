@@ -11,6 +11,13 @@ const photoSchema = z.strictObject({
   width: z.number().int().positive(),
   height: z.number().int().positive(),
   alt: z.string().min(10, "alt text must describe the photograph"),
+  // How the film shows it: the picture's width/height on the strip, and where to centre the crop.
+  frame: z
+    .strictObject({
+      aspect: z.number().min(0.4).max(2.5),
+      focus: z.string().regex(/^\d{1,3}% \d{1,3}%$/),
+    })
+    .optional(),
   caption: z.string().min(1).optional(),
   location: z.string().min(1).optional(),
   date: z

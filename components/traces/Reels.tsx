@@ -3,7 +3,16 @@
 import { AnimatePresence, MotionConfig } from "motion/react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { placeOnCurve, stepFollower, stepLead, wrap, type Reel } from "@/lib/reel-physics";
+import {
+  layFilm,
+  nearestSlot,
+  offsetTo,
+  placeOnCurve,
+  stepFollower,
+  stepLead,
+  type Film,
+  type Reel,
+} from "@/lib/reel-physics";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Viewer, type GalleryPhoto } from "./Gallery";
 import s from "./Reels.module.css";
@@ -13,6 +22,14 @@ import { asset } from "@/lib/base-path";
 const FOLLOW_RATIO = 0.82;
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/·—";
 const pad = (n: number) => String(n).padStart(2, "0");
+// Share of a cell's height the picture takes (the rest is sprocket holes), and its side margins.
+const PICTURE_H = 0.74;
+const PICTURE_MARGIN = 10;
+
+// Each frame is cut to its picture: its own crop if it has one, else the photo's shape, kept sane.
+function aspectOf(p: GalleryPhoto) {
+  return p.frame?.aspect ?? Math.min(1.8, Math.max(0.56, p.width / p.height));
+}
 
 function detailLines(p: GalleryPhoto, i: number, n: number) {
   return [
@@ -24,7 +41,17 @@ function detailLines(p: GalleryPhoto, i: number, n: number) {
 }
 
 // A reel on the film: muted, looping, and only playing while that frame is on screen.
-function ReelVideo({ src, poster, reduced }: { src: string; poster: string; reduced: boolean }) {
+function ReelVideo({
+  src,
+  poster,
+  focus,
+  reduced,
+}: {
+  src: string;
+  poster: string;
+  focus?: string;
+  reduced: boolean;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const v = ref.current;
@@ -47,6 +74,7 @@ function ReelVideo({ src, poster, reduced }: { src: string; poster: string; redu
       preload="none"
       aria-hidden="true"
       className={s.reelVideo}
+      style={{ objectPosition: focus }}
     />
   );
 }
@@ -65,6 +93,11 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
 
   // Enough frames per strip to wrap past both edges of a wide screen.
   const [count, setCount] = useState(Math.max(n, 12));
+  const [frameH, setFrameH] = useState(240);
+  const widths = useMemo(
+    () => photos.map((p) => Math.round(frameH * PICTURE_H * aspectOf(p) + PICTURE_MARGIN)),
+    [photos, frameH],
+  );
   const frames = useMemo(
     () => [
       Array.from({ length: count }, (_, i) => i % n),
@@ -80,9 +113,13 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
     goal: null as number | null,
     lastInput: -Infinity,
     drag: null as null | { strip: number; x: number; t: number; v: number; moved: number },
-    frameW: 300,
+    film: layFilm([300]) as Film,
     active: -1,
   });
+  const film = useMemo(() => layFilm(frames[0].map((pi) => widths[pi])), [frames, widths]);
+  useEffect(() => {
+    sim.current.film = film;
+  }, [film]);
 
   const nudge = useCallback(() => {
     sim.current.lastInput = performance.now() / 1000;
@@ -95,15 +132,17 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       const w = el.clientWidth;
       const section = el.parentElement!;
       section.style.setProperty("--details-top", `${el.offsetTop + el.offsetHeight / 2}px`);
-      sim.current.frameW = Math.round(Math.min(320, Math.max(180, w * 0.19)));
-      el.style.setProperty("--frame-w", `${sim.current.frameW}px`);
-      setCount(Math.max(n, Math.ceil((w * 1.9) / sim.current.frameW / n) * n));
+      const h = Math.round(Math.min(256, Math.max(144, w * 0.152)));
+      el.style.setProperty("--frame-h", `${h}px`);
+      setFrameH(h);
+      const cycle = photos.reduce((a, p) => a + h * PICTURE_H * aspectOf(p) + PICTURE_MARGIN, 0);
+      setCount(n * Math.max(1, Math.ceil((w * 1.9) / cycle)));
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [n]);
+  }, [n, photos]);
 
   // Scramble the details into the active frame's words.
   useEffect(() => {
@@ -154,18 +193,18 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
     let visible = false;
 
     const render = () => {
-      const W = st.frameW;
+      const f = st.film;
       const half = el.clientWidth / 2;
       const radius = Math.max(700, el.clientWidth * 0.95);
       [st.lead, st.follow].forEach((reel, si) => {
         const strip = strips.current[si];
         if (!strip) return;
-        const span = count * W;
         const kids = strip.children as HTMLCollectionOf<HTMLElement>;
         const skew = reduced ? 0 : Math.max(-9, Math.min(9, -reel.v / 240));
         for (let i = 0; i < kids.length; i++) {
-          const pos = wrap(i * W - reel.x + span / 2, span) - span / 2;
           const kid = kids[i];
+          const W = f.widths[i] ?? 0;
+          const pos = offsetTo(f, reel.x, i);
           // Past the bend's limit frames would pile up on the clamped edge; they're out of sight anyway.
           if (Math.abs(pos) > half + W * 1.5 || Math.abs(pos) / radius > 1.3) {
             kid.style.visibility = "hidden";
@@ -182,7 +221,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
           ?.querySelector("feGaussianBlur")
           ?.setAttribute("stdDeviation", `${b.toFixed(2)} 0`);
       });
-      const idx = wrap(Math.round(st.lead.x / W), count) % n;
+      const idx = nearestSlot(f, st.lead.x) % n;
       if (idx !== st.active) {
         st.active = idx;
         setActive(idx);
@@ -205,7 +244,9 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
             st.goal = null;
           }
         } else {
-          stepLead(st.lead, dt, st.frameW, reduced ? 0 : idle, reduced);
+          const f = st.film;
+          const snap = (x: number) => x + offsetTo(f, x, nearestSlot(f, x));
+          stepLead(st.lead, dt, snap, reduced ? 0 : idle, reduced);
         }
       }
       stepFollower(st.follow, st.lead, dt, FOLLOW_RATIO, reduced);
@@ -243,7 +284,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       cancelAnimationFrame(frame);
       el.removeEventListener("wheel", onWheel);
     };
-  }, [count, n, reduced, nudge]);
+  }, [count, n, film, reduced, nudge]);
 
   // Dragging: the lower reel runs the other way, so dragging it moves the upper one inversely.
   const onPointerDown = (strip: number) => (e: React.PointerEvent) => {
@@ -289,11 +330,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
   // Keyboard: focusing a frame brings it to the centre; arrows step between frames.
   const centreOn = (photo: number) => {
     const st = sim.current;
-    const W = st.frameW;
-    const span = count * W;
-    const base = Math.round(st.lead.x / span) * span;
-    const options = [-span, 0, span].map((k) => base + k + photo * W);
-    st.goal = options.reduce((a, b) => (Math.abs(b - st.lead.x) < Math.abs(a - st.lead.x) ? b : a));
+    st.goal = st.lead.x + offsetTo(st.film, st.lead.x, photo);
     nudge();
   };
   const onFrameKey = (photo: number) => (e: React.KeyboardEvent) => {
@@ -344,6 +381,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
                     }}
                     type="button"
                     className={s.frame}
+                    style={{ width: widths[pi] }}
                     tabIndex={real ? 0 : -1}
                     aria-hidden={real ? undefined : true}
                     aria-label={real ? `${photo.alt} Open photograph.` : undefined}
@@ -357,13 +395,19 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
                     <span className={s.holes} data-edge="top" aria-hidden="true" />
                     <span className={s.picture}>
                       {photo.video ? (
-                        <ReelVideo src={photo.video} poster={photo.src} reduced={reduced} />
+                        <ReelVideo
+                          src={photo.video}
+                          poster={photo.src}
+                          focus={photo.frame?.focus}
+                          reduced={reduced}
+                        />
                       ) : (
                         <Image
                           src={photo.src}
                           alt=""
                           fill
-                          sizes="320px"
+                          sizes="360px"
+                          style={{ objectPosition: photo.frame?.focus }}
                           draggable={false}
                           priority={si === 0 && fi < 6}
                         />

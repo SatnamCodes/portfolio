@@ -13,6 +13,7 @@ export type GalleryPhoto = {
   id: string;
   src: string;
   video?: string;
+  frame?: { aspect: number; focus: string };
   width: number;
   height: number;
   alt: string;
@@ -32,6 +33,42 @@ function Details({ photo, className }: { photo: GalleryPhoto; className?: string
       {photo.place && <p className={s.meta}>{photo.place}</p>}
       {photo.kit && <p className={s.meta}>{photo.kit}</p>}
     </div>
+  );
+}
+
+// Star trails for the viewer's backdrop: arcs of a long exposure around the pole, seeded so the
+// sky is the same on every render (server and client).
+const TRAILS = (() => {
+  let seed = 7;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  return Array.from({ length: 380 }, () => {
+    const r = 18 + Math.pow(rand(), 0.65) * 1000;
+    const from = rand() * Math.PI * 2;
+    const to = from + (0.12 + rand() * 0.5) * (1 - 0.4 * (r / 1000));
+    const at = (a: number) => `${(r * Math.cos(a)).toFixed(1)} ${(r * Math.sin(a)).toFixed(1)}`;
+    return {
+      d: `M${at(from)}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${at(to)}`,
+      width: (0.5 + rand() * rand() * 2.2).toFixed(2),
+      opacity: (0.1 + rand() * rand() * 0.55).toFixed(2),
+    };
+  });
+})();
+
+function StarTrails() {
+  return (
+    <svg className={s.trails} viewBox="-1000 -1000 2000 2000" aria-hidden="true">
+      {TRAILS.map((t, i) => (
+        <path
+          key={i}
+          d={t.d}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={t.width}
+          strokeLinecap="round"
+          opacity={t.opacity}
+        />
+      ))}
+    </svg>
   );
 }
 
@@ -101,7 +138,9 @@ export function Viewer({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: reduced ? 0.15 : 0.45 }}
-      />
+      >
+        <StarTrails />
+      </motion.div>
       <div
         className={s.stage}
         onPointerDown={(e) => (swipe.current = { x: e.clientX, y: e.clientY })}

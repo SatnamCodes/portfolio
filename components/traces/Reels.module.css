@@ -21,8 +21,7 @@
    the upper strip covers the figure's crop line. */
 .stage {
   z-index: 1;
-  --frame-w: 300px;
-  --frame-h: calc(var(--frame-w) * 0.8);
+  --frame-h: 240px;
   --gap: 14.5rem;
   position: relative;
   width: 100vw;
@@ -61,7 +60,6 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: var(--frame-w);
   height: var(--frame-h);
   padding: 0;
   border: 0;
@@ -115,13 +113,13 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  /* Each cell is cut to its own picture, so cover rarely crops; `frame.focus` picks the centre. */
+  object-fit: cover;
 }
 
 .picture img {
-  /* Contain, not cover: astrophotographs sit on black, so the whole moon or sun fits the cell and
-     the letterbox reads as sky. */
-  object-fit: contain;
+  /* The cell is sized to the picture, so cover fills it without letterboxing. */
+  object-fit: cover;
   filter: saturate(0.92) contrast(1.02);
 }
 

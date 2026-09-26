@@ -14,16 +14,56 @@ const FOLLOW_DAMPING = 2 * 0.7 * Math.sqrt(FOLLOW_STIFFNESS);
 
 export const wrap = (x: number, span: number) => ((x % span) + span) % span;
 
-export function nearestFrame(x: number, frame: number) {
-  return Math.round(x / frame) * frame;
+/**
+ * The film's layout: each slot's centre along the strip (slot 0 at 0) and the strip's full length.
+ * Positions wrap every `span`.
+ */
+export type Film = { centres: number[]; widths: number[]; span: number };
+
+export function layFilm(widths: number[]): Film {
+  const centres: number[] = [];
+  let at = 0;
+  widths.forEach((w, i) => {
+    at += i === 0 ? 0 : widths[i - 1] / 2 + w / 2;
+    centres.push(at);
+  });
+  return { centres, widths, span: widths.reduce((a, b) => a + b, 0) };
 }
 
-/** Advances the lead reel. `idle` is seconds since the last input; `reduced` removes all inertia. */
-export function stepLead(r: Reel, dt: number, frame: number, idle: number, reduced: boolean) {
+/** Signed distance from `x` to slot `i`, taking the shorter way round the loop. */
+export function offsetTo(film: Film, x: number, i: number) {
+  return wrap(film.centres[i] - x + film.span / 2, film.span) - film.span / 2;
+}
+
+/** The slot whose centre is closest to `x`. */
+export function nearestSlot(film: Film, x: number) {
+  let best = 0;
+  let bestD = Infinity;
+  for (let i = 0; i < film.centres.length; i++) {
+    const d = Math.abs(offsetTo(film, x, i));
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
+/**
+ * Advances the lead reel. `nearest` maps a position to the centre of the closest frame (frames can
+ * differ in width); `idle` is seconds since the last input; `reduced` removes all inertia.
+ */
+export function stepLead(
+  r: Reel,
+  dt: number,
+  nearest: (x: number) => number,
+  idle: number,
+  reduced: boolean,
+) {
   const h = Math.min(dt, 1 / 30);
   if (reduced) {
     r.v = 0;
-    r.x = nearestFrame(r.x, frame);
+    r.x = nearest(r.x);
     return;
   }
   if (idle > IDLE_AFTER) {
@@ -32,7 +72,7 @@ export function stepLead(r: Reel, dt: number, frame: number, idle: number, reduc
   } else {
     r.v *= Math.exp(-FRICTION * h);
     if (Math.abs(r.v) < SNAP_BELOW) {
-      const a = SNAP_STIFFNESS * (nearestFrame(r.x, frame) - r.x) - SNAP_DAMPING * r.v;
+      const a = SNAP_STIFFNESS * (nearest(r.x) - r.x) - SNAP_DAMPING * r.v;
       r.v += a * h;
     }
   }

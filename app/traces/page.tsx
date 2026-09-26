@@ -13,7 +13,7 @@ import s from "./traces.module.css";
 export const metadata: Metadata = pageMetadata({
   title: "Traces",
   description:
-    "Astrophotography by Satnam: the moon, the sun and its sunspots, Saturn and the Orion Nebula, shown on two reels of film.",
+    "Astrophotography by Satnam: the moon, the sun and its sunspots, Saturn, Jupiter and its moons and the Orion Nebula, shown on a reel of film.",
   path: "/traces",
   type: "website",
 });
@@ -23,6 +23,7 @@ export default function TracesPage() {
     id: p.id,
     src: p.src,
     video: p.video,
+    frame: p.frame,
     width: p.width,
     height: p.height,
     alt: p.alt,
