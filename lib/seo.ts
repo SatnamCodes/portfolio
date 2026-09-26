@@ -36,8 +36,9 @@ type PageMeta = {
   published?: string;
   modified?: string;
   noindex?: boolean;
-  /** A page's own share card (a writing's animation); section pages leave it out and get the banner. */
-  image?: { url: string; alt: string };
+  /** The page has its own opengraph-image route (a writing's card); section pages leave this out
+   *  and share the banner. */
+  ownCard?: boolean;
 };
 
 // The site's share card (app/opengraph-image.jpg). Repeated per page because a page's own openGraph
@@ -58,10 +59,11 @@ export function pageMetadata({
   published,
   modified,
   noindex,
-  image,
+  ownCard,
 }: PageMeta): Metadata {
   const url = absolute(path);
-  const card = image ? { ...image, width: 1200, height: 630 } : SHARE_IMAGE;
+  // A page with its own card leaves `images` out, so its opengraph-image route supplies it.
+  const images = ownCard ? {} : { images: [SHARE_IMAGE] };
   return {
     ...(title ? { title } : {}),
     description,
@@ -73,7 +75,7 @@ export function pageMetadata({
       locale: "en_GB",
       ...(title ? { title } : {}),
       description,
-      images: [card],
+      ...images,
       ...(type === "article" && published
         ? { publishedTime: published, ...(modified ? { modifiedTime: modified } : {}) }
         : {}),
@@ -82,7 +84,7 @@ export function pageMetadata({
       card: "summary_large_image",
       ...(title ? { title } : {}),
       description,
-      images: [card],
+      ...images,
     },
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
   };
