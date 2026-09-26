@@ -49,10 +49,61 @@ const TRAILS = (() => {
     return {
       d: `M${at(from)}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${at(to)}`,
       width: (0.5 + rand() * rand() * 2.2).toFixed(2),
-      opacity: (0.1 + rand() * rand() * 0.55).toFixed(2),
+      opacity: (0.15 + rand() * rand() * 0.55).toFixed(2),
     };
   });
 })();
+
+// A tree at the viewer's left edge, drawn once: a trunk that forks and tapers into twigs, each
+// branch bending a little as it goes. Seeded like the trails, so it's the same tree every time.
+const TREE = (() => {
+  let seed = 11;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  const out: { d: string; w: number }[] = [];
+  const grow = (x: number, y: number, angle: number, len: number, w: number, depth: number) => {
+    const bend = (rand() - 0.5) * 0.5;
+    const mx = x + Math.cos(angle + bend) * len * 0.5;
+    const my = y + Math.sin(angle + bend) * len * 0.5;
+    const ex = x + Math.cos(angle) * len;
+    const ey = y + Math.sin(angle) * len;
+    out.push({
+      d: `M${x.toFixed(1)} ${y.toFixed(1)}Q${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`,
+      w,
+    });
+    if (depth === 0 || w < 0.5) return;
+    const kids = depth > 6 ? 2 : rand() < 0.35 ? 3 : 2;
+    for (let k = 0; k < kids; k++) {
+      const spread = (k / (kids - 1 || 1) - 0.5) * (0.7 + rand() * 0.5);
+      // Branches lean towards the light, up and into the frame.
+      const a = angle + spread + (rand() - 0.5) * 0.35 + 0.05;
+      grow(ex, ey, a, len * (0.68 + rand() * 0.16), w * (0.62 + rand() * 0.1), depth - 1);
+    }
+  };
+  grow(-230, 1000, -Math.PI / 2 + 0.08, 230, 26, 10);
+  return out;
+})();
+
+function Tree() {
+  return (
+    <svg
+      className={s.tree}
+      viewBox="-260 0 760 1000"
+      preserveAspectRatio="xMinYMax meet"
+      aria-hidden="true"
+    >
+      {TREE.map((b, i) => (
+        <path
+          key={i}
+          d={b.d}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={b.w}
+          strokeLinecap="round"
+        />
+      ))}
+    </svg>
+  );
+}
 
 function StarTrails() {
   return (
@@ -140,6 +191,7 @@ export function Viewer({
         transition={{ duration: reduced ? 0.15 : 0.45 }}
       >
         <StarTrails />
+        <Tree />
       </motion.div>
       <div
         className={s.stage}

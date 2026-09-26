@@ -103,6 +103,24 @@
   animation: trails-turn 240s linear infinite;
 }
 
+/* A tree against the long exposure, rooted at the bottom left, still while the sky turns. */
+.tree {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: min(92svh, 60rem);
+  width: auto;
+  color: var(--color-espresso);
+  opacity: 0.88;
+}
+
+@media (max-width: 47.99rem) {
+  .tree {
+    height: 55svh;
+    opacity: 0.35;
+  }
+}
+
 @keyframes trails-turn {
   to {
     rotate: 360deg;
@@ -153,6 +171,8 @@
 /* The photograph sits on the cream like a print: a thin dark mount and a soft shadow. */
 .viewer .frame {
   background: #000;
+  border-radius: 14px;
+  overflow: hidden;
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--color-espresso) 60%, transparent),
     0 24px 60px -20px color-mix(in srgb, var(--color-espresso) 55%, transparent);
