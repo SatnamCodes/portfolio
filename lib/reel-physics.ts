@@ -51,7 +51,8 @@ export function nearestSlot(film: Film, x: number) {
 
 /**
  * Advances the lead reel. `nearest` maps a position to the centre of the closest frame (frames can
- * differ in width); `idle` is seconds since the last input; `reduced` removes all inertia.
+ * differ in width); `idle` is seconds since the last input; `reduced` removes all inertia; `dir` is
+ * the way the film idles, so it carries on the way it was last pushed instead of turning back.
  */
 export function stepLead(
   r: Reel,
@@ -59,6 +60,7 @@ export function stepLead(
   nearest: (x: number) => number,
   idle: number,
   reduced: boolean,
+  dir = 1,
 ) {
   const h = Math.min(dt, 1 / 30);
   if (reduced) {
@@ -68,7 +70,7 @@ export function stepLead(
   }
   if (idle > IDLE_AFTER) {
     // Running on its own: ease towards a slow constant speed, never snapping.
-    r.v += (IDLE_SPEED - r.v) * Math.min(1, h * 1.5);
+    r.v += (IDLE_SPEED * dir - r.v) * Math.min(1, h * 1.5);
   } else {
     r.v *= Math.exp(-FRICTION * h);
     if (Math.abs(r.v) < SNAP_BELOW) {

@@ -2,7 +2,7 @@
 
 import { AnimatePresence, MotionConfig } from "motion/react";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   IDLE_AFTER,
   layFilm,
@@ -21,11 +21,10 @@ import { asset } from "@/lib/base-path";
 
 // The lower reel counter-runs at this fraction of the upper one.
 const FOLLOW_RATIO = 0.82;
-// A frame crossing the centre under momentum is caught there for a moment, then flung on with the
-// speed it arrived with: a catapult, not a stop.
-const CATCH_FOR = 0.14; // s
-const CATCH_ABOVE = 140; // px/s: slower than this, the ordinary snap takes over
-const FLING = 1.08;
+// A frame crossing the centre under momentum gives the film a small notch: it slows a touch as each
+// picture passes the middle, like a detent, without ever stopping or jumping back.
+const NOTCH = 0.9;
+const NOTCH_ABOVE = 140; // px/s: slower than this, the ordinary snap takes over
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/·—";
 const pad = (n: number) => String(n).padStart(2, "0");
 // Share of a cell's height the picture takes (the rest is sprocket holes), and its side margins.
@@ -46,32 +45,12 @@ function detailLines(p: GalleryPhoto, i: number, n: number) {
   ];
 }
 
-// A reel on the film: muted, looping, and only playing while that frame is on screen.
-function ReelVideo({
-  src,
-  poster,
-  focus,
-  reduced,
-}: {
-  src: string;
-  poster: string;
-  focus?: string;
-  reduced: boolean;
-}) {
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const v = ref.current;
-    if (!v || reduced) return;
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) v.play().catch(() => {});
-      else v.pause();
-    });
-    io.observe(v);
-    return () => io.disconnect();
-  }, [reduced]);
+// A reel on the film: muted and looping. Only the centred one plays (the film loop starts and stops
+// them); a dozen videos decoding at once is what made the film stutter.
+function ReelVideo({ src, poster, focus }: { src: string; poster: string; focus?: string }) {
   return (
     <video
-      ref={ref}
+      data-reel=""
       src={asset(src)}
       poster={asset(poster)}
       muted
@@ -84,6 +63,66 @@ function ReelVideo({
     />
   );
 }
+
+// One cell of film. Memoised: the centred frame changes many times a second in a flick, and
+// re-rendering every cell each time was a large part of the stutter.
+const FilmFrame = memo(function FilmFrame({
+  photo,
+  index,
+  width,
+  real,
+  priority,
+  onOpen,
+  onCentre,
+  onKey,
+  register,
+}: {
+  photo: GalleryPhoto;
+  index: number;
+  width: number;
+  real: boolean;
+  priority: boolean;
+  onOpen: (photo: number) => void;
+  onCentre: (photo: number) => void;
+  onKey: (photo: number, e: React.KeyboardEvent) => void;
+  register: (photo: number, el: HTMLButtonElement | null) => void;
+}) {
+  return (
+    <button
+      ref={real ? (el) => register(index, el) : undefined}
+      type="button"
+      className={s.frame}
+      style={{ width }}
+      data-photo={index}
+      tabIndex={real ? 0 : -1}
+      aria-hidden={real ? undefined : true}
+      aria-label={real ? `${photo.alt} Open photograph.` : undefined}
+      onFocus={real ? () => onCentre(index) : undefined}
+      onKeyDown={real ? (e) => onKey(index, e) : undefined}
+      onClick={() => onOpen(index)}
+    >
+      <span className={s.holes} data-edge="top" aria-hidden="true" />
+      <span className={s.picture}>
+        {photo.video ? (
+          <ReelVideo src={photo.video} poster={photo.src} focus={photo.frame?.focus} />
+        ) : (
+          <Image
+            src={photo.src}
+            alt=""
+            fill
+            sizes="360px"
+            style={{ objectPosition: photo.frame?.focus }}
+            draggable={false}
+            priority={priority}
+          />
+        )}
+      </span>
+      <span className={s.holes} data-edge="bottom" aria-hidden="true">
+        <span className={s.edgeMark}>{pad(index + 1)}A</span>
+      </span>
+    </button>
+  );
+});
 
 export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.ReactNode }) {
   const reduced = useReducedMotion();
@@ -118,7 +157,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
     follow: { x: 0, v: 0 } as Reel,
     goal: null as number | null,
     lastInput: -Infinity,
-    caught: null as null | { x: number; v: number; until: number },
+    dir: 1,
     drag: null as null | { strip: number; x: number; t: number; v: number; moved: number },
     film: layFilm([300]) as Film,
     active: -1,
@@ -139,7 +178,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       const w = el.clientWidth;
       const section = el.parentElement!;
       section.style.setProperty("--details-top", `${el.offsetTop + el.offsetHeight / 2}px`);
-      const h = Math.round(Math.min(256, window.innerHeight * 0.27, Math.max(144, w * 0.152)));
+      const h = Math.round(Math.min(330, window.innerHeight * 0.33, Math.max(160, w * 0.175)));
       el.style.setProperty("--frame-h", `${h}px`);
       // A fixed perspective pulls the bent ends in from the edges on wide screens; scale it so the
       // film always runs off both sides.
@@ -225,17 +264,20 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
           kid.style.visibility = "";
           kid.style.transform = `translate3d(${c.x - W / 2}px, ${c.y}px, ${c.z}px) rotateY(${c.rotateY}deg) skewX(${skew}deg)`;
         }
-        const b = reduced ? 0 : Math.min(6, Math.abs(reel.v) / 420);
-        strip.style.filter = b > 0.35 ? `url(#reel-blur-${si})` : "";
-        document
-          .getElementById(`reel-blur-${si}`)
-          ?.querySelector("feGaussianBlur")
-          ?.setAttribute("stdDeviation", `${b.toFixed(2)} 0`);
       });
-      const idx = nearestSlot(f, st.lead.x) % n;
+      const slot = nearestSlot(f, st.lead.x);
+      const idx = slot % n;
       if (idx !== st.active) {
         st.active = idx;
         setActive(idx);
+        const kids = strips.current[0]?.children;
+        if (kids)
+          for (let i = 0; i < kids.length; i++) {
+            const v = kids[i].querySelector<HTMLVideoElement>("video[data-reel]");
+            if (!v) continue;
+            if (i === slot && !reduced) v.play().catch(() => {});
+            else if (!v.paused) v.pause();
+          }
       }
     };
 
@@ -244,15 +286,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       last = now;
       const idle = now / 1000 - st.lastInput;
       const f = st.film;
-      if (st.caught && !st.drag) {
-        // Held on the centre; the momentum is kept, not spent.
-        st.lead.x = st.caught.x;
-        st.lead.v = 0;
-        if (now / 1000 >= st.caught.until) {
-          st.lead.v = st.caught.v * FLING;
-          st.caught = null;
-        }
-      } else if (!st.drag) {
+      if (!st.drag) {
         if (st.goal !== null) {
           const k = 90;
           const a = k * (st.goal - st.lead.x) - 2 * Math.sqrt(k) * st.lead.v;
@@ -266,20 +300,13 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
         } else {
           const snap = (x: number) => x + offsetTo(f, x, nearestSlot(f, x));
           const from = st.lead.x;
-          stepLead(st.lead, dt, snap, reduced ? 0 : idle, reduced);
-          // Did a frame's centre pass the middle during a flick? Catch it there.
-          if (!reduced && idle < IDLE_AFTER && Math.abs(st.lead.v) > CATCH_ABOVE) {
+          stepLead(st.lead, dt, snap, reduced ? 0 : idle, reduced, st.dir);
+          // A picture passing the middle during a flick: a small notch in the film's speed.
+          if (!reduced && idle < IDLE_AFTER && Math.abs(st.lead.v) > NOTCH_ABOVE) {
             const slot = nearestSlot(f, st.lead.x);
             const before = offsetTo(f, from, slot);
             const after = offsetTo(f, st.lead.x, slot);
-            if (before * after < 0 && Math.abs(before) < f.widths[slot]) {
-              st.caught = {
-                x: st.lead.x + after,
-                v: st.lead.v,
-                until: now / 1000 + CATCH_FOR,
-              };
-              st.lead.x = st.caught.x;
-            }
+            if (before * after < 0) st.lead.v *= NOTCH;
           }
         }
       }
@@ -308,8 +335,8 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       e.preventDefault();
       st.goal = null;
       const push = d * (e.deltaMode === 1 ? 40 : 2.4);
-      if (st.caught) st.caught.v = Math.max(-2400, Math.min(2400, st.caught.v + push));
-      else st.lead.v = Math.max(-2400, Math.min(2400, st.lead.v + push));
+      st.lead.v = Math.max(-2400, Math.min(2400, st.lead.v + push));
+      st.dir = Math.sign(push) || st.dir;
       nudge();
     };
     el.addEventListener("wheel", onWheel, { passive: false });
@@ -326,7 +353,6 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
   const onPointerDown = (strip: number) => (e: React.PointerEvent) => {
     if (e.button !== 0) return;
     sim.current.drag = { strip, x: e.clientX, t: e.timeStamp, v: 0, moved: 0 };
-    sim.current.caught = null;
     sim.current.goal = null;
     // No pointer capture yet: capturing now would send the click to the strip instead of the
     // photo under the mouse. It's taken once the pointer actually starts to drag (below).
@@ -351,6 +377,7 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
     const d = sim.current.drag;
     if (!d) return;
     sim.current.lead.v = d.v;
+    if (Math.abs(d.v) > 20) sim.current.dir = Math.sign(d.v);
     sim.current.drag = null;
     nudge();
     // A real drag shouldn't also count as a click on the frame under the pointer.
@@ -365,17 +392,30 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
   };
 
   // Keyboard: focusing a frame brings it to the centre; arrows step between frames.
-  const centreOn = (photo: number) => {
-    const st = sim.current;
-    st.goal = st.lead.x + offsetTo(st.film, st.lead.x, photo);
-    nudge();
-  };
-  const onFrameKey = (photo: number) => (e: React.KeyboardEvent) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-    e.preventDefault();
-    const next = (photo + (e.key === "ArrowRight" ? 1 : -1) + n) % n;
-    realButtons.current[next]?.focus();
-  };
+  const centreOn = useCallback(
+    (photo: number) => {
+      const st = sim.current;
+      st.goal = st.lead.x + offsetTo(st.film, st.lead.x, photo);
+      nudge();
+    },
+    [nudge],
+  );
+  const onFrameKey = useCallback(
+    (photo: number, e: React.KeyboardEvent) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
+      const next = (photo + (e.key === "ArrowRight" ? 1 : -1) + n) % n;
+      realButtons.current[next]?.focus();
+    },
+    [n],
+  );
+  const openFrame = useCallback((photo: number) => {
+    returnTo.current = photo;
+    setOpen(photo);
+  }, []);
+  const register = useCallback((photo: number, el: HTMLButtonElement | null) => {
+    realButtons.current[photo] = el;
+  }, []);
 
   const restoreFocus = () => {
     if (returnTo.current !== null)
@@ -385,13 +425,6 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
   return (
     <MotionConfig reducedMotion="user">
       <section className={s.reels} aria-label="Traces, as two reels of film">
-        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
-          {[0, 1].map((i) => (
-            <filter key={i} id={`reel-blur-${i}`} x="-10%" y="0" width="120%" height="100%">
-              <feGaussianBlur stdDeviation="0 0" />
-            </filter>
-          ))}
-        </svg>
         {lead}
         <div ref={stage} className={s.stage}>
           {frames.slice(0, 1).map((list, si) => (
@@ -407,58 +440,20 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
               onPointerUp={onPointerUp}
               onPointerCancel={onPointerUp}
             >
-              {list.map((pi, fi) => {
-                const photo = photos[pi];
-                const real = si === 0 && fi < n;
-                return (
-                  <button
-                    key={fi}
-                    ref={(el) => {
-                      if (real) realButtons.current[pi] = el;
-                    }}
-                    type="button"
-                    className={s.frame}
-                    style={{ width: widths[pi] }}
-                    tabIndex={real ? 0 : -1}
-                    aria-hidden={real ? undefined : true}
-                    aria-label={real ? `${photo.alt} Open photograph.` : undefined}
-                    onFocus={real ? () => centreOn(pi) : undefined}
-                    onKeyDown={real ? onFrameKey(pi) : undefined}
-                    onClick={() => {
-                      returnTo.current = pi;
-                      setOpen(pi);
-                    }}
-                  >
-                    <span className={s.holes} data-edge="top" aria-hidden="true" />
-                    <span className={s.picture}>
-                      {photo.video ? (
-                        <ReelVideo
-                          src={photo.video}
-                          poster={photo.src}
-                          focus={photo.frame?.focus}
-                          reduced={reduced}
-                        />
-                      ) : (
-                        <Image
-                          src={photo.src}
-                          alt=""
-                          fill
-                          sizes="360px"
-                          style={{ objectPosition: photo.frame?.focus }}
-                          draggable={false}
-                          priority={si === 0 && fi < 6}
-                        />
-                      )}
-                    </span>
-                    <span className={s.holes} data-edge="bottom" aria-hidden="true">
-                      <span className={s.edgeMark}>
-                        {pad(pi + 1)}
-                        {si === 0 ? "A" : "B"}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
+              {list.map((pi, fi) => (
+                <FilmFrame
+                  key={fi}
+                  photo={photos[pi]}
+                  index={pi}
+                  width={widths[pi]}
+                  real={fi < n}
+                  priority={fi < 6}
+                  onOpen={openFrame}
+                  onCentre={centreOn}
+                  onKey={onFrameKey}
+                  register={register}
+                />
+              ))}
             </div>
           ))}
         </div>

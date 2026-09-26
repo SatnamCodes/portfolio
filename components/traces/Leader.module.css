@@ -16,7 +16,7 @@
 .figure {
   width: auto;
   /* Sized so the figure, the line and the whole film strip fit on the first screen. */
-  height: clamp(9rem, min(9rem + 21vw, 100svh - 38rem), 28rem);
+  height: clamp(9rem, min(9rem + 21vw, 100svh - 43rem), 26rem);
   /* Rises out of the film on arrival, coming into focus. */
   animation: rise-from-film 1.3s var(--ease-out) 0.2s both;
 }
