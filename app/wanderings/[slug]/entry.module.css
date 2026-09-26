@@ -85,18 +85,29 @@
   }
 }
 
-/* The Punjabi translation: Gurmukhi in both the notebook and the article view. Letter-spacing
-   would break the headline stroke that joins Gurmukhi letters, so it is turned off. */
+/* The Punjabi translation. Notebook: a rounder pen-like Gurmukhi, slanted as if written quickly,
+   in the same seeded ink drift as the English. Article: the book serif, upright. Letter-spacing
+   would break the headline stroke that joins Gurmukhi letters, so it is off in both. */
 .punjabi.punjabi :is(h1, h2, h3, p, li, blockquote, span) {
-  font-family: var(--font-gurmukhi), var(--font-body);
+  font-family: var(--font-gurmukhi-hand), var(--font-gurmukhi), var(--font-body);
+  font-style: oblique 7deg;
   letter-spacing: normal;
 }
 
 .punjabi.punjabi :is(p, li) {
-  line-height: 1.9;
+  line-height: 1.95;
 }
 
 .punjabi .title {
   font-size: clamp(2.1rem, 1.4rem + 3vw, 3.75rem);
   line-height: 1.35;
+}
+
+[data-plain] .punjabi.punjabi :is(h1, h2, h3, p, li, blockquote, span) {
+  font-family: var(--font-gurmukhi), var(--font-body);
+  font-style: normal;
+}
+
+[data-plain] .punjabi.punjabi :is(p, li) {
+  line-height: 1.85;
 }

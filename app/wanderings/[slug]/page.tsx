@@ -113,11 +113,18 @@ export default async function WanderingEntry({ params }: { params: Promise<{ slu
             english
           )}
         </article>
-        {/* The ending picks words out of the English text, so it plays only with the English. */}
+        {/* The ending picks its words out of the text on screen, so each language has its own. */}
         {meta.ending === "feynman" && (
-          <OnlyIn lang="en">
-            <Unravel articleId="essay" />
-          </OnlyIn>
+          <>
+            <OnlyIn lang="en">
+              <Unravel articleId="essay" />
+            </OnlyIn>
+            {punjabi && (
+              <OnlyIn lang="pa">
+                <Unravel articleId="essay" lang="pa" />
+              </OnlyIn>
+            )}
+          </>
         )}
       </PlainTypeFrame>
     </Page>

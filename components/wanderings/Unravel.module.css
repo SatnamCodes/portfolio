@@ -64,6 +64,16 @@
   color: var(--color-ink-muted);
 }
 
+/* The Punjabi ending: Gurmukhi, and no italic slant on the attribution. */
+.quote[data-lang="pa"] :is(p, footer) {
+  font-family: var(--font-gurmukhi), var(--font-display);
+  line-height: 1.5;
+}
+
+.quote[data-lang="pa"] footer {
+  font-style: normal;
+}
+
 /* The end of the essay: once this is fully on screen (and stays), the ending plays. */
 .sentinel {
   height: 1px;

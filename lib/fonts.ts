@@ -4,6 +4,7 @@ import {
   Kalam,
   La_Belle_Aurore,
   Newsreader,
+  Baloo_Paaji_2,
   Tiro_Gurmukhi,
 } from "next/font/google";
 
@@ -65,6 +66,16 @@ export const gurmukhi = Tiro_Gurmukhi({
   fallback: ["Noto Serif Gurmukhi", "Raavi", "serif"],
 });
 
-export const fontVariables = [display, body, meta, fountain, gel, gurmukhi]
+// The Punjabi notebook: a rounder, pen-like Gurmukhi for the handwritten view. Loaded only when shown.
+export const gurmukhiHand = Baloo_Paaji_2({
+  subsets: ["gurmukhi"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-gurmukhi-hand",
+  preload: false,
+  fallback: ["Noto Sans Gurmukhi", "Raavi", "sans-serif"],
+});
+
+export const fontVariables = [display, body, meta, fountain, gel, gurmukhi, gurmukhiHand]
   .map((f) => f.variable)
   .join(" ");

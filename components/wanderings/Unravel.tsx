@@ -14,24 +14,73 @@ import s from "./Unravel.module.css";
 // overlay (thousands of DOM letters would be too heavy for a phone); only words near the screen
 // become letters.
 
-const QUOTE = ["What", "I", "cannot", "create,", "I", "do", "not", "understand."];
-const ATTRIBUTION = "Richard Feynman, on his blackboard at Caltech, 1988";
+type Ending = {
+  // The quote, word by word as it is laid out.
+  quote: string[];
+  attribution: string;
+  // Each quote word taken from the essay, and the exact place in the essay it comes from.
+  sources: { word: string; phrase: string }[];
+  // Quote slots the source words fill (index into quote).
+  slot: number[];
+  // The one word not taken from the essay: built from drifting letters, then its trailing mark.
+  build: { slot: number; parts: string[]; trailing: string };
+  // Where the quote breaks onto a second line on a narrow screen.
+  split: number;
+  // The typeface the settled quote is set in.
+  fontVar: string;
+};
+
+const ENDINGS: Record<"en" | "pa", Ending> = {
+  en: {
+    quote: ["What", "I", "cannot", "create,", "I", "do", "not", "understand."],
+    attribution: "Richard Feynman, on his blackboard at Caltech, 1988",
+    sources: [
+      { word: "What", phrase: "What had actually happened was closer to the opposite of closure" },
+      { word: "I", phrase: "I reacted to that headline in the same way most people did" },
+      { word: "cannot", phrase: "The feeling of the institutions cannot be described as fear" },
+      { word: "I", phrase: "I still remember what studying used to feel like" },
+      { word: "do", phrase: "Some students have started to do assignments" },
+      { word: "not", phrase: "He did not hand me a conclusion" },
+      { word: "understand", phrase: "until they actually understand it" },
+    ],
+    slot: [0, 1, 2, 4, 5, 6, 7],
+    build: { slot: 3, parts: ["c", "r", "e", "a", "t", "e"], trailing: "," },
+    split: 4,
+    fontVar: "--font-display",
+  },
+  // The Punjabi translation: "ਜੋ ਮੈਂ ਬਣਾ ਨਹੀਂ ਸਕਦਾ, ਉਹ ਮੈਨੂੰ ਸਮਝ ਨਹੀਂ ਆਉਂਦਾ।" Its words come from
+  // the matching places in content/wanderings/pa/what-survives-the-answer.mdx; "ਬਣਾ" is built.
+  pa: {
+    quote: ["ਜੋ", "ਮੈਂ", "ਬਣਾ", "ਨਹੀਂ", "ਸਕਦਾ,", "ਉਹ", "ਮੈਨੂੰ", "ਸਮਝ", "ਨਹੀਂ", "ਆਉਂਦਾ।"],
+    attribution: "ਰਿਚਰਡ ਫਾਈਨਮੈਨ, ਕੈਲਟੈਕ ਵਿੱਚ ਆਪਣੇ ਬਲੈਕਬੋਰਡ 'ਤੇ, 1988",
+    sources: [
+      { word: "ਜੋ", phrase: "ਜੋ ਅਸਲ ਵਿੱਚ ਹੋਇਆ ਸੀ" },
+      { word: "ਮੈਂ", phrase: "ਮੈਂ ਵੀ ਉਸ ਸੁਰਖ਼ੀ" },
+      { word: "ਨਹੀਂ", phrase: "ਨਤੀਜਾ ਨਹੀਂ ਫੜਾਇਆ" },
+      { word: "ਸਕਦਾ", phrase: "ਨਾ ਡਰ ਕਿਹਾ ਜਾ ਸਕਦਾ" },
+      { word: "ਉਹ", phrase: "ਉਹ ਵਾਕ ਅਤੇ ਸਾਡੀ" },
+      { word: "ਮੈਨੂੰ", phrase: "ਮੈਨੂੰ ਅੱਜ ਵੀ ਯਾਦ" },
+      { word: "ਸਮਝ", phrase: "ਸੱਚਮੁੱਚ ਸਮਝ ਨਾ" },
+      { word: "ਨਹੀਂ", phrase: "ਸੀ ਹੀ ਨਹੀਂ" },
+      { word: "ਆਉਂਦਾ", phrase: "ਥਾਂ ਤੋਂ ਆਉਂਦਾ" },
+    ],
+    slot: [0, 1, 3, 4, 5, 6, 7, 8, 9],
+    build: { slot: 2, parts: ["ਬ", "ਣਾ"], trailing: "" },
+    split: 5,
+    fontVar: "--font-gurmukhi",
+  },
+};
+
+// Letters as a reader sees them: Gurmukhi vowel signs stay with their consonant.
+const segmenter =
+  typeof Intl !== "undefined" && "Segmenter" in Intl
+    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+    : null;
+const graphemes = (text: string) =>
+  segmenter ? [...segmenter.segment(text)].map((g) => g.segment) : [...text];
+
 // The portrait's box (viewBox 375 × 305).
 const PORTRAIT_RATIO = 305 / 375;
-
-// Each quote word, and the exact place in the essay it comes from.
-const SOURCES: { word: string; phrase: string }[] = [
-  { word: "What", phrase: "What had actually happened was closer to the opposite of closure" },
-  { word: "I", phrase: "I reacted to that headline in the same way most people did" },
-  { word: "cannot", phrase: "The feeling of the institutions cannot be described as fear" },
-  { word: "I", phrase: "I still remember what studying used to feel like" },
-  { word: "do", phrase: "Some students have started to do assignments" },
-  { word: "not", phrase: "He did not hand me a conclusion" },
-  { word: "understand", phrase: "until they actually understand it" },
-];
-// Quote slots the source words fill (index into QUOTE); "create," (3) is built from letters.
-const SLOT = [0, 1, 2, 4, 5, 6, 7];
-const CREATE = ["c", "r", "e", "a", "t", "e"];
 
 type Letter = {
   ch: string;
@@ -67,7 +116,7 @@ function locate(article: HTMLElement, word: string, phrase: string): HTMLElement
       if (
         want.every(
           (wd, j) =>
-            texts[i + j].replace(/[.,:;?!”“"’]+$/g, "") === wd.replace(/[.,:;?!”“"’]+$/g, ""),
+            texts[i + j].replace(/[.,:;?!”“"’।]+$/g, "") === wd.replace(/[.,:;?!”“"’।]+$/g, ""),
         )
       ) {
         const k = want.findIndex((wd) => wd === word);
@@ -78,7 +127,8 @@ function locate(article: HTMLElement, word: string, phrase: string): HTMLElement
   return null;
 }
 
-export function Unravel({ articleId }: { articleId: string }) {
+export function Unravel({ articleId, lang = "en" }: { articleId: string; lang?: "en" | "pa" }) {
+  const E = ENDINGS[lang];
   const overlay = useRef<HTMLCanvasElement>(null);
   const sentinel = useRef<HTMLDivElement>(null);
   const coda = useRef<HTMLElement>(null);
@@ -103,7 +153,7 @@ export function Unravel({ articleId }: { articleId: string }) {
     cv.height = Math.round(vh * dpr);
     const ink = getComputedStyle(article).color;
     const serif =
-      getComputedStyle(document.documentElement).getPropertyValue("--font-display").trim() ||
+      getComputedStyle(document.documentElement).getPropertyValue(E.fontVar).trim() ||
       "Georgia, serif";
     const rand = (() => {
       let x = 42;
@@ -111,7 +161,7 @@ export function Unravel({ articleId }: { articleId: string }) {
     })();
 
     // 1. Letters: every word near the screen becomes letters at its exact place.
-    const chosen = SOURCES.map((src) => locate(article, src.word, src.phrase));
+    const chosen = E.sources.map((src) => locate(article, src.word, src.phrase));
     const letters: Letter[] = [];
     for (const sp of wordsOf(article)) {
       if (chosen.includes(sp)) continue;
@@ -127,7 +177,7 @@ export function Unravel({ articleId }: { articleId: string }) {
       const scale = r.width / total;
       // Ripple upward: lower lines go first.
       const delay = 0.15 + clamp((vh - r.top) / (vh * 1.8)) * 1.6 + rand() * 0.15;
-      for (const ch of text) {
+      for (const ch of graphemes(text)) {
         const cw = ctx.measureText(ch).width * scale;
         if (ch.trim())
           letters.push({
@@ -144,9 +194,9 @@ export function Unravel({ articleId }: { articleId: string }) {
         x += cw;
       }
     }
-    // Six letters for "create", chosen near the middle of the screen.
+    // The built word's letters, chosen near the middle of the screen.
     const taken = new Set<number>();
-    CREATE.forEach((ch, i) => {
+    E.build.parts.forEach((ch, i) => {
       let best = -1,
         bd = Infinity;
       letters.forEach((l, j) => {
@@ -160,16 +210,31 @@ export function Unravel({ articleId }: { articleId: string }) {
       if (best >= 0) {
         taken.add(best);
         letters[best].create = i;
+      } else {
+        // Not on screen as dust: it rises from below instead.
+        letters.push({
+          ch,
+          x: vw * (0.3 + rand() * 0.4),
+          y: vh + 30,
+          vx: 0,
+          vy: 0,
+          rot: 0,
+          vr: (rand() - 0.5) * 2,
+          delay: 0,
+          font: `${Math.min(46, vw * 0.075)}px ${serif}`,
+          create: i,
+        });
       }
     });
 
     // 2. The chosen words, from wherever they are (usually above the screen).
     const words: Word[] = chosen.map((sp, i) => {
-      if (!sp) return { text: SOURCES[i].word, x: vw / 2, y: -40, font: `24px ${serif}`, size: 24 };
+      if (!sp)
+        return { text: E.sources[i].word, x: vw / 2, y: -40, font: `24px ${serif}`, size: 24 };
       const r = sp.getBoundingClientRect();
       const cs = getComputedStyle(sp);
       return {
-        text: SOURCES[i].word,
+        text: E.sources[i].word,
         x: r.left,
         y: r.top + r.height * 0.78,
         font: `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`,
@@ -181,9 +246,11 @@ export function Unravel({ articleId }: { articleId: string }) {
     const size = Math.min(46, vw * 0.075);
     ctx.font = `${size}px ${serif}`;
     const space = ctx.measureText(" ").width;
-    const full = QUOTE.join(" ");
+    const full = E.quote.join(" ");
     const lines =
-      ctx.measureText(full).width > vw * 0.88 ? [QUOTE.slice(0, 4), QUOTE.slice(4)] : [QUOTE];
+      ctx.measureText(full).width > vw * 0.88
+        ? [E.quote.slice(0, E.split), E.quote.slice(E.split)]
+        : [E.quote];
     // The portrait sits above the quote; the whole group is centred on screen.
     const pw = Math.min(440, vw * 0.88, (vh * 0.42) / PORTRAIT_RATIO);
     const ph = pw * PORTRAIT_RATIO;
@@ -191,13 +258,10 @@ export function Unravel({ articleId }: { articleId: string }) {
     const top = (vh - blockH) / 2;
     const quoteTop = top + ph + 28 + size;
     // It starts drawing as the quote finishes forming, as if the dust became the ink.
-    const portraitTimer = setTimeout(
-      () => {
-        from.current = { left: (vw - pw) / 2, top, w: pw };
-        setPortraitBox(from.current);
-      },
-      5100,
-    );
+    const portraitTimer = setTimeout(() => {
+      from.current = { left: (vw - pw) / 2, top, w: pw };
+      setPortraitBox(from.current);
+    }, 5100);
     const slots: { x: number; y: number }[] = [];
     lines.forEach((line, li) => {
       const lw =
@@ -208,16 +272,13 @@ export function Unravel({ articleId }: { articleId: string }) {
         x += ctx.measureText(wd).width + space;
       }
     });
-    const createSlot = slots[3];
+    const createSlot = slots[E.build.slot];
     const createXs: number[] = [];
-    {
-      let x = createSlot.x;
-      for (const ch of "create") {
-        createXs.push(x);
-        x += ctx.measureText(ch).width;
-      }
+    let commaX = createSlot.x;
+    for (const part of E.build.parts) {
+      createXs.push(commaX);
+      commaX += ctx.measureText(part).width;
     }
-    const commaX = createXs[5] + ctx.measureText("e").width;
 
     article.style.transition = "none";
     article.style.opacity = "0";
@@ -271,7 +332,7 @@ export function Unravel({ articleId }: { articleId: string }) {
       }
       // The seven words: glow, then travel into the quote.
       words.forEach((wd, i) => {
-        const slot = slots[SLOT[i]];
+        const slot = slots[E.slot[i]];
         const q = ease(seg(t, 1.5 + i * 0.18, 3.3 + i * 0.18));
         const x = wd.x + (slot.x - wd.x) * q,
           y = wd.y + (slot.y - wd.y) * q;
@@ -280,26 +341,26 @@ export function Unravel({ articleId }: { articleId: string }) {
         ctx.shadowColor = "rgba(214,150,70,0.55)";
         ctx.shadowBlur = 10 * (1 - seg(t, 4.6, 6));
         ctx.font = q < 0.5 ? wd.font : `${size}px ${serif}`;
-        const text = QUOTE[SLOT[i]];
-        // The quote's punctuation (the final ".") arrives with the settled line.
-        const shown = text.endsWith(".") && t < 4.8 ? text.slice(0, -1) : text;
+        const text = E.quote[E.slot[i]];
+        // The quote's closing mark (the final "." or "।") arrives with the settled line.
+        const shown = /[.।]$/.test(text) && t < 4.8 ? text.slice(0, -1) : text;
         ctx.fillText(q < 0.5 ? wd.text : shown, x, y);
         ctx.restore();
       });
       // The comma after "create", and the attribution.
       const punct = seg(t, 4.8, 5.3);
-      if (punct > 0) {
+      if (punct > 0 && E.build.trailing) {
         ctx.globalAlpha = punct;
         ctx.font = `${size}px ${serif}`;
-        ctx.fillText(",", commaX, createSlot.y);
+        ctx.fillText(E.build.trailing, commaX, createSlot.y);
       }
       const att = seg(t, 5.3, 6.2);
       if (att > 0) {
         ctx.globalAlpha = att * 0.85;
-        ctx.font = `italic ${Math.max(13, size * 0.36)}px ${serif}`;
+        ctx.font = `${lang === "pa" ? "" : "italic "}${Math.max(13, size * 0.36)}px ${serif}`;
         ctx.textAlign = "center";
         ctx.fillText(
-          ATTRIBUTION,
+          E.attribution,
           vw / 2,
           quoteTop + (lines.length - 1) * size * 1.25 + size * 0.95,
         );
@@ -345,6 +406,15 @@ export function Unravel({ articleId }: { articleId: string }) {
     return () => io.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduced]);
+
+  // Switching language mid-ending unmounts this one: give the essay back its opacity.
+  useEffect(
+    () => () => {
+      const article = document.getElementById(articleId);
+      if (article) article.style.opacity = "";
+    },
+    [articleId],
+  );
 
   const showStill = reduced || phase === "done";
 
@@ -397,9 +467,9 @@ export function Unravel({ articleId }: { articleId: string }) {
         <div ref={codaPortrait} className={s.portrait}>
           <FeynmanLines />
         </div>
-        <blockquote className={s.quote}>
-          <p>What I cannot create, I do not understand.</p>
-          <footer>{ATTRIBUTION}</footer>
+        <blockquote className={s.quote} lang={lang} data-lang={lang}>
+          <p>{E.quote.join(" ")}</p>
+          <footer>{E.attribution}</footer>
         </blockquote>
       </section>
     </>

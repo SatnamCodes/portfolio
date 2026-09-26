@@ -5,7 +5,6 @@ import s from "./FeynmanLines.module.css";
 // photograph of him at the blackboard, kept to his silhouette (no background). Ink only;
 // with `animate` the lines draw themselves: outline, hair, face, then the smile.
 
-
 export function FeynmanLines({ animate, className }: { animate?: boolean; className?: string }) {
   return (
     <svg
