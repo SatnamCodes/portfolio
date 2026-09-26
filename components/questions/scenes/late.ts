@@ -13,7 +13,6 @@ import {
   seg,
 } from "../engine/core";
 import { caption, circlePts, handwrite, linePts, mathText, type Pt, stroke } from "../engine/ink";
-import { hand } from "../engine/ascii";
 import { glow } from "../engine/texture";
 import { euclid, fieldLines, table, tape, TURING_STATES } from "./geometry";
 
@@ -350,14 +349,14 @@ export function sceneConvergence(e: Env, L: Layout) {
 }
 
 /** 12. The prism: one beam in, seven out; a second, inverted prism gathers the seven back into
- *  white (Newton's own experimentum crucis, run in reverse). Then two hands meet. */
+ *  white (Newton's own experimentum crucis, run in reverse). */
 export function scenePrism(e: Env, L: Layout, colophon: string) {
   const { t, w, h, ctx } = e;
   const lay = illustrationLayout(w, h * 0.9, e.portrait ? w * 0.9 : w * 0.8);
   const shiftY = e.portrait ? h * 0.02 : h * 0.03;
   const P = (p: readonly [number, number]): Pt => [p[0], p[1] + shiftY];
   const [start, entry] = [P(lay.start), P(lay.entry)];
-  const recede = 1 - seg(t, 134, 136.5) * 0.82; // the prisms step back for the hands
+  const recede = 1;
   ctx.save();
   ctx.globalAlpha = recede;
   ctx.lineCap = "round";
@@ -490,9 +489,8 @@ export function scenePrism(e: Env, L: Layout, colophon: string) {
   glow(e, exit[0], exit[1], 36, 0.6 * seg(t, 127.4, 128) * (1 - seg(t, 129.5, 131)));
   ctx.restore();
 
-  hands(e, t);
   // The colophon: the page ends here.
-  const col = seg(t, 141, 143) * 0.8;
+  const col = seg(t, 133.5, 135.5) * 0.8;
   if (colophon) {
     caption(e, colophon, col, w / 2, h - 40, "center");
     stroke(
@@ -506,36 +504,6 @@ export function scenePrism(e: Env, L: Layout, colophon: string) {
       col * 0.5,
     );
   }
-}
-
-/** Two hands in ASCII, after the Sistine ceiling; here the fingers close the gap and touch. */
-function hands(e: Env, t: number) {
-  const a = seg(t, 134.4, 136);
-  if (a <= 0) return;
-  const { ctx, w, h } = e;
-  const cell = e.portrait ? 4 : 5.5;
-  const width = e.portrait ? w * 0.47 : Math.min(w * 0.4, 620);
-  const adam = hand(false, width, cell);
-  const god = hand(true, width, cell);
-  const cy = e.portrait ? h * 0.63 : h * 0.6;
-  const touch = easeInOut(seg(t, 136, 140.5));
-  const gapPx = lerp(w * 0.12, 0, touch);
-  const leftX = w / 2 - gapPx / 2 - adam.tipX;
-  const rightTip = w / 2 + gapPx / 2;
-  ctx.save();
-  // Monospace glyphs are ~0.6 em wide: size the font so one glyph fills one sampled cell.
-  ctx.font = `${cell / 0.6}px ui-monospace, "SF Mono", Menlo, Consolas, monospace`;
-  ctx.textBaseline = "top";
-  ctx.fillStyle = ink(0.75 * a);
-  adam.rows.forEach((r, i) => ctx.fillText(r, leftX, cy - adam.tipY + i * adam.ch));
-  // God's hand is the same drawing mirrored, reaching left.
-  ctx.translate(rightTip, cy - god.tipY);
-  ctx.scale(-1, 1);
-  god.rows.forEach((r, i) => ctx.fillText(r, -god.tipX, i * god.ch));
-  ctx.restore();
-  // The moment of contact.
-  const spark = seg(t, 140.3, 140.8) * (1 - seg(t, 141.5, 143.5));
-  glow(e, w / 2, cy, 40, 0.8 * spark, "255,240,210");
 }
 
 function mix(a: string, b: string, t: number) {

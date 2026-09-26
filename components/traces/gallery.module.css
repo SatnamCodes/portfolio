@@ -116,10 +116,15 @@
   opacity: 0.88;
 }
 
+/* On a phone the tree stands full size behind the photograph, rooted at the bottom edge and
+   reaching across the screen, rather than shrunk into the space beside it. */
 @media (max-width: 47.99rem) {
   .tree {
-    height: 55svh;
-    opacity: 0.35;
+    left: -38vw;
+    bottom: 0;
+    height: 80svh;
+    max-width: none;
+    opacity: 0.32;
   }
 }
 

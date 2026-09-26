@@ -10,7 +10,7 @@ import { clearClouds } from "./engine/points";
 import { finish, grain, paper } from "./engine/texture";
 import { render } from "./scenes";
 import { SOURCES } from "./sources";
-import { AUDIO_SRC, DURATION, sceneAt } from "./timeline";
+import { AUDIO_SRC, DURATION, LEAD_IN, sceneAt } from "./timeline";
 import s from "./TheQuestions.module.css";
 
 const FINAL = "What lies between what we know and what remains unknown?";
@@ -156,12 +156,15 @@ export function TheQuestions({ colophon }: { colophon: string }) {
     };
     (el as HTMLElement & { __wake?: () => void }).__wake = wake;
 
-    // Plays when most of it is on screen; pauses when it leaves.
+    // Plays once a third of it is on screen; pauses when it leaves.
     const io = new IntersectionObserver(
       ([entry]) => {
         c.visible = entry.isIntersecting;
-        if (entry.intersectionRatio >= 0.5 && !c.started) {
+        if (entry.intersectionRatio >= 0.3 && !c.started) {
           c.started = true;
+          // Skip the lead-in (a lone dot before the first question writes itself), so a reader
+          // in a hurry sees something happen straight away.
+          if (c.t === 0) c.t = LEAD_IN;
           c.playing = true;
           setPlaying(true);
           setStarted(true);
@@ -171,7 +174,7 @@ export function TheQuestions({ colophon }: { colophon: string }) {
           audio.current.play().catch(() => {});
         wake();
       },
-      { threshold: [0, 0.5] },
+      { threshold: [0, 0.3] },
     );
     io.observe(el);
     const ro = new ResizeObserver(size);
@@ -225,6 +228,7 @@ export function TheQuestions({ colophon }: { colophon: string }) {
   const togglePlay = () => {
     const c = clock.current;
     if (c.t >= DURATION) return replay();
+    if (c.t === 0) c.t = LEAD_IN;
     c.playing = !c.playing;
     c.started = true;
     setStarted(true);
@@ -249,14 +253,14 @@ export function TheQuestions({ colophon }: { colophon: string }) {
   };
   const replay = () => {
     const c = clock.current;
-    c.seek = 0;
-    c.t = 0;
+    c.seek = LEAD_IN;
+    c.t = LEAD_IN;
     c.playing = true;
     c.started = true;
     setPlaying(true);
     setEnded(false);
     if (audio.current && !muted) {
-      audio.current.currentTime = 0;
+      audio.current.currentTime = LEAD_IN;
       audio.current.play().catch(() => {});
     }
     wake();
