@@ -156,11 +156,12 @@ export function TheQuestions({ colophon }: { colophon: string }) {
     };
     (el as HTMLElement & { __wake?: () => void }).__wake = wake;
 
-    // Plays once a third of it is on screen; pauses when it leaves.
+    // Plays as soon as a sixth of it is on screen (readers rarely wait at the end of a page);
+    // pauses when it leaves.
     const io = new IntersectionObserver(
       ([entry]) => {
         c.visible = entry.isIntersecting;
-        if (entry.intersectionRatio >= 0.3 && !c.started) {
+        if (entry.intersectionRatio >= 0.15 && !c.started) {
           c.started = true;
           // Skip the lead-in (a lone dot before the first question writes itself), so a reader
           // in a hurry sees something happen straight away.
@@ -174,7 +175,7 @@ export function TheQuestions({ colophon }: { colophon: string }) {
           audio.current.play().catch(() => {});
         wake();
       },
-      { threshold: [0, 0.3] },
+      { threshold: [0, 0.15] },
     );
     io.observe(el);
     const ro = new ResizeObserver(size);

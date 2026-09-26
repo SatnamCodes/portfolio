@@ -24,14 +24,14 @@ export function sceneQuestion(e: Env) {
     cy = h * 0.42;
   dot(e, cx, cy, 3.2 * easeOut(seg(t, 0.3, 1.2)), 1 - seg(t, 1.6, 2.4));
   // The engraving: concentric hatching, like the ground of an old portrait plate.
-  const eng = fade(t, 2.6, 4.6, 7.4, 9) * 0.08;
+  const eng = fade(t, 4.4, 6, 7.4, 9) * 0.08;
   if (eng > 0.002) {
     const R = Math.min(w, h) * 0.24;
     for (let i = 0; i < 22; i++)
       stroke(e, circlePts(cx, cy, R * (0.3 + i * 0.033), 90, 0.6, i), 1, 0.5, eng);
   }
-  // Written 2.8–6.4, then held about 1.2 s before it breaks into circle A at 7.6.
-  handwrite(e, Q1, seg(t, 2.8, 6.4), 1 - seg(t, 7.6, 8.4), cx, cy, q1Size(e), "center");
+  // Written quickly (4.6–6.4), then held about 1.2 s before it breaks into circle A at 7.6.
+  handwrite(e, Q1, seg(t, 4.6, 6.4), 1 - seg(t, 7.6, 8.4), cx, cy, q1Size(e), "center");
 }
 
 /** 02. Euclid, Elements I.1: on a given line, construct an equilateral triangle. */
