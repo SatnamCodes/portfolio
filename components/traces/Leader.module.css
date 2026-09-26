@@ -73,3 +73,10 @@
     animation: none;
   }
 }
+
+/* On a phone the intro sits above the figure, not beside it, so the figure mustn't rise into it. */
+@media (max-width: 47.99rem) {
+  .leader {
+    margin-top: 0;
+  }
+}

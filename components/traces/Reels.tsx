@@ -141,6 +141,9 @@ export function Reels({ photos, lead }: { photos: GalleryPhoto[]; lead?: React.R
       section.style.setProperty("--details-top", `${el.offsetTop + el.offsetHeight / 2}px`);
       const h = Math.round(Math.min(256, window.innerHeight * 0.27, Math.max(144, w * 0.152)));
       el.style.setProperty("--frame-h", `${h}px`);
+      // A fixed perspective pulls the bent ends in from the edges on wide screens; scale it so the
+      // film always runs off both sides.
+      el.style.perspective = `${Math.round(Math.max(1400, w * 1.2))}px`;
       setFrameH(h);
       const cycle = photos.reduce((a, p) => a + h * PICTURE_H * aspectOf(p) + PICTURE_MARGIN, 0);
       setCount(n * Math.max(1, Math.ceil((w * 1.9) / cycle)));
