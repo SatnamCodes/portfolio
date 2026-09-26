@@ -5,8 +5,8 @@
 export const AUDIO_SRC = "/audio/the-questions.mp3";
 
 export const DURATION = 137;
-// Where playback starts: the first question begins writing at 1.2s, after a lone dot.
-export const LEAD_IN = 1.2; // seconds; the last few hold the resting "end of page" frame
+// Where playback starts: the moment the first question begins writing (its lone dot is skipped).
+export const LEAD_IN = 2.8; // seconds
 
 export type SceneId =
   | "question"
@@ -55,7 +55,7 @@ export const CAPTIONS: Record<string, string> = {
 // Narration cues (what the voice says, and when). Also shown as quiet captions, so the piece
 // works silently. Questions are spoken as they appear on screen.
 export const NARRATION: { at: number; text: string; caption?: boolean }[] = [
-  { at: 2.5, text: "What is knowledge?" },
+  { at: 2.9, text: "What is knowledge?" },
   { at: 13.5, text: "What can be known from what we already know?" },
   {
     at: 26,
